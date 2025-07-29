@@ -1,4 +1,4 @@
-import { useState, useEffect,useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
@@ -13,9 +13,10 @@ export default function CalendarEditor() {
   const [gradientStrength, setGradientStrength] = useState("medium"); // 'soft', 'medium', 'hard'
   const [gradientTheme, setGradientTheme] = useState("classic");
   const [backgroundImage, setBackgroundImage] = useState(null);
-const headerRef = useRef();
-const bottomRef = useRef();
+  const headerRef = useRef();
+  const bottomRef = useRef();
   const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
+
 
   const extractColorsFromImage = async (imgUrl) => {
     const fac = new FastAverageColor();
@@ -52,64 +53,76 @@ const bottomRef = useRef();
       img.onerror = reject;
     });
   };
- 
+
+
 
   const handleSaveCalendar = () => {
-  if (style === "style1" || style === "style2") {
-    if (!image) {
-      alert("Brakuje grafiki nagłówka.");
-      return;
+    const token = localStorage.getItem(ACCESS_TOKEN);
+
+  const topImageId = image.id
+  let bottomImageId = null;
+  if(backgroundImage!==null){
+    bottomImageId = backgroundImage.id
+  }
+ 
+
+  let data = {
+    top_image: topImageId,
+    bottom_type: "",
+    bottom_color: null,
+    gradient_start_color: bgColor,
+    gradient_end_color: gradientEndColor,
+    gradient_direction: null,
+    gradient_theme: null,
+    bottom_image: bottomImageId,
+  };
+
+  if (style === "style1") {
+    data.bottom_type = "color";
+    data.bottom_color = bgColor;
+  }
+
+  if (style === "style2") {
+    if (gradientTheme === "classic") {
+      const direction = {
+        diagonal: "to bottom right",
+        vertical: "to bottom",
+        horizontal: "to right",
+        radial: "radial",
+      }[gradientVariant] || "to bottom";
+
+      data.bottom_type = "gradient";
+      data.gradient_start_color = bgColor;
+      data.gradient_end_color = gradientEndColor;
+      data.gradient_direction = direction;
+    } else {
+      data.bottom_type = "theme-gradient";
+      data.gradient_theme = gradientTheme;
     }
-
-    // wygeneruj CSS tła na podstawie stylu
-    let backgroundCss = "";
-
-    if (style === "style1") {
-      backgroundCss = `background-color: ${bgColor};`;
-    }
-
-    if (style === "style2") {
-      if (gradientTheme === "classic") {
-        const direction = {
-          diagonal: "to bottom right",
-          vertical: "to bottom",
-          horizontal: "to right",
-          radial: "radial",
-        }[gradientVariant] || "to bottom";
-
-        const strengthMap = {
-          soft: "60%",
-          medium: "40%",
-          hard: "20%",
-        };
-
-        const strength = strengthMap[gradientStrength] || "40%";
-
-        if (gradientVariant === "radial") {
-          backgroundCss = `background: radial-gradient(circle, ${bgColor} ${strength}, ${gradientEndColor});`;
-        } else {
-          backgroundCss = `background: linear-gradient(${direction}, ${bgColor} ${strength}, ${gradientEndColor});`;
-        }
-      } else {
-        backgroundCss = `background: var(--gradient-${gradientTheme}); /* specjalny motyw */`;
-      }
-    }
-
-    alert(`🔗 Link do nagłówka:\n${image}\n\n🎨 CSS dla tła:\n${backgroundCss}`);
-    console.log("Nagłówek:", image);
-    console.log("Tło (CSS):", backgroundCss);
   }
 
   if (style === "style3") {
-    if (!image || !backgroundImage) {
-      alert("Brakuje obrazów do eksportu");
-      return;
-    }
+    data.bottom_type = "image";
+    data.bottom_image = bottomImageId;
+  }
 
-    alert(`🔗 Linki do obrazów:\nNagłówek: ${image}\nTło: ${backgroundImage}`);
-    console.log("Obrazy kalendarza:", { naglowek: image, tlo: backgroundImage });
+  try {
+    const response =  axios.post(`${apiUrl}/calendars/`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("✅ Utworzono kalendarz:", data);
+    alert("✅ Kalendarz został zapisany!");
+  } catch (error) {
+    console.error("❌ Błąd zapisu:", error.response?.data || error.message);
+    alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
   }
 };
+
+
+
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);
 
@@ -123,8 +136,8 @@ const bottomRef = useRef();
       .catch((err) => console.error("Błąd podczas pobierania obrazów:", err));
   }, []);
 
-  const handleImageSelect = (imgUrl) => {
-    setImage(imgUrl);
+  const handleImageSelect = (img) => {
+    setImage(img);
   };
 
   const handleFileUpload = (e) => {
@@ -197,7 +210,7 @@ const bottomRef = useRef();
 
     if (style === "style3" && backgroundImage) {
       return {
-        background: `url(${backgroundImage}) center/cover no-repeat`,
+        background: `url(${backgroundImage.url}) center/cover no-repeat`,
         color: "white",
       };
     }
@@ -248,7 +261,7 @@ const bottomRef = useRef();
                 src={img.url}
                 alt="Grafika AI"
                 className="cursor-pointer object-cover h-20 w-full border rounded hover:opacity-70"
-                onClick={() => handleImageSelect(img.url)}
+                onClick={() => handleImageSelect(img)}
               />
             ))}
           </div>
@@ -281,7 +294,7 @@ const bottomRef = useRef();
               />
               {image && (
                 <button
-                  onClick={() => extractColorsFromImage(image)}
+                  onClick={() => extractColorsFromImage(image.url)}
                   className="mt-2 w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
                 >
                   Dobierz automatycznie kolory z grafiki
@@ -296,7 +309,7 @@ const bottomRef = useRef();
             <h2 className="text-lg font-semibold mb-2">Ustawienia gradientu</h2>
             {image && (
               <button
-                onClick={() => extractColorsFromImage(image)}
+                onClick={() => extractColorsFromImage(image.url)}
                 className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
               >
                 Dobierz automatycznie kolory z grafiki
@@ -377,9 +390,9 @@ const bottomRef = useRef();
                   key={img.id || img.url}
                   src={img.url}
                   alt="Grafika tła"
-                  className={`cursor-pointer object-cover h-20 w-full border rounded ${backgroundImage === img.url ? "ring-2 ring-blue-500" : ""
+                  className={`cursor-pointer object-cover h-20 w-full border rounded ${backgroundImage === img ? "ring-2 ring-blue-500" : ""
                     }`}
-                  onClick={() => setBackgroundImage(img.url)}
+                  onClick={() => setBackgroundImage(img)}
                 />
               ))}
             </div>
@@ -412,7 +425,7 @@ const bottomRef = useRef();
           {/* Header */}
           <div ref={headerRef} className="h-[252px] bg-gray-200 flex items-center justify-center">
             {image ? (
-              <img src={image} alt="Nagłówek" className="w-full h-full object-cover" />
+              <img src={image.url} alt="Nagłówek" className="w-full h-full object-cover" />
             ) : (
               <span className="text-gray-500">Brak grafiki nagłówka</span>
             )}
@@ -440,13 +453,13 @@ const bottomRef = useRef();
         </div>
       </div>
       <div className="text-center mt-4">
-  <button
-    onClick={handleSaveCalendar}
-    className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm shadow"
-  >
-    Zapisz kalendarz
-  </button>
-</div>
+        <button
+          onClick={handleSaveCalendar}
+          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm shadow"
+        >
+          Zapisz kalendarz
+        </button>
+      </div>
     </div>
   );
 }
