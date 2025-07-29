@@ -7,6 +7,7 @@ import StyleSidebar from "./calendarEditorElements/stylesBar";
 import ImgColor from "./calendarEditorElements/imgAndColor";
 import GradientSettings from "./calendarEditorElements/imgAndFade";
 import BackgroundImg from "./calendarEditorElements/imgAndImg";
+import YearText from "./calendarEditorElements/yearText";
 export default function CalendarEditor() {
   const [style, setStyle] = useState("style1");
   const [bgColor, setBgColor] = useState("#ffffff");
@@ -20,8 +21,18 @@ export default function CalendarEditor() {
   const headerRef = useRef();
   const bottomRef = useRef();
   const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
+  const [yearText, setYearText] = useState("2025");
+  const [yearColor, setYearColor] = useState("#ffffff");
+  const [yearFontSize, setYearFontSize] = useState(32);
+  const [yearPosition, setYearPosition] = useState({
+    preset: "center",
+    coords: null, // null oznacza, że używamy preset
+  });
 
 
+
+  const [yearFontWeight, setYearFontWeight] = useState("bold");
+  const [yearFontFamily, setYearFontFamily] = useState("Arial");
   const extractColorsFromImage = async (imgUrl) => {
     const fac = new FastAverageColor();
     const img = new Image();
@@ -124,7 +135,98 @@ export default function CalendarEditor() {
       alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
     }
   };
+  function getYearPositionStyles(position) {
+    if (position.coords) {
+      return {
+        left: position.coords.x,
+        top: position.coords.y,
+        transform: "translate(-50%, -50%)",
+      };
+    }
 
+    switch (position.preset) {
+      case "top-left":
+        return { top: "10px", left: "10px" };
+      case "top-center":
+        return { top: "10px", left: "50%", transform: "translateX(-50%)" };
+      case "top-right":
+        return { top: "10px", right: "10px" };
+      case "center-left":
+        return { top: "50%", left: "10px", transform: "translateY(-50%)" };
+      case "center":
+        return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+      case "center-right":
+        return { top: "50%", right: "10px", transform: "translateY(-50%)" };
+      case "bottom-left":
+        return { bottom: "10px", left: "10px" };
+      case "bottom-center":
+        return { bottom: "10px", left: "50%", transform: "translateX(-50%)" };
+      case "bottom-right":
+        return { bottom: "10px", right: "10px" };
+      default:
+        return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
+    }
+  }
+  const [dragging, setDragging] = useState(false);
+  const dragStartPos = useRef({ mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
+  const spanRef = useRef(null);
+
+  const onMouseDown = (e) => {
+    e.preventDefault();
+    setDragging(true);
+
+    let startX, startY;
+
+    if (yearPosition.coords) {
+      startX = yearPosition.coords.x;
+      startY = yearPosition.coords.y;
+    } else {
+      // Zamiana preset na konkretne coords
+      const rect = spanRef.current.getBoundingClientRect();
+      const parentRect = spanRef.current.parentElement.getBoundingClientRect();
+
+      startX = rect.left - parentRect.left + rect.width / 2;
+      startY = rect.top - parentRect.top + rect.height / 2;
+
+      setYearPosition({ preset: null, coords: { x: startX, y: startY } });
+    }
+
+    dragStartPos.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      elemX: startX,
+      elemY: startY,
+    };
+  };
+
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      if (!dragging) return;
+
+      const deltaX = e.clientX - dragStartPos.current.mouseX;
+      const deltaY = e.clientY - dragStartPos.current.mouseY;
+
+      setYearPosition({
+        preset: null,
+        coords: {
+          x: dragStartPos.current.elemX + deltaX,
+          y: dragStartPos.current.elemY + deltaY,
+        },
+      });
+    };
+
+    const onMouseUp = () => {
+      if (dragging) setDragging(false);
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [dragging]);
 
 
   useEffect(() => {
@@ -267,18 +369,55 @@ export default function CalendarEditor() {
             setBackgroundImage={setBackgroundImage}
           />
         )}
+
+        <YearText
+          yearText={yearText}
+          setYearText={setYearText}
+          yearColor={yearColor}
+          setYearColor={setYearColor}
+          yearFontSize={yearFontSize}
+          setYearFontSize={setYearFontSize}
+          yearFontFamily={yearFontFamily}
+          setYearFontFamily={setYearFontFamily}
+          yearFontWeight={yearFontWeight}
+          setYearFontWeight={setYearFontWeight}
+          yearPosition={yearPosition}
+          setYearPosition={setYearPosition}
+        />
+
       </div>
-      <div className="lg:col-span-1"/>
+      <div className="lg:col-span-1" />
 
 
-   
+
       {/* Preview area */}
       <div className="lg:col-span-2">
         <div className="border rounded w-[372px] h-[972px] mx-auto bg-white overflow-hidden shadow">
           {/* Header */}
-          <div ref={headerRef} className="h-[252px] bg-gray-200 flex items-center justify-center">
+          <div ref={headerRef} className="relative h-[252px] bg-gray-200 flex items-center justify-center">
             {image ? (
-              <img src={image.url} alt="Nagłówek" className="w-full h-full object-cover" />
+              <>
+                <img src={image.url} alt="Nagłówek" className="w-full h-full object-cover" />
+                {/* Tekst z rokiem */}
+                <span
+                  ref={spanRef}
+                  onMouseDown={onMouseDown}
+                  style={{
+                    position: "absolute",
+                    color: yearColor,
+                    fontSize: `${yearFontSize}px`,
+                    fontWeight: yearFontWeight,
+                    fontFamily: yearFontFamily,
+                    cursor: "move",
+                    userSelect: "none",
+                    whiteSpace: "nowrap",
+                    pointerEvents: "auto",
+                    ...getYearPositionStyles(yearPosition),
+                  }}
+                >
+                  {yearText}
+                </span>
+              </>
             ) : (
               <span className="text-gray-500">Brak grafiki nagłówka</span>
             )}
