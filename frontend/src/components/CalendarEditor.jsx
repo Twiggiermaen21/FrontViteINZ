@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-
+import { useState, useEffect, useRef, Fragment } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { FastAverageColor } from "fast-average-color";
@@ -8,6 +7,30 @@ import ImgColor from "./calendarEditorElements/imgAndColor";
 import GradientSettings from "./calendarEditorElements/imgAndFade";
 import BackgroundImg from "./calendarEditorElements/imgAndImg";
 import YearText from "./calendarEditorElements/yearText";
+
+function useAutoFontSize(text, maxFontSize = 30, minFontSize = 12) {
+  const [fontSize, setFontSize] = useState(maxFontSize);
+  const ref = useRef();
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const lineCount = (text.match(/\n/g) || []).length + 1;
+    const length = text.length;
+
+    let calculatedFontSize = maxFontSize;
+
+    if (lineCount > 1 || length > 40) {
+      calculatedFontSize = Math.max(minFontSize, maxFontSize - lineCount * 2 - Math.floor(length / 50));
+    }
+
+    setFontSize(calculatedFontSize);
+  }, [text, maxFontSize, minFontSize]);
+
+  return [ref, fontSize];
+}
+
+
 export default function CalendarEditor() {
   const [style, setStyle] = useState("style1");
   const [bgColor, setBgColor] = useState("#ffffff");
@@ -28,8 +51,8 @@ export default function CalendarEditor() {
     preset: "center",
     coords: null, // null oznacza, że używamy preset
   });
-
-
+  const [monthTexts, setMonthTexts] = useState(["", "", ""]);
+  const months = ["Grudzień", "Styczeń", "Luty"];
 
   const [yearFontWeight, setYearFontWeight] = useState("bold");
   const [yearFontFamily, setYearFontFamily] = useState("Arial");
@@ -69,7 +92,11 @@ export default function CalendarEditor() {
     });
   };
 
-
+  const handleMonthTextChange = (index, value) => {
+    const newTexts = [...monthTexts];
+    newTexts[index] = value;
+    setMonthTexts(newTexts);
+  };
 
   const handleSaveCalendar = () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
@@ -334,7 +361,7 @@ export default function CalendarEditor() {
         handleImageSelect={handleImageSelect}
         handleFileUpload={handleFileUpload}
       />
-      <div className="lg:col-span-2 ">
+      <div className="lg:col-span-2 space-y-4 ">
         {style === "style1" && (
           <ImgColor
             bgColor={bgColor}
@@ -384,7 +411,22 @@ export default function CalendarEditor() {
           yearPosition={yearPosition}
           setYearPosition={setYearPosition}
         />
-
+        <div className="mt-4 space-y-3">
+          {months.map((month, index) => (
+            <div key={index}>
+              <label className="block text-sm font-medium text-gray-700">
+                Tekst pod miesiącem {month}
+              </label>
+              <input
+                type="text"
+                value={monthTexts[index]}
+                onChange={(e) => handleMonthTextChange(index, e.target.value)}
+                className="w-full border rounded px-2 py-1 text-sm"
+                placeholder={`Tekst pod ${month}`}
+              />
+            </div>
+          ))}
+        </div>
       </div>
       <div className="lg:col-span-1" />
 
@@ -425,21 +467,54 @@ export default function CalendarEditor() {
 
           {/* Bottom */}
           <div ref={bottomRef}
-            className="h-[720px] px-3 py-4 flex flex-col gap-28 items-center text-center"
+            className="h-[720px] px-3 py-4 flex flex-col  items-center text-center"
             style={getBottomSectionBackground()}
           >
-            {["Grudzień", "Styczeń", "Luty"].map((month) => (
-              <div
-                key={month}
-                className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
-              >
-                <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                  {month}
-                </h3>
-                <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
-                  [Siatka dni dla {month}]
+            {months.map((month, index) => (
+              <Fragment key={month}>
+                <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
+                  <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                    {month}
+                  </h3>
+                  <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
+                    [Siatka dni dla {month}]
+                  </div>
                 </div>
-              </div>
+                <div>
+                {(() => {
+                  const [ref, fontSize] = useAutoFontSize(monthTexts[index]);
+
+                  return (
+                    <textarea
+                      ref={ref}
+                      value={monthTexts[index]}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        const lines = val.split("\n");
+
+                        // Pozwól maksymalnie 2 linie
+                        if (lines.length <= 2) {
+                          handleMonthTextChange(index, val);
+                        } else {
+                          // Jeśli użytkownik próbuje wpisać 3+ linię - ignoruj zmianę
+                          // (możesz też np. wyświetlić alert lub inny feedback)
+                        }
+                      }}
+                      rows={2} // wymuszamy 2 linie
+                      className="w-full h-[60px] resize-none italic text-center text-gray-800 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      style={{
+                        fontSize: `${fontSize}px`,
+                        lineHeight: "1.2",
+                        overflow: "hidden", // ukrywa scroll
+                        paddingTop: "1px",
+                        paddingBottom: "16px",
+                      }}
+                      placeholder="Wpisz tekst pod miesiącem..."
+                    />
+                  );
+                })()}
+                </div>
+              </Fragment>
             ))}
           </div>
         </div>

@@ -1,0 +1,58 @@
+import { useRef, useEffect, useState } from "react";
+
+const ContentEditableText({ value, onChange, placeholder = "" }) {
+  const divRef = useRef<HTMLDivElement>(null);
+  const [fontSize, setFontSize] = useState(24);
+
+  const adjustFontSize = () => {
+    if (!divRef.current) return;
+
+    const div = divRef.current;
+    const maxFontSize = 28;
+    const minFontSize = 14;
+    const step = 1;
+
+    let currentSize = maxFontSize;
+
+    const clone = div.cloneNode(true) as HTMLDivElement;
+    clone.style.visibility = "hidden";
+    clone.style.position = "absolute";
+    clone.style.height = "auto";
+    clone.style.width = div.offsetWidth + "px";
+    clone.style.fontSize = currentSize + "px";
+    clone.style.whiteSpace = "pre-wrap";
+    clone.style.lineHeight = "1.2";
+    document.body.appendChild(clone);
+
+    clone.innerText = div.innerText;
+
+    while (clone.scrollHeight > div.offsetHeight && currentSize > minFontSize) {
+      currentSize -= step;
+      clone.style.fontSize = currentSize + "px";
+    }
+
+    setFontSize(currentSize);
+    document.body.removeChild(clone);
+  };
+
+  useEffect(() => {
+    adjustFontSize();
+  }, [value]);
+
+  return (
+  
+    <div
+      ref={divRef}
+      contentEditable
+      suppressContentEditableWarning
+      onInput={(e) => onChange(e.currentTarget.textContent || "")}
+      placeholder={placeholder}
+      className="w-full min-h-[80px] px-2 py-2 border rounded text-center text-gray-800 italic resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-400 leading-tight flex items-center justify-center"
+      style={{ fontSize: `${fontSize}px` }}
+    >
+      {value}
+    </div>
+    
+  );
+}
+export default ContentEditableText;
