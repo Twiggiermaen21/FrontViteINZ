@@ -3,6 +3,10 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { FastAverageColor } from "fast-average-color";
+import StyleSidebar from "./calendarEditorElements/stylesBar";
+import ImgColor from "./calendarEditorElements/imgAndColor";
+import GradientSettings from "./calendarEditorElements/imgAndFade";
+import BackgroundImg from "./calendarEditorElements/imgAndImg";
 export default function CalendarEditor() {
   const [style, setStyle] = useState("style1");
   const [bgColor, setBgColor] = useState("#ffffff");
@@ -59,67 +63,67 @@ export default function CalendarEditor() {
   const handleSaveCalendar = () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
 
-  const topImageId = image.id
-  let bottomImageId = null;
-  if(backgroundImage!==null){
-    bottomImageId = backgroundImage.id
-  }
- 
-
-  let data = {
-    top_image: topImageId,
-    bottom_type: "",
-    bottom_color: null,
-    gradient_start_color: bgColor,
-    gradient_end_color: gradientEndColor,
-    gradient_direction: null,
-    gradient_theme: null,
-    bottom_image: bottomImageId,
-  };
-
-  if (style === "style1") {
-    data.bottom_type = "color";
-    data.bottom_color = bgColor;
-  }
-
-  if (style === "style2") {
-    if (gradientTheme === "classic") {
-      const direction = {
-        diagonal: "to bottom right",
-        vertical: "to bottom",
-        horizontal: "to right",
-        radial: "radial",
-      }[gradientVariant] || "to bottom";
-
-      data.bottom_type = "gradient";
-      data.gradient_start_color = bgColor;
-      data.gradient_end_color = gradientEndColor;
-      data.gradient_direction = direction;
-    } else {
-      data.bottom_type = "theme-gradient";
-      data.gradient_theme = gradientTheme;
+    const topImageId = image.id
+    let bottomImageId = null;
+    if (backgroundImage !== null) {
+      bottomImageId = backgroundImage.id
     }
-  }
 
-  if (style === "style3") {
-    data.bottom_type = "image";
-    data.bottom_image = bottomImageId;
-  }
 
-  try {
-    const response =  axios.post(`${apiUrl}/calendars/`, data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    let data = {
+      top_image: topImageId,
+      bottom_type: "",
+      bottom_color: null,
+      gradient_start_color: bgColor,
+      gradient_end_color: gradientEndColor,
+      gradient_direction: null,
+      gradient_theme: null,
+      bottom_image: bottomImageId,
+    };
 
-    console.log("✅ Utworzono kalendarz:", data);
-    alert("✅ Kalendarz został zapisany!");
-  } catch (error) {
-    console.error("❌ Błąd zapisu:", error.response?.data || error.message);
-    alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
-  }
-};
+    if (style === "style1") {
+      data.bottom_type = "color";
+      data.bottom_color = bgColor;
+    }
+
+    if (style === "style2") {
+      if (gradientTheme === "classic") {
+        const direction = {
+          diagonal: "to bottom right",
+          vertical: "to bottom",
+          horizontal: "to right",
+          radial: "radial",
+        }[gradientVariant] || "to bottom";
+
+        data.bottom_type = "gradient";
+        data.gradient_start_color = bgColor;
+        data.gradient_end_color = gradientEndColor;
+        data.gradient_direction = direction;
+      } else {
+        data.bottom_type = "theme-gradient";
+        data.gradient_theme = gradientTheme;
+      }
+    }
+
+    if (style === "style3") {
+      data.bottom_type = "image";
+      data.bottom_image = bottomImageId;
+    }
+
+    try {
+      const response = axios.post(`${apiUrl}/calendars/`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("✅ Utworzono kalendarz:", data);
+      alert("✅ Kalendarz został zapisany!");
+    } catch (error) {
+      console.error("❌ Błąd zapisu:", error.response?.data || error.message);
+      alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
+    }
+  };
 
 
 
@@ -221,204 +225,53 @@ export default function CalendarEditor() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-9 gap-4 p-4">
       {/* Sidebar options */}
-      <div className="lg:col-span-2 space-y-4 ">
-
-        <div className="border rounded p-4">
-          <h2 className="text-lg font-semibold mb-4">Styl kalendarza</h2>
-          <div className="space-y-2">
-            <button
-              className={`w-full px-4 py-2 border rounded ${style === "style1" ? "bg-black text-white" : "bg-white text-black"
-                }`}
-              onClick={() => setStyle("style1")}
-            >
-              Grafika + kolor
-            </button>
-            <button
-              className={`w-full px-4 py-2 border rounded ${style === "style2" ? "bg-black text-white" : "bg-white text-black"
-                }`}
-              onClick={() => setStyle("style2")}
-            >
-              Rozciągnięty gradient
-            </button>
-            <button
-              className={`w-full px-4 py-2 border rounded ${style === "style3" ? "bg-black text-white" : "bg-white text-black"
-                }`}
-              onClick={() => setStyle("style3")}
-            >
-              Grafika na całym tle
-            </button>
-          </div>
-        </div>
-
-        {/* Opcje dla stylu 1: kolor + grafika */}
-
-        <div className="border rounded p-4">
-          <h2 className="text-lg font-semibold mb-2">Galeria grafik</h2>
-          <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-            {images.map((img) => (
-              <img
-                key={img.id || img.url}
-                src={img.url}
-                alt="Grafika AI"
-                className="cursor-pointer object-cover h-20 w-full border rounded hover:opacity-70"
-                onClick={() => handleImageSelect(img)}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="border rounded p-4">
-          <h2 className="text-lg font-semibold mb-2">Wgraj własną grafikę</h2>
-          <input
-            id="imageUpload"
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="block w-full text-sm text-gray-700 border border-gray-300 rounded"
-          />
-        </div>
-
-      </div>
-
+      <StyleSidebar
+        style={style}
+        setStyle={setStyle}
+        images={images}
+        handleImageSelect={handleImageSelect}
+        handleFileUpload={handleFileUpload}
+      />
       <div className="lg:col-span-2 ">
-
         {style === "style1" && (
-          <>
-            <div className="border rounded p-4">
-              <h2 className="text-lg font-semibold mb-2">Kolor tła</h2>
-              <input
-                type="color"
-                value={bgColor}
-                onChange={(e) => setBgColor(e.target.value)}
-                className="w-full h-10 border rounded"
-              />
-              {image && (
-                <button
-                  onClick={() => extractColorsFromImage(image.url)}
-                  className="mt-2 w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                >
-                  Dobierz automatycznie kolory z grafiki
-                </button>
-              )}
-            </div>
-          </>
+          <ImgColor
+            bgColor={bgColor}
+            setBgColor={setBgColor}
+            image={image}
+            extractColorsFromImage={extractColorsFromImage}
+          />
         )}
         {/* Opcje dla gradientu */}
         {style === "style2" && (
-          <div className="border rounded p-4 space-y-4">
-            <h2 className="text-lg font-semibold mb-2">Ustawienia gradientu</h2>
-            {image && (
-              <button
-                onClick={() => extractColorsFromImage(image.url)}
-                className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-              >
-                Dobierz automatycznie kolory z grafiki
-              </button>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Kolor początkowy</label>
-              <input
-                type="color"
-                value={bgColor}
-                onChange={(e) => setBgColor(e.target.value)}
-                className="w-full h-10 border rounded"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Kolor końcowy</label>
-              <input
-                type="color"
-                value={gradientEndColor}
-                onChange={(e) => setGradientEndColor(e.target.value)}
-                className="w-full h-10 border rounded"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Wariant</label>
-              <select
-                value={gradientVariant}
-                onChange={(e) => setGradientVariant(e.target.value)}
-                className="w-full border rounded px-2 py-1 text-sm"
-              >
-                <option value="diagonal">Diagonalny (↘)</option>
-                <option value="vertical">Pionowy (↓)</option>
-                <option value="horizontal">Poziomy (→)</option>
-                <option value="radial">Radialny (okrągły)</option>
-              </select>
-            </div>
-
-            <div >
-              <label className="block text-sm font-medium text-gray-700">Motyw gradientu</label>
-              <select
-                value={gradientTheme}
-                onChange={(e) => setGradientTheme(e.target.value)}
-                className="w-full border rounded px-2 py-1 text-sm"
-              >
-                <option value="classic">Klasyczny (z kolorów)</option>
-                <option value="aurora">Aurora</option>
-                <option value="liquid">Liquid</option>
-                <option value="mesh">Mesh</option>
-                <option value="waves">Waves</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Intensywność przejścia</label>
-              <select
-                value={gradientStrength}
-                onChange={(e) => setGradientStrength(e.target.value)}
-                className="w-full border rounded px-2 py-1 text-sm"
-              >
-                <option value="soft">Miękki</option>
-                <option value="medium">Średni</option>
-                <option value="hard">Mocny</option>
-              </select>
-            </div>
-          </div>
+          <GradientSettings
+            image={image}
+            extractColorsFromImage={extractColorsFromImage}
+            bgColor={bgColor}
+            setBgColor={setBgColor}
+            gradientEndColor={gradientEndColor}
+            setGradientEndColor={setGradientEndColor}
+            gradientVariant={gradientVariant}
+            setGradientVariant={setGradientVariant}
+            gradientTheme={gradientTheme}
+            setGradientTheme={setGradientTheme}
+            gradientStrength={gradientStrength}
+            setGradientStrength={setGradientStrength}
+          />
         )}
 
         {/* Opcje dla stylu 3: tylko grafika */}
         {style === "style3" && (
-          <div className="border rounded p-4 space-y-4">
-            <h2 className="text-lg font-semibold mb-2">Tło kalendarza</h2>
-
-            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-              {images.map((img) => (
-                <img
-                  key={img.id || img.url}
-                  src={img.url}
-                  alt="Grafika tła"
-                  className={`cursor-pointer object-cover h-20 w-full border rounded ${backgroundImage === img ? "ring-2 ring-blue-500" : ""
-                    }`}
-                  onClick={() => setBackgroundImage(img)}
-                />
-              ))}
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-gray-700 mt-2 mb-1">Wgraj własną grafikę tła</h3>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setBackgroundImage(URL.createObjectURL(file));
-                  }
-                }}
-                className="block w-full text-sm text-gray-700 border border-gray-300 rounded"
-              />
-            </div>
-          </div>
+          <BackgroundImg
+            images={images}
+            backgroundImage={backgroundImage}
+            setBackgroundImage={setBackgroundImage}
+          />
         )}
-
       </div>
-      <div className="lg:col-span-1 ">
+      <div className="lg:col-span-1"/>
 
 
-      </div>
+   
       {/* Preview area */}
       <div className="lg:col-span-2">
         <div className="border rounded w-[372px] h-[972px] mx-auto bg-white overflow-hidden shadow">
