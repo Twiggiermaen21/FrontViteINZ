@@ -7,28 +7,13 @@ import ImgColor from "./calendarEditorElements/imgAndColor";
 import GradientSettings from "./calendarEditorElements/imgAndFade";
 import BackgroundImg from "./calendarEditorElements/imgAndImg";
 import YearText from "./calendarEditorElements/yearText";
+import LimitedTextarea from "./calendarEditorElements/contentEdittableText";
+import ImageEditor from "./calendarEditorElements/ImageEditor";
+import MonthEditor from "./calendarEditorElements/textOrImg";
 
-function useAutoFontSize(text, maxFontSize = 30, minFontSize = 12) {
-  const [fontSize, setFontSize] = useState(maxFontSize);
-  const ref = useRef();
-
-  useEffect(() => {
-    if (!ref.current) return;
-
-    const lineCount = (text.match(/\n/g) || []).length + 1;
-    const length = text.length;
-
-    let calculatedFontSize = maxFontSize;
-
-    if (lineCount > 1 || length > 40) {
-      calculatedFontSize = Math.max(minFontSize, maxFontSize - lineCount * 2 - Math.floor(length / 50));
-    }
-
-    setFontSize(calculatedFontSize);
-  }, [text, maxFontSize, minFontSize]);
-
-  return [ref, fontSize];
-}
+const fontFamilies = ["Arial", "Courier New", "Georgia", "Tahoma", "Verdana", "Roboto"];
+const fontWeights = ["300", "400", "500", "600", "700", "bold", "normal"];
+const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 
 export default function CalendarEditor() {
@@ -43,7 +28,7 @@ export default function CalendarEditor() {
   const [backgroundImage, setBackgroundImage] = useState(null);
   const headerRef = useRef();
   const bottomRef = useRef();
-  const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
+  
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
@@ -53,7 +38,64 @@ export default function CalendarEditor() {
   });
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);
   const months = ["Grudzień", "Styczeń", "Luty"];
+  const [fontSettings, setFontSettings] = useState(
+    months.map(() => ({
+      fontFamily: "Arial",
+      fontWeight: "400",
+      fontColor: "#333333",
+    }))
+  );
 
+  const [monthImages, setMonthImages] = useState(Array(months.length).fill(null));
+const [isImageMode, setIsImageMode] = useState(() =>
+  months.map(() => false)
+);
+const [monthImagesInTextarea, setMonthImagesInTextarea] = useState(() =>
+  months.map(() => null)
+);
+
+const [imageScales, setImageScales] = useState(() =>
+  months.map(() => 1)
+);
+
+
+const toggleImageMode = (index) => {
+  setIsImageMode((prev) => {
+    const newMode = [...prev];
+    newMode[index] = !newMode[index];
+    return newMode;
+  });
+};
+
+const handleImageChange = (index, e) => {
+  if (e.target.files && e.target.files[0]) {
+    const url = URL.createObjectURL(e.target.files[0]);
+    setMonthImagesInTextarea((prev) => {
+      const newImgs = [...prev];
+      newImgs[index] = url;
+      return newImgs;
+    });
+    setImageScales((prev) => {
+      const newScales = [...prev];
+      newScales[index] = 1;
+      return newScales;
+    });
+  }
+};
+
+const handleImageScaleChange = (index, value) => {
+  setImageScales((prev) => {
+    const newScales = [...prev];
+    newScales[index] = parseFloat(value);
+    return newScales;
+  });
+};
+
+  const handleMonthImageChange = (index, newSrc) => {
+    const newImages = [...monthImages];
+    newImages[index] = newSrc;
+    setMonthImages(newImages);
+  };
   const [yearFontWeight, setYearFontWeight] = useState("bold");
   const [yearFontFamily, setYearFontFamily] = useState("Arial");
   const extractColorsFromImage = async (imgUrl) => {
@@ -96,6 +138,12 @@ export default function CalendarEditor() {
     const newTexts = [...monthTexts];
     newTexts[index] = value;
     setMonthTexts(newTexts);
+  };
+
+  const handleFontSettingChange = (index, field, value) => {
+    const updated = [...fontSettings];
+    updated[index] = { ...updated[index], [field]: value };
+    setFontSettings(updated);
   };
 
   const handleSaveCalendar = () => {
@@ -412,21 +460,26 @@ export default function CalendarEditor() {
           setYearPosition={setYearPosition}
         />
         <div className="mt-4 space-y-3">
-          {months.map((month, index) => (
-            <div key={index}>
-              <label className="block text-sm font-medium text-gray-700">
-                Tekst pod miesiącem {month}
-              </label>
-              <input
-                type="text"
-                value={monthTexts[index]}
-                onChange={(e) => handleMonthTextChange(index, e.target.value)}
-                className="w-full border rounded px-2 py-1 text-sm"
-                placeholder={`Tekst pod ${month}`}
-              />
-            </div>
-          ))}
-        </div>
+            {months.map((month, index) => (
+    <MonthEditor
+      key={month}
+      month={month}
+      index={index}
+      isImageMode={isImageMode[index]}
+      toggleImageMode={toggleImageMode}
+      fontSettings={fontSettings[index]}
+      handleFontSettingChange={handleFontSettingChange}
+      monthTexts={monthTexts[index]}
+      handleMonthTextChange={handleMonthTextChange}
+      monthImages={monthImages[index]}
+      handleImageChange={handleImageChange}
+      imageScales={imageScales[index]}
+      handleImageScaleChange={handleImageScaleChange}
+      fontFamilies={fontFamilies}
+      fontWeights={fontWeights}
+    />
+  ))}
+</div>
       </div>
       <div className="lg:col-span-1" />
 
@@ -480,40 +533,22 @@ export default function CalendarEditor() {
                     [Siatka dni dla {month}]
                   </div>
                 </div>
-                <div>
-                {(() => {
-                  const [ref, fontSize] = useAutoFontSize(monthTexts[index]);
 
-                  return (
-                    <textarea
-                      ref={ref}
-                      value={monthTexts[index]}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        const lines = val.split("\n");
+                <LimitedTextarea
+                  value={monthTexts[index]}
+                  index={index}
+                  onChange={handleMonthTextChange}
+                  placeholder="Wpisz tekst pod miesiącem..."
+                  fontFamily={fontSettings[index].fontFamily}
+                  fontWeight={fontSettings[index].fontWeight}
+                  fontColor={fontSettings[index].fontColor}
+                  maxChars={1000}
+                />
 
-                        // Pozwól maksymalnie 2 linie
-                        if (lines.length <= 2) {
-                          handleMonthTextChange(index, val);
-                        } else {
-                          // Jeśli użytkownik próbuje wpisać 3+ linię - ignoruj zmianę
-                          // (możesz też np. wyświetlić alert lub inny feedback)
-                        }
-                      }}
-                      rows={2} // wymuszamy 2 linie
-                      className="w-full h-[60px] resize-none italic text-center text-gray-800 bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      style={{
-                        fontSize: `${fontSize}px`,
-                        lineHeight: "1.2",
-                        overflow: "hidden", // ukrywa scroll
-                        paddingTop: "1px",
-                        paddingBottom: "16px",
-                      }}
-                      placeholder="Wpisz tekst pod miesiącem..."
-                    />
-                  );
-                })()}
-                </div>
+                
+
+
+
               </Fragment>
             ))}
           </div>
