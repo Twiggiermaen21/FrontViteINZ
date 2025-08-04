@@ -10,6 +10,7 @@ import YearText from "./calendarEditorElements/yearText";
 import LimitedTextarea from "./calendarEditorElements/contentEdittableText";
 import ImageEditor from "./calendarEditorElements/ImageEditor";
 import MonthEditor from "./calendarEditorElements/textOrImg";
+import { getYearPositionStyles } from '../utils/getYearPositionStyles';
 
 const fontFamilies = ["Arial", "Courier New", "Georgia", "Tahoma", "Verdana", "Roboto"];
 const fontWeights = ["300", "400", "500", "600", "700", "bold", "normal"];
@@ -23,81 +24,59 @@ export default function CalendarEditor() {
   const [images, setImages] = useState([]);
   const [gradientVariant, setGradientVariant] = useState("diagonal");
   const [gradientEndColor, setGradientEndColor] = useState("#ffffff");
-  const [gradientStrength, setGradientStrength] = useState("medium"); // 'soft', 'medium', 'hard'
+  const [gradientStrength, setGradientStrength] = useState("medium");
   const [gradientTheme, setGradientTheme] = useState("classic");
   const [backgroundImage, setBackgroundImage] = useState(null);
   const headerRef = useRef();
   const bottomRef = useRef();
-  
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
-  const [yearPosition, setYearPosition] = useState({
-    preset: "center",
-    coords: null, // null oznacza, że używamy preset
-  });
+  const [yearPosition, setYearPosition] = useState({ preset: "center", coords: null });
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);
   const months = ["Grudzień", "Styczeń", "Luty"];
-  const [fontSettings, setFontSettings] = useState(
-    months.map(() => ({
-      fontFamily: "Arial",
-      fontWeight: "400",
-      fontColor: "#333333",
-    }))
-  );
-
+  const [fontSettings, setFontSettings] = useState(months.map(() => ({ fontFamily: "Arial", fontWeight: "400", fontColor: "#333333", })));
   const [monthImages, setMonthImages] = useState(Array(months.length).fill(null));
-const [isImageMode, setIsImageMode] = useState(() =>
-  months.map(() => false)
-);
-const [monthImagesInTextarea, setMonthImagesInTextarea] = useState(() =>
-  months.map(() => null)
-);
-
-const [imageScales, setImageScales] = useState(() =>
-  months.map(() => 1)
-);
-
-
-const toggleImageMode = (index) => {
-  setIsImageMode((prev) => {
-    const newMode = [...prev];
-    newMode[index] = !newMode[index];
-    return newMode;
-  });
-};
-
-const handleImageChange = (index, e) => {
-  if (e.target.files && e.target.files[0]) {
-    const url = URL.createObjectURL(e.target.files[0]);
-    setMonthImagesInTextarea((prev) => {
-      const newImgs = [...prev];
-      newImgs[index] = url;
-      return newImgs;
-    });
-    setImageScales((prev) => {
-      const newScales = [...prev];
-      newScales[index] = 1;
-      return newScales;
-    });
-  }
-};
-
-const handleImageScaleChange = (index, value) => {
-  setImageScales((prev) => {
-    const newScales = [...prev];
-    newScales[index] = parseFloat(value);
-    return newScales;
-  });
-};
-
-  const handleMonthImageChange = (index, newSrc) => {
-    const newImages = [...monthImages];
-    newImages[index] = newSrc;
-    setMonthImages(newImages);
-  };
+  const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
+  const [imageScales, setImageScales] = useState(() => months.map(() => 1));
   const [yearFontWeight, setYearFontWeight] = useState("bold");
   const [yearFontFamily, setYearFontFamily] = useState("Arial");
+  const [dragging, setDragging] = useState(false);
+  const dragStartPos = useRef({ mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
+  const spanRef = useRef(null);
+  const toggleImageMode = (index) => {
+    setIsImageMode((prev) => {
+      const newMode = [...prev];
+      newMode[index] = !newMode[index];
+      return newMode;
+    });
+  };
+
+  const handleImageChange = (index, e) => {
+    if (e.target.files && e.target.files[0]) {
+      const url = URL.createObjectURL(e.target.files[0]);
+      setMonthImagesInTextarea((prev) => {
+        const newImgs = [...prev];
+        newImgs[index] = url;
+        return newImgs;
+      });
+      setImageScales((prev) => {
+        const newScales = [...prev];
+        newScales[index] = 1;
+        return newScales;
+      });
+    }
+  };
+
+  const handleImageScaleChange = (index, value) => {
+    setImageScales((prev) => {
+      const newScales = [...prev];
+      newScales[index] = parseFloat(value);
+      return newScales;
+    });
+  };
+
+
   const extractColorsFromImage = async (imgUrl) => {
     const fac = new FastAverageColor();
     const img = new Image();
@@ -210,41 +189,8 @@ const handleImageScaleChange = (index, value) => {
       alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
     }
   };
-  function getYearPositionStyles(position) {
-    if (position.coords) {
-      return {
-        left: position.coords.x,
-        top: position.coords.y,
-        transform: "translate(-50%, -50%)",
-      };
-    }
 
-    switch (position.preset) {
-      case "top-left":
-        return { top: "10px", left: "10px" };
-      case "top-center":
-        return { top: "10px", left: "50%", transform: "translateX(-50%)" };
-      case "top-right":
-        return { top: "10px", right: "10px" };
-      case "center-left":
-        return { top: "50%", left: "10px", transform: "translateY(-50%)" };
-      case "center":
-        return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
-      case "center-right":
-        return { top: "50%", right: "10px", transform: "translateY(-50%)" };
-      case "bottom-left":
-        return { bottom: "10px", left: "10px" };
-      case "bottom-center":
-        return { bottom: "10px", left: "50%", transform: "translateX(-50%)" };
-      case "bottom-right":
-        return { bottom: "10px", right: "10px" };
-      default:
-        return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
-    }
-  }
-  const [dragging, setDragging] = useState(false);
-  const dragStartPos = useRef({ mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
-  const spanRef = useRef(null);
+
 
   const onMouseDown = (e) => {
     e.preventDefault();
@@ -460,26 +406,26 @@ const handleImageScaleChange = (index, value) => {
           setYearPosition={setYearPosition}
         />
         <div className="mt-4 space-y-3">
-            {months.map((month, index) => (
-    <MonthEditor
-      key={month}
-      month={month}
-      index={index}
-      isImageMode={isImageMode[index]}
-      toggleImageMode={toggleImageMode}
-      fontSettings={fontSettings[index]}
-      handleFontSettingChange={handleFontSettingChange}
-      monthTexts={monthTexts[index]}
-      handleMonthTextChange={handleMonthTextChange}
-      monthImages={monthImages[index]}
-      handleImageChange={handleImageChange}
-      imageScales={imageScales[index]}
-      handleImageScaleChange={handleImageScaleChange}
-      fontFamilies={fontFamilies}
-      fontWeights={fontWeights}
-    />
-  ))}
-</div>
+          {months.map((month, index) => (
+            <MonthEditor
+              key={month}
+              month={month}
+              index={index}
+              isImageMode={isImageMode[index]}
+              toggleImageMode={toggleImageMode}
+              fontSettings={fontSettings[index]}
+              handleFontSettingChange={handleFontSettingChange}
+              monthTexts={monthTexts[index]}
+              handleMonthTextChange={handleMonthTextChange}
+              monthImages={monthImages[index]}
+              handleImageChange={handleImageChange}
+              imageScales={imageScales[index]}
+              handleImageScaleChange={handleImageScaleChange}
+              fontFamilies={fontFamilies}
+              fontWeights={fontWeights}
+            />
+          ))}
+        </div>
       </div>
       <div className="lg:col-span-1" />
 
@@ -533,22 +479,24 @@ const handleImageScaleChange = (index, value) => {
                     [Siatka dni dla {month}]
                   </div>
                 </div>
+                {isImageMode[index] ? (
+                  <ImageEditor
+                    imageSrc={monthImages[index]}
+                  
+                  />
 
-                <LimitedTextarea
-                  value={monthTexts[index]}
-                  index={index}
-                  onChange={handleMonthTextChange}
-                  placeholder="Wpisz tekst pod miesiącem..."
-                  fontFamily={fontSettings[index].fontFamily}
-                  fontWeight={fontSettings[index].fontWeight}
-                  fontColor={fontSettings[index].fontColor}
-                  maxChars={1000}
-                />
-
-                
-
-
-
+                ) : (
+                  <LimitedTextarea
+                    value={monthTexts[index]}
+                    index={index}
+                    onChange={handleMonthTextChange}
+                    placeholder="Wpisz tekst pod miesiącem..."
+                    fontFamily={fontSettings[index].fontFamily}
+                    fontWeight={fontSettings[index].fontWeight}
+                    fontColor={fontSettings[index].fontColor}
+                    maxChars={1000}
+                  />
+                )}
               </Fragment>
             ))}
           </div>

@@ -62,7 +62,7 @@ const LimitedTextarea = ({
       onChange(index, allowed);
     }
   };
-  console.log("fontSize", fontSize, "px");
+  
   return (
     <div className="relative w-full">
       <textarea
