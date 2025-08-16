@@ -55,7 +55,7 @@ export default function CalendarEditor() {
   const handleImageChange = (index, e) => {
     if (e.target.files && e.target.files[0]) {
       const url = URL.createObjectURL(e.target.files[0]);
-      setMonthImagesInTextarea((prev) => {
+      setMonthImages((prev) => {
         const newImgs = [...prev];
         newImgs[index] = url;
         return newImgs;
@@ -75,7 +75,7 @@ export default function CalendarEditor() {
       return newScales;
     });
   };
-
+console.log(monthImages)
 
   const extractColorsFromImage = async (imgUrl) => {
     const fac = new FastAverageColor();
