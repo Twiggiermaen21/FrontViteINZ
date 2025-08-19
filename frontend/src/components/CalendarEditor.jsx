@@ -29,6 +29,7 @@ export default function CalendarEditor() {
   const [backgroundImage, setBackgroundImage] = useState(null);
   const headerRef = useRef();
   const bottomRef = useRef();
+  const [yearActive, setYearActive] = useState(false);
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
@@ -75,7 +76,7 @@ export default function CalendarEditor() {
       return newScales;
     });
   };
-console.log(monthImages)
+
 
   const extractColorsFromImage = async (imgUrl) => {
     const fac = new FastAverageColor();
@@ -175,12 +176,23 @@ console.log(monthImages)
       data.bottom_image = bottomImageId;
     }
 
+    if (yearActive) {
+      data.yearColor = yearColor;
+      data.yearFontSize = yearFontSize;
+      data.yearFontFamily = yearFontFamily;
+      data.yearFontWeight = yearFontWeight;
+      data.yearPosition = yearPosition;
+      data.yearText = yearText;
+    }
+
+    
+
     try {
-      const response = axios.post(`${apiUrl}/calendars/`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // const response = axios.post(`${apiUrl}/calendars/`, data, {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // });
 
       console.log("✅ Utworzono kalendarz:", data);
       alert("✅ Kalendarz został zapisany!");
@@ -404,6 +416,8 @@ console.log(monthImages)
           setYearFontWeight={setYearFontWeight}
           yearPosition={yearPosition}
           setYearPosition={setYearPosition}
+          setYearActive={setYearActive}
+          yearActive={yearActive}
         />
         <div className="mt-4 space-y-3">
           {months.map((month, index) => (
@@ -440,11 +454,12 @@ console.log(monthImages)
               <>
                 <img src={image.url} alt="Nagłówek" className="w-full h-full object-cover" />
                 {/* Tekst z rokiem */}
-                <span
-                  ref={spanRef}
-                  onMouseDown={onMouseDown}
-                  style={{
-                    position: "absolute",
+                {yearActive && (
+                  <span
+                    ref={spanRef}
+                    onMouseDown={onMouseDown}
+                    style={{
+                      position: "absolute",
                     color: yearColor,
                     fontSize: `${yearFontSize}px`,
                     fontWeight: yearFontWeight,
@@ -458,6 +473,7 @@ console.log(monthImages)
                 >
                   {yearText}
                 </span>
+                )}
               </>
             ) : (
               <span className="text-gray-500">Brak grafiki nagłówka</span>

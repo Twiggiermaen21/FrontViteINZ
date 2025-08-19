@@ -15,7 +15,10 @@ const YearText = ({
     setYearFontWeight,
     yearPosition,
    
-    setYearPosition}) => {
+    setYearPosition,
+    setYearActive,
+    yearActive
+}) => {
 
 
 
@@ -24,6 +27,15 @@ const YearText = ({
     return (
         <div className="border rounded p-4 ">
             <h2 className="text-lg font-semibold">Napis z rokiem</h2>
+<label className="inline-flex items-center space-x-2 mb-4 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={yearActive}
+          onChange={() => setYearActive(!yearActive)}
+          className="form-checkbox h-5 w-5 text-blue-600"
+        />
+        <span>{yearActive ? "Aktywny" : "Nieaktywny"}</span>
+      </label>
 
             {/* Select z latami */}
             <div>
