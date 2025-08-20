@@ -1,9 +1,8 @@
 import React, { useState, useRef } from "react";
 
-const ImageEditor = () => {
-  const [imageSrc, setImageSrc] = useState(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [scale, setScale] = useState(1);
+const ImageEditor = ({imageSrc,setImageSrc,imageScale,setImageScale,position,setPosition}) => {
+ 
+  
   const [dragging, setDragging] = useState(false);
   const [startDragPos, setStartDragPos] = useState({ x: 0, y: 0 });
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -18,7 +17,7 @@ const ImageEditor = () => {
       reader.onloadend = () => {
         setImageSrc(reader.result);
         setPosition({ x: 0, y: 0 }); // reset pozycji
-        setScale(1); // reset skali
+        setImageScale(1); // reset skali
       };
       reader.readAsDataURL(file);
     }
@@ -49,19 +48,14 @@ const ImageEditor = () => {
   // Zoom
   const onZoomChange = (e) => {
     const val = parseFloat(e.target.value);
-    setScale(val);
+    setImageScale(val);
   };
 
   return (
     <div
       className={`text-center ${dragging ? "select-none" : "select-auto"}  w-full`}
     >
-      <input
-        type="file"
-        accept="image/*"
-        onChange={onFileChange}
-        className="mx-auto my-4 block"
-      />
+      
 
       {imageSrc && (
         <>
@@ -71,7 +65,7 @@ const ImageEditor = () => {
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
             onMouseLeave={onMouseUp}
-            className={`mt-5 mx-auto border border-gray-300 overflow-hidden relative cursor-${dragging ? "grabbing" : "grab"}`}
+            className={`my-5 mx-auto border border-gray-300 overflow-hidden relative cursor-${dragging ? "grabbing" : "grab"}`}
             style={{ height: 60 }}
           >
             <img
@@ -84,7 +78,7 @@ const ImageEditor = () => {
                 top: position.y,
                 
                 height: 60,
-                transform: `scale(${scale})`,
+                transform: `scale(${imageScale})`,
                 transformOrigin: "top left",
                 userSelect: "none",
               }}
@@ -96,15 +90,7 @@ const ImageEditor = () => {
             />
           </div>
 
-          <input
-            type="range"
-            min="0.1"
-            max="3"
-            step="0.01"
-            value={scale}
-            onChange={onZoomChange}
-            className="] mt-2"
-          />
+        
         </>
       )}
     </div>

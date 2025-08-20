@@ -10,12 +10,18 @@ import YearText from "./calendarEditorElements/yearText";
 import LimitedTextarea from "./calendarEditorElements/contentEdittableText";
 import ImageEditor from "./calendarEditorElements/ImageEditor";
 import MonthEditor from "./calendarEditorElements/textOrImg";
-import { getYearPositionStyles } from '../utils/getYearPositionStyles';
+import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 
-const fontFamilies = ["Arial", "Courier New", "Georgia", "Tahoma", "Verdana", "Roboto"];
+const fontFamilies = [
+  "Arial",
+  "Courier New",
+  "Georgia",
+  "Tahoma",
+  "Verdana",
+  "Roboto",
+];
 const fontWeights = ["300", "400", "500", "600", "700", "bold", "normal"];
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
-
 
 export default function CalendarEditor() {
   const [style, setStyle] = useState("style1");
@@ -33,13 +39,26 @@ export default function CalendarEditor() {
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
-  const [yearPosition, setYearPosition] = useState({ preset: "center", coords: null });
+  const [yearPosition, setYearPosition] = useState({
+    preset: "center",
+    coords: null,
+  });
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);
   const months = ["Grudzień", "Styczeń", "Luty"];
-  const [fontSettings, setFontSettings] = useState(months.map(() => ({ fontFamily: "Arial", fontWeight: "400", fontColor: "#333333", })));
-  const [monthImages, setMonthImages] = useState(Array(months.length).fill(null));
+  const [fontSettings, setFontSettings] = useState(
+    months.map(() => ({
+      fontFamily: "Arial",
+      fontWeight: "400",
+      fontColor: "#333333",
+    }))
+  );
+  const [monthImages, setMonthImages] = useState(() => months.map(() => null));
   const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
   const [imageScales, setImageScales] = useState(() => months.map(() => 1));
+  const [positions, setPositions] = useState(() =>
+    months.map(() => ({ x: 0, y: 0 }))
+  );
+
   const [yearFontWeight, setYearFontWeight] = useState("bold");
   const [yearFontFamily, setYearFontFamily] = useState("Arial");
   const [dragging, setDragging] = useState(false);
@@ -77,7 +96,6 @@ export default function CalendarEditor() {
     });
   };
 
-
   const extractColorsFromImage = async (imgUrl) => {
     const fac = new FastAverageColor();
     const img = new Image();
@@ -93,9 +111,18 @@ export default function CalendarEditor() {
           // Wygeneruj drugi kolor (jaśniejszy lub ciemniejszy)
           const adjustBrightness = (hex, percent) => {
             const num = parseInt(hex.slice(1), 16);
-            const r = Math.min(255, Math.max(0, ((num >> 16) + percent))).toString(16).padStart(2, "0");
-            const g = Math.min(255, Math.max(0, (((num >> 8) & 0x00FF) + percent))).toString(16).padStart(2, "0");
-            const b = Math.min(255, Math.max(0, ((num & 0x0000FF) + percent))).toString(16).padStart(2, "0");
+            const r = Math.min(255, Math.max(0, (num >> 16) + percent))
+              .toString(16)
+              .padStart(2, "0");
+            const g = Math.min(
+              255,
+              Math.max(0, ((num >> 8) & 0x00ff) + percent)
+            )
+              .toString(16)
+              .padStart(2, "0");
+            const b = Math.min(255, Math.max(0, (num & 0x0000ff) + percent))
+              .toString(16)
+              .padStart(2, "0");
             return `#${r}${g}${b}`;
           };
 
@@ -128,24 +155,10 @@ export default function CalendarEditor() {
 
   const handleSaveCalendar = () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
-
-    const topImageId = image.id
-    let bottomImageId = null;
-    if (backgroundImage !== null) {
-      bottomImageId = backgroundImage.id
+    let data = {};
+    if (image !== null) {
+      data.top_image = image.id;
     }
-
-
-    let data = {
-      top_image: topImageId,
-      bottom_type: "",
-      bottom_color: null,
-      gradient_start_color: bgColor,
-      gradient_end_color: gradientEndColor,
-      gradient_direction: null,
-      gradient_theme: null,
-      bottom_image: bottomImageId,
-    };
 
     if (style === "style1") {
       data.bottom_type = "color";
@@ -154,12 +167,13 @@ export default function CalendarEditor() {
 
     if (style === "style2") {
       if (gradientTheme === "classic") {
-        const direction = {
-          diagonal: "to bottom right",
-          vertical: "to bottom",
-          horizontal: "to right",
-          radial: "radial",
-        }[gradientVariant] || "to bottom";
+        const direction =
+          {
+            diagonal: "to bottom right",
+            vertical: "to bottom",
+            horizontal: "to right",
+            radial: "radial",
+          }[gradientVariant] || "to bottom";
 
         data.bottom_type = "gradient";
         data.gradient_start_color = bgColor;
@@ -173,7 +187,7 @@ export default function CalendarEditor() {
 
     if (style === "style3") {
       data.bottom_type = "image";
-      data.bottom_image = bottomImageId;
+      data.bottom_image = backgroundImage.id;
     }
 
     if (yearActive) {
@@ -185,7 +199,36 @@ export default function CalendarEditor() {
       data.yearText = yearText;
     }
 
-    
+    console.log("text", monthTexts);
+    console.log("font", fontSettings);
+    console.log("img", monthImages);
+    console.log("mode", isImageMode);
+    console.log("scale", imageScales);
+
+    data.field1 = [];
+    data.field2 = [];
+    data.field3 = [];
+
+    for (let i = 0; i < months.length; i++) {
+      const fieldName = `field${i + 1}`; // field1, field2, field3...
+
+      if (!data[fieldName]) {
+        data[fieldName] = []; // upewniamy się, że istnieje
+      }
+
+      if (isImageMode[i]) {
+        data[fieldName].push({
+          image: monthImages[i],
+          scale: imageScales[i],
+          position: positions[i],
+        });
+      } else {
+        data[fieldName].push({
+          text: monthTexts[i],
+          font: fontSettings[i],
+        });
+      }
+    }
 
     try {
       // const response = axios.post(`${apiUrl}/calendars/`, data, {
@@ -201,8 +244,6 @@ export default function CalendarEditor() {
       alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
     }
   };
-
-
 
   const onMouseDown = (e) => {
     e.preventDefault();
@@ -221,7 +262,7 @@ export default function CalendarEditor() {
       startX = rect.left - parentRect.left + rect.width / 2;
       startY = rect.top - parentRect.top + rect.height / 2;
 
-      setYearPosition({ preset: null, coords: { x: startX, y: startY } });
+      setYearPosition({ coords: { x: startX, y: startY } });
     }
 
     dragStartPos.current = {
@@ -260,7 +301,6 @@ export default function CalendarEditor() {
       window.removeEventListener("mouseup", onMouseUp);
     };
   }, [dragging]);
-
 
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);
@@ -346,7 +386,6 @@ export default function CalendarEditor() {
       return { background: gradientStyle };
     }
 
-
     if (style === "style3" && backgroundImage) {
       return {
         background: `url(${backgroundImage.url}) center/cover no-repeat`,
@@ -418,6 +457,7 @@ export default function CalendarEditor() {
           setYearPosition={setYearPosition}
           setYearActive={setYearActive}
           yearActive={yearActive}
+          dragging={dragging}
         />
         <div className="mt-4 space-y-3">
           {months.map((month, index) => (
@@ -443,16 +483,21 @@ export default function CalendarEditor() {
       </div>
       <div className="lg:col-span-1" />
 
-
-
       {/* Preview area */}
       <div className="lg:col-span-2">
         <div className="border rounded w-[372px] h-[972px] mx-auto bg-white overflow-hidden shadow">
           {/* Header */}
-          <div ref={headerRef} className="relative h-[252px] bg-gray-200 flex items-center justify-center">
+          <div
+            ref={headerRef}
+            className="relative h-[252px] bg-gray-200 flex items-center justify-center"
+          >
             {image ? (
               <>
-                <img src={image.url} alt="Nagłówek" className="w-full h-full object-cover" />
+                <img
+                  src={image.url}
+                  alt="Nagłówek"
+                  className="w-full h-full object-cover"
+                />
                 {/* Tekst z rokiem */}
                 {yearActive && (
                   <span
@@ -460,19 +505,19 @@ export default function CalendarEditor() {
                     onMouseDown={onMouseDown}
                     style={{
                       position: "absolute",
-                    color: yearColor,
-                    fontSize: `${yearFontSize}px`,
-                    fontWeight: yearFontWeight,
-                    fontFamily: yearFontFamily,
-                    cursor: "move",
-                    userSelect: "none",
-                    whiteSpace: "nowrap",
-                    pointerEvents: "auto",
-                    ...getYearPositionStyles(yearPosition),
-                  }}
-                >
-                  {yearText}
-                </span>
+                      color: yearColor,
+                      fontSize: `${yearFontSize}px`,
+                      fontWeight: yearFontWeight,
+                      fontFamily: yearFontFamily,
+                      cursor: "move",
+                      userSelect: "none",
+                      whiteSpace: "nowrap",
+                      pointerEvents: "auto",
+                      ...getYearPositionStyles(yearPosition),
+                    }}
+                  >
+                    {yearText}
+                  </span>
                 )}
               </>
             ) : (
@@ -481,7 +526,8 @@ export default function CalendarEditor() {
           </div>
 
           {/* Bottom */}
-          <div ref={bottomRef}
+          <div
+            ref={bottomRef}
             className="h-[720px] px-3 py-4 flex flex-col  items-center text-center"
             style={getBottomSectionBackground()}
           >
@@ -498,9 +544,24 @@ export default function CalendarEditor() {
                 {isImageMode[index] ? (
                   <ImageEditor
                     imageSrc={monthImages[index]}
-                  
+                    setImageSrc={(newValue) =>
+                      setMonthImages((prev) =>
+                        prev.map((img, i) => (i === index ? newValue : img))
+                      )
+                    }
+                    imageScale={imageScales[index]}
+                    setImageScale={(newValue) =>
+                      setImageScales((prev) =>
+                        prev.map((s, i) => (i === index ? newValue : s))
+                      )
+                    }
+                    position={positions[index]}
+                    setPosition={(newValue) =>
+                      setPositions((prev) =>
+                        prev.map((p, i) => (i === index ? newValue : p))
+                      )
+                    }
                   />
-
                 ) : (
                   <LimitedTextarea
                     value={monthTexts[index]}

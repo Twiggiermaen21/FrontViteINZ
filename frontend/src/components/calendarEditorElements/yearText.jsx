@@ -1,27 +1,30 @@
-import React from 'react'
+
+import { useState, useEffect } from "react";
 
 const YearText = ({
     yearText,
     setYearText,
     yearColor,
-    
     setYearColor,
     yearFontSize,
     setYearFontSize,    
     yearFontFamily,
     setYearFontFamily,
-    
     yearFontWeight,
     setYearFontWeight,
     yearPosition,
-   
     setYearPosition,
     setYearActive,
-    yearActive
+    yearActive,
+    dragging
 }) => {
+const [isCustom, setIsCustom] = useState(false);
 
-
-
+useEffect(() => {
+  if (dragging) {
+    setIsCustom(true);
+  }
+}, [dragging]);
 
 
     return (
@@ -105,24 +108,25 @@ const YearText = ({
                 </select>
             </div>
 
-            <div>
-                <label className="block text-sm font-medium mb-1">Pozycja napisu</label>
-                <select
-                    value={yearPosition}
-                    onChange={(e) => setYearPosition(e.target.value)}
-                    className="w-full border rounded px-2 py-1 text-sm"
-                >
-                    <option value="top-left">Góra - lewo</option>
-                    <option value="top-center">Góra - środek</option>
-                    <option value="top-right">Góra - prawo</option>
-                    <option value="center-left">Środek - lewo</option>
-                    <option value="center">Środek - środek</option>
-                    <option value="center-right">Środek - prawo</option>
-                    <option value="bottom-left">Dół - lewo</option>
-                    <option value="bottom-center">Dół - środek</option>
-                    <option value="bottom-right">Dół - prawo</option>
-                </select>
-            </div>
+         <div>
+  <label className="block text-sm font-medium mb-1">Pozycja napisu</label>
+  <select
+    value={isCustom ? "custom" : yearPosition}
+    onChange={(e) => setYearPosition(e.target.value)}
+    className="w-full border rounded px-2 py-1 text-sm"
+  >
+    <option value="top-left">Góra - lewo</option>
+    <option value="top-center">Góra - środek</option>
+    <option value="top-right">Góra - prawo</option>
+    <option value="center-left">Środek - lewo</option>
+    <option value="center">Środek - środek</option>
+    <option value="center-right">Środek - prawo</option>
+    <option value="bottom-left">Dół - lewo</option>
+    <option value="bottom-center">Dół - środek</option>
+    <option value="bottom-right">Dół - prawo</option>
+    {isCustom && <option value="custom">Własna (X:{yearPosition.coords.x}, Y:{yearPosition.coords.y})</option>}
+  </select>
+</div>
         </div>
     )
 }
