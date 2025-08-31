@@ -17,7 +17,7 @@ const MonthEditor = ({
   fontWeights,
 }) => {
   return (
-    <div key={month} className="mt-2 border p-4 rounded shadow">
+    <div key={month} className="border p-4 rounded shadow">
       <h3 className="font-bold mb-2">{month}</h3>
 
       <label className="inline-flex items-center space-x-2 mb-4 cursor-pointer">
@@ -66,15 +66,15 @@ const MonthEditor = ({
             </select>
           </div>
 
-          <div className="mb-2">
-            <label className="block text-gray-700">Kolor tekstu</label>
+          <div className="mb-2 flex items-center gap-2">
+            <label className="text-gray-700 block">Kolor tekstu</label>
             <input
               type="color"
-              className="h-[36px] w-[50px] p-0 border rounded"
               value={fontSettings.fontColor}
               onChange={(e) =>
                 handleFontSettingChange(index, "fontColor", e.target.value)
               }
+              className=" p-0 border rounded bg-gray-100 cursor-pointer"
             />
           </div>
 
@@ -82,7 +82,7 @@ const MonthEditor = ({
             className="w-full border rounded p-2"
             value={monthTexts}
             onChange={(e) => handleMonthTextChange(index, e.target.value)}
-            rows={3}
+            rows={1}
             maxLength={1000}
             placeholder="Wpisz tekst..."
             style={{

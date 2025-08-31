@@ -307,11 +307,15 @@ export default function CalendarEditor() {
     const onMouseUp = () => {
       if (dragging) setDragging(false);
     };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [dragging]);
+}, [dragging, xLimits, yLimits, setYearPosition]);
 
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);
@@ -408,9 +412,9 @@ export default function CalendarEditor() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-9 gap-4 p-4">
+    <div className="grid grid-cols-1 lg:grid-cols-14 gap-4 p-4">
       {/* Sidebar options */}
-      <div className="lg:col-span-2 space-y-4">
+      <div className="lg:col-span-3 space-y-4">
         <StyleSidebar
           style={style}
           setStyle={setStyle}
@@ -428,7 +432,7 @@ export default function CalendarEditor() {
         </div>
       </div>
 
-      <div className="lg:col-span-2 space-y-4 ">
+      <div className="lg:col-span-3 space-y-4 ">
         {style === "style1" && (
           <ImgColor
             bgColor={bgColor}
@@ -485,32 +489,32 @@ export default function CalendarEditor() {
           xLimits={xLimits}
           yLimits={yLimits}
         />
-        <div className="mt-4 space-y-3">
-          {months.map((month, index) => (
-            <MonthEditor
-              key={month}
-              month={month}
-              index={index}
-              isImageMode={isImageMode[index]}
-              toggleImageMode={toggleImageMode}
-              fontSettings={fontSettings[index]}
-              handleFontSettingChange={handleFontSettingChange}
-              monthTexts={monthTexts[index]}
-              handleMonthTextChange={handleMonthTextChange}
-              monthImages={monthImages[index]}
-              handleImageChange={handleImageChange}
-              imageScales={imageScales[index]}
-              handleImageScaleChange={handleImageScaleChange}
-              fontFamilies={fontFamilies}
-              fontWeights={fontWeights}
-            />
-          ))}
-        </div>
+      </div>
+      <div className="lg:col-span-3 space-y-4 ">
+        {months.map((month, index) => (
+          <MonthEditor
+            key={month}
+            month={month}
+            index={index}
+            isImageMode={isImageMode[index]}
+            toggleImageMode={toggleImageMode}
+            fontSettings={fontSettings[index]}
+            handleFontSettingChange={handleFontSettingChange}
+            monthTexts={monthTexts[index]}
+            handleMonthTextChange={handleMonthTextChange}
+            monthImages={monthImages[index]}
+            handleImageChange={handleImageChange}
+            imageScales={imageScales[index]}
+            handleImageScaleChange={handleImageScaleChange}
+            fontFamilies={fontFamilies}
+            fontWeights={fontWeights}
+          />
+        ))}
       </div>
       <div className="lg:col-span-1" />
 
       {/* Preview area */}
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-3">
         <div className="border rounded w-[372px] h-[972px] mx-auto bg-white overflow-hidden shadow">
           {/* Header */}
           <div
