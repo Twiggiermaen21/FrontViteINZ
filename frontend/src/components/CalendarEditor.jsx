@@ -39,7 +39,7 @@ export default function CalendarEditor() {
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
-  const [yearPosition, setYearPosition] = useState({ coords: null });
+  const [yearPosition, setYearPosition] = useState({ coords: { x: 50, y: 20 } });
   const [xLimits, setXLimits] = useState({ min: 50, max: 325 });
   const [yLimits, setYLimits] = useState({ min: 20, max: 235 });
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);

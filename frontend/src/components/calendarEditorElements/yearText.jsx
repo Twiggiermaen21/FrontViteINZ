@@ -29,9 +29,6 @@ const YearText = ({
     }
   }, [dragging]);
 
-  // przykładowa struktura yearPosition
-  // { position: "top-left", coords: { x: 0, y: 0 } }
-
   const handleYearPositionChange = (value) => {
     let newPosition = {};
 
@@ -83,7 +80,7 @@ const updateLimitsByFontSize = (fontSize) => {
     setXLimits({ min: 60, max: 300 });
     setYLimits({ min: 30, max: 220 });
   } else {
-    setXLimits({ min: 70, max: 280 });
+    setXLimits({ min: 90, max: 280 });
     setYLimits({ min: 40, max: 200 });
   }
 };
