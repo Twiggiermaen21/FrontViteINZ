@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const CalendarList = () => {
@@ -19,17 +19,17 @@ const CalendarList = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setCalendars(response.data.calendars);
+        setCalendars(response.data);
       } catch (err) {
         console.error("Błąd podczas pobierania danych:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, []);
 
+  console.log("Calendars fetched:", calendars);
   const getBottomStyle = (calendar) => {
     if (calendar.bottom_type === "color" && calendar.bottom_color) {
       return { backgroundColor: calendar.bottom_color };
@@ -41,7 +41,9 @@ const CalendarList = () => {
       calendar.gradient_end_color
     ) {
       return {
-        background: `linear-gradient(${calendar.gradient_direction || "to bottom"}, ${calendar.gradient_start_color}, ${calendar.gradient_end_color})`,
+        background: `linear-gradient(${
+          calendar.gradient_direction || "to bottom"
+        }, ${calendar.gradient_start_color}, ${calendar.gradient_end_color})`,
       };
     }
 
@@ -83,45 +85,67 @@ const CalendarList = () => {
           ref={scrollRef}
           className="flex gap-6 transition-all duration-300 ease-in-out overflow-x-auto scrollbar-hide"
         >
-          {calendars.map((calendar) => (
-            <div
-              key={calendar.id}
-              className="w-[372px] h-[972px] bg-white border rounded overflow-hidden shadow shrink-0"
-            >
-              {/* Header */}
-              <div className="h-[252px] bg-gray-200 flex items-center justify-center">
-                {calendar.top_image ? (
-                  <img
-                    src={calendar.top_image_url}
-                    alt="Nagłówek"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-gray-500">Brak grafiki nagłówka</span>
-                )}
-              </div>
-
-              {/* Bottom */}
+          {calendars === null || calendars.length === 0 ? (
+            <p>Brak dostępnych kalendarzy.</p>
+          ) : (
+            calendars.map((calendar) => (
               <div
-                className="h-[720px] px-3 py-4 flex flex-col gap-28 items-center text-center"
-                style={getBottomStyle(calendar)}
+                key={calendar.id}
+                className="w-[372px] h-[972px] bg-white border rounded overflow-hidden shadow shrink-0"
               >
-                {["Grudzień", "Styczeń", "Luty"].map((month) => (
-                  <div
-                    key={month}
-                    className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
-                  >
-                    <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                      {month}
-                    </h3>
-                    <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
-                      [Siatka dni dla {month}]
+                {/* Header */}
+                <div className="relative h-[252px] bg-gray-200 flex items-center justify-center overflow-hidden">
+                  {calendar.top_image ? (
+                    <>
+                      <img
+                        src={calendar.top_image_url}
+                        alt="Nagłówek"
+                        className="w-full h-full object-cover"
+                      />
+                      {calendar.year_data && (
+                        <span
+                          style={{
+                            position: "absolute", 
+                            color: calendar.year_data.color,
+                            fontSize: `${calendar.year_data.size}px`,
+                            fontWeight: calendar.year_data.weight,
+                            fontFamily: calendar.year_data.font,
+                            left: `${calendar.year_data.positionX}px`,
+                            top: `${calendar.year_data.positionY}px`,
+                            transform: "translate(-50%, -50%)",
+                          }}
+                        >
+                          {calendar.year_data.text || ""}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="text-gray-500">Brak grafiki nagłówka</span>
+                  )}
+                </div>
+
+                {/* Bottom */}
+                <div
+                  className="h-[720px] px-3 py-4 flex flex-col gap-28 items-center text-center"
+                  style={getBottomStyle(calendar)}
+                >
+                  {["Grudzień", "Styczeń", "Luty"].map((month) => (
+                    <div
+                      key={month}
+                      className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
+                    >
+                      <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                        {month}
+                      </h3>
+                      <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
+                        [Siatka dni dla {month}]
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 

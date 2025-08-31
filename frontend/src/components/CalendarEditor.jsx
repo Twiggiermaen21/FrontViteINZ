@@ -181,6 +181,8 @@ export default function CalendarEditor() {
       } else {
         data.bottom_type = "theme-gradient";
         data.gradient_theme = gradientTheme;
+        data.gradient_start_color = bgColor;
+        data.gradient_end_color = gradientEndColor;
       }
     }
 
@@ -194,7 +196,8 @@ export default function CalendarEditor() {
       data.yearFontSize = yearFontSize;
       data.yearFontFamily = yearFontFamily;
       data.yearFontWeight = yearFontWeight;
-      data.yearPosition = yearPosition;
+      data.yearPositionX = yearPosition.coords.x;
+      data.yearPositionY = yearPosition.coords.y;
       data.yearText = yearText;
     }
 
@@ -230,11 +233,11 @@ export default function CalendarEditor() {
     }
 
     try {
-      // const response = axios.post(`${apiUrl}/calendars/`, data, {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
+      const response = axios.post(`${apiUrl}/calendars/`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       console.log("✅ Utworzono kalendarz:", data);
       alert("✅ Kalendarz został zapisany!");
@@ -413,7 +416,6 @@ export default function CalendarEditor() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-4 p-4">
-      {/* Sidebar options */}
       <div className="lg:col-span-3 space-y-4">
         <StyleSidebar
           style={style}
@@ -431,7 +433,6 @@ export default function CalendarEditor() {
           </button>
         </div>
       </div>
-
       <div className="lg:col-span-3 space-y-4 ">
         {style === "style1" && (
           <ImgColor
