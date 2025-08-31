@@ -39,10 +39,9 @@ export default function CalendarEditor() {
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
-  const [yearPosition, setYearPosition] = useState({
-    preset: "center",
-    coords: null,
-  });
+  const [yearPosition, setYearPosition] = useState({ coords: null });
+  const [xLimits, setXLimits] = useState({ min: 50, max: 325 });
+  const [yLimits, setYLimits] = useState({ min: 20, max: 235 });
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);
   const months = ["Grudzień", "Styczeń", "Luty"];
   const [fontSettings, setFontSettings] = useState(
@@ -251,9 +250,11 @@ export default function CalendarEditor() {
 
     let startX, startY;
 
+    const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
     if (yearPosition.coords) {
-      startX = yearPosition.coords.x;
-      startY = yearPosition.coords.y;
+      startX = clamp(yearPosition.coords.x, xLimits.min, xLimits.max);
+      startY = clamp(yearPosition.coords.y, yLimits.min, yLimits.max);
     } else {
       // Zamiana preset na konkretne coords
       const rect = spanRef.current.getBoundingClientRect();
@@ -261,6 +262,10 @@ export default function CalendarEditor() {
 
       startX = rect.left - parentRect.left + rect.width / 2;
       startY = rect.top - parentRect.top + rect.height / 2;
+
+      // Ograniczenie wartości do zakresu
+      startX = clamp(startX, xLimits.min, xLimits.max);
+      startY = clamp(startY, yLimits.min, yLimits.max);
 
       setYearPosition({ coords: { x: startX, y: startY } });
     }
@@ -280,22 +285,28 @@ export default function CalendarEditor() {
       const deltaX = e.clientX - dragStartPos.current.mouseX;
       const deltaY = e.clientY - dragStartPos.current.mouseY;
 
-      setYearPosition({
-        preset: null,
+      const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
+      setYearPosition((prev) => ({
+        ...prev,
         coords: {
-          x: dragStartPos.current.elemX + deltaX,
-          y: dragStartPos.current.elemY + deltaY,
+          x: clamp(
+            dragStartPos.current.elemX + deltaX,
+            xLimits.min,
+            xLimits.max
+          ),
+          y: clamp(
+            dragStartPos.current.elemY + deltaY,
+            yLimits.min,
+            yLimits.max
+          ),
         },
-      });
+      }));
     };
 
     const onMouseUp = () => {
       if (dragging) setDragging(false);
     };
-
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
@@ -399,13 +410,24 @@ export default function CalendarEditor() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-9 gap-4 p-4">
       {/* Sidebar options */}
-      <StyleSidebar
-        style={style}
-        setStyle={setStyle}
-        images={images}
-        handleImageSelect={handleImageSelect}
-        handleFileUpload={handleFileUpload}
-      />
+      <div className="lg:col-span-2 space-y-4">
+        <StyleSidebar
+          style={style}
+          setStyle={setStyle}
+          images={images}
+          handleImageSelect={handleImageSelect}
+          handleFileUpload={handleFileUpload}
+        />
+        <div className="border rounded p-4 justify-center items-center flex">
+          <button
+            onClick={handleSaveCalendar}
+            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm shadow"
+          >
+            Zapisz kalendarz
+          </button>
+        </div>
+      </div>
+
       <div className="lg:col-span-2 space-y-4 ">
         {style === "style1" && (
           <ImgColor
@@ -458,6 +480,10 @@ export default function CalendarEditor() {
           setYearActive={setYearActive}
           yearActive={yearActive}
           dragging={dragging}
+          setXLimits={setXLimits}
+          setYLimits={setYLimits}
+          xLimits={xLimits}
+          yLimits={yLimits}
         />
         <div className="mt-4 space-y-3">
           {months.map((month, index) => (
@@ -578,14 +604,6 @@ export default function CalendarEditor() {
             ))}
           </div>
         </div>
-      </div>
-      <div className="text-center mt-4">
-        <button
-          onClick={handleSaveCalendar}
-          className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm shadow"
-        >
-          Zapisz kalendarz
-        </button>
       </div>
     </div>
   );

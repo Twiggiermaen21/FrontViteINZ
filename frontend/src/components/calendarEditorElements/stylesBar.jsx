@@ -2,7 +2,7 @@ import React from "react";
 
 const StyleSidebar = ({ style, setStyle, images, handleImageSelect, handleFileUpload }) => {
   return (
-    <div className="lg:col-span-2 space-y-4">
+    <>
       {/* Styl kalendarza */}
       <div className="border rounded p-4">
         <h2 className="text-lg font-semibold mb-4">Styl kalendarza</h2>
@@ -55,7 +55,7 @@ const StyleSidebar = ({ style, setStyle, images, handleImageSelect, handleFileUp
           className="block w-full text-sm text-gray-700 border border-gray-300 rounded"
         />
       </div>
-    </div>
+    </>
   );
 };
 
