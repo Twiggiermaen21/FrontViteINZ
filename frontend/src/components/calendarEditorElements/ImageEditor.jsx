@@ -69,9 +69,10 @@ const ImageEditor = ({imageSrc,setImageSrc,imageScale,setImageScale,position,set
             style={{ height: 60 }}
           >
             <img
-              src={imageSrc}
+              src={URL.createObjectURL(imageSrc)}
               alt="Uploaded"
               draggable={false}
+           
               style={{
                 position: "absolute",
                 left: position.x,
@@ -86,6 +87,7 @@ const ImageEditor = ({imageSrc,setImageSrc,imageScale,setImageScale,position,set
                 if (position.x === 0 && position.y === 0) {
                   setPosition({ x: 0, y: 0 });
                 }
+                URL.revokeObjectURL(imageSrc);
               }}
             />
           </div>

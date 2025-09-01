@@ -1,6 +1,6 @@
 import React from "react";
 
-const StyleSidebar = ({ style, setStyle, images, handleImageSelect, handleFileUpload }) => {
+const StyleSidebar = ({ style, setStyle, images, handleImageSelect, handleFileUpload,setImageFromDisk }) => {
   return (
     <>
       {/* Styl kalendarza */}
@@ -38,7 +38,10 @@ const StyleSidebar = ({ style, setStyle, images, handleImageSelect, handleFileUp
               src={img.url}
               alt="Grafika AI"
               className="cursor-pointer object-cover h-20 w-full border rounded hover:opacity-70"
-              onClick={() => handleImageSelect(img)}
+              onClick={() => {
+                handleImageSelect(img);
+                setImageFromDisk(false);
+              }}
             />
           ))}
         </div>

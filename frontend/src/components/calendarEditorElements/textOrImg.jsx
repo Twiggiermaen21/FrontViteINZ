@@ -108,7 +108,7 @@ const MonthEditor = ({
               style={{ width: 300, height: 85 }}
             >
               <img
-                src={monthImages}
+                src={URL.createObjectURL(monthImages)}
                 alt={`Zdjęcie ${month}`}
                 style={{
                   width: "100%",

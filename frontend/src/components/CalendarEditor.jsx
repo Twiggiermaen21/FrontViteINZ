@@ -60,7 +60,7 @@ export default function CalendarEditor() {
   const [positions, setPositions] = useState(() =>
     months.map(() => ({ x: 0, y: 0 }))
   );
-
+  const [imageFromDisk, setImageFromDisk] = useState(false);
   const [yearFontWeight, setYearFontWeight] = useState("bold");
   const [yearFontFamily, setYearFontFamily] = useState("Arial");
   const [dragging, setDragging] = useState(false);
@@ -76,7 +76,7 @@ export default function CalendarEditor() {
 
   const handleImageChange = (index, e) => {
     if (e.target.files && e.target.files[0]) {
-      const url = URL.createObjectURL(e.target.files[0]);
+      const url = e.target.files[0];
       setMonthImages((prev) => {
         const newImgs = [...prev];
         newImgs[index] = url;
@@ -346,7 +346,8 @@ export default function CalendarEditor() {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(URL.createObjectURL(file));
+      setImage(file);
+      setImageFromDisk(true);
     }
   };
 
@@ -359,6 +360,7 @@ export default function CalendarEditor() {
           images={images}
           handleImageSelect={handleImageSelect}
           handleFileUpload={handleFileUpload}
+          setImageFromDisk={setImageFromDisk}
         />
         <div className="border rounded p-4 justify-center items-center flex">
           <button
@@ -461,7 +463,9 @@ export default function CalendarEditor() {
             {image ? (
               <>
                 <img
-                  src={image.url}
+                  src={
+                    imageFromDisk ? URL.createObjectURL(image) : image.url
+                  }
                   alt="Nagłówek"
                   className="w-full h-full object-cover"
                 />

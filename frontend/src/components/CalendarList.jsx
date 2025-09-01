@@ -112,7 +112,8 @@ const CalendarList = () => {
                         : calendar.bottom?.content_type_id === 28
                         ? "style3"
                         : null,
-                    bgColor: calendar.bottom?.color ??  calendar.bottom?.start_color,
+                    bgColor:
+                      calendar.bottom?.color ?? calendar.bottom?.start_color,
                     gradientEndColor: calendar.bottom?.end_color,
                     gradientTheme: calendar.bottom?.theme,
                     gradientStrength: calendar.bottom?.strength,
@@ -121,29 +122,27 @@ const CalendarList = () => {
                   })}
                 >
                   {[calendar.field1, calendar.field2, calendar.field3].map(
-                    (field) => {
+                    (field, index) => {
                       if (!field) return null; // jeśli pole jest null
 
                       const isText = "text" in field;
                       const isImage = "path" in field;
 
                       return (
-                        <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
-                          <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                            {isText
-                              ? field.text
-                              : isImage
-                              ? "Obrazek"
-                              : "Nieznany typ"}
-                          </h3>
-                          <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
-                            {isText
-                              ? `[Pole tekstowe]`
-                              : isImage
-                              ? `[Obrazek]`
-                              : `[Nieznany typ]`}
+                        <>
+                          <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
+                            <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                              {months[index]}
+                            </h3>
+                            <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
+                              [Siatka dni dla {months[index]}]
+                            </div>
                           </div>
-                        </div>
+
+                          <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                            {isText ? field.text : isImage ? "Obrazek" : null}
+                          </h3>
+                        </>
                       );
                     }
                   )}
