@@ -11,6 +11,7 @@ import LimitedTextarea from "./calendarEditorElements/contentEdittableText";
 import ImageEditor from "./calendarEditorElements/ImageEditor";
 import MonthEditor from "./calendarEditorElements/textOrImg";
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
+import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 
 const fontFamilies = [
   "Arial",
@@ -39,7 +40,9 @@ export default function CalendarEditor() {
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
-  const [yearPosition, setYearPosition] = useState({ coords: { x: 50, y: 20 } });
+  const [yearPosition, setYearPosition] = useState({
+    coords: { x: 50, y: 20 },
+  });
   const [xLimits, setXLimits] = useState({ min: 50, max: 325 });
   const [yLimits, setYLimits] = useState({ min: 20, max: 235 });
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);
@@ -178,6 +181,8 @@ export default function CalendarEditor() {
         data.gradient_start_color = bgColor;
         data.gradient_end_color = gradientEndColor;
         data.gradient_direction = direction;
+        data.gradient_strength = gradientStrength;
+        data.gradient_theme = gradientTheme;
       } else {
         data.bottom_type = "theme-gradient";
         data.gradient_theme = gradientTheme;
@@ -222,7 +227,8 @@ export default function CalendarEditor() {
         data[fieldName].push({
           image: monthImages[i],
           scale: imageScales[i],
-          position: positions[i],
+          positionX: positions[i].x,
+          positionY: positions[i].y,
         });
       } else {
         data[fieldName].push({
@@ -318,7 +324,7 @@ export default function CalendarEditor() {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-}, [dragging, xLimits, yLimits, setYearPosition]);
+  }, [dragging, xLimits, yLimits, setYearPosition]);
 
   useEffect(() => {
     const token = localStorage.getItem(ACCESS_TOKEN);
@@ -342,76 +348,6 @@ export default function CalendarEditor() {
     if (file) {
       setImage(URL.createObjectURL(file));
     }
-  };
-
-  const getBottomSectionBackground = () => {
-    if (style === "style1") {
-      return { background: bgColor };
-    }
-
-    if (style === "style2") {
-      if (gradientTheme !== "classic") {
-        // Predefiniowane stylizacje
-        const themes = {
-          aurora: {
-            background: `radial-gradient(circle at 30% 30%, ${bgColor}, ${gradientEndColor}, ${bgColor})`,
-            color: "white",
-          },
-          liquid: {
-            background: `linear-gradient(135deg, ${bgColor} 0%, ${gradientEndColor} 100%)`,
-            color: "white",
-          },
-          mesh: {
-            background: `linear-gradient(120deg, ${bgColor} 0%, ${gradientEndColor} 100%)`,
-            color: "white",
-          },
-          waves: {
-            background: `repeating-linear-gradient(135deg, ${bgColor}, ${gradientEndColor} 20%, ${bgColor} 40%)`,
-            color: "white",
-          },
-        };
-
-        return themes[gradientTheme] || { background: bgColor };
-      }
-
-      // klasyczny gradient
-      let blendMap = {
-        soft: "66",
-        medium: "99",
-        hard: "cc",
-      };
-
-      const alphaHex = blendMap[gradientStrength] || "99";
-      const blendedEnd = gradientEndColor + alphaHex;
-
-      let gradientStyle;
-      switch (gradientVariant) {
-        case "vertical":
-          gradientStyle = `linear-gradient(to bottom, ${bgColor}, ${blendedEnd})`;
-          break;
-        case "horizontal":
-          gradientStyle = `linear-gradient(to right, ${bgColor}, ${blendedEnd})`;
-          break;
-        case "radial":
-          gradientStyle = `radial-gradient(circle, ${bgColor}, ${blendedEnd})`;
-          break;
-        case "diagonal":
-        default:
-          gradientStyle = `linear-gradient(to bottom right, ${bgColor}, ${blendedEnd})`;
-          break;
-      }
-
-      return { background: gradientStyle };
-    }
-
-    if (style === "style3" && backgroundImage) {
-      return {
-        background: `url(${backgroundImage.url}) center/cover no-repeat`,
-        color: "white",
-      };
-    }
-
-    return { background: "#ffffff" };
   };
 
   return (
@@ -560,7 +496,15 @@ export default function CalendarEditor() {
           <div
             ref={bottomRef}
             className="h-[720px] px-3 py-4 flex flex-col  items-center text-center"
-            style={getBottomSectionBackground()}
+            style={getBottomSectionBackground({
+              style,
+              bgColor,
+              gradientEndColor,
+              gradientTheme,
+              gradientStrength,
+              gradientVariant,
+              backgroundImage,
+            })}
           >
             {months.map((month, index) => (
               <Fragment key={month}>

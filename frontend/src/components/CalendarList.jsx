@@ -1,15 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
+import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
+
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const CalendarList = () => {
   const [calendars, setCalendars] = useState([]);
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef(null);
-
+  const months = ["Grudzień", "Styczeń", "Luty"];
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem(ACCESS_TOKEN);
@@ -30,32 +32,6 @@ const CalendarList = () => {
   }, []);
 
   console.log("Calendars fetched:", calendars);
-  const getBottomStyle = (calendar) => {
-    if (calendar.bottom_type === "color" && calendar.bottom_color) {
-      return { backgroundColor: calendar.bottom_color };
-    }
-
-    if (
-      calendar.bottom_type === "gradient" &&
-      calendar.gradient_start_color &&
-      calendar.gradient_end_color
-    ) {
-      return {
-        background: `linear-gradient(${
-          calendar.gradient_direction || "to bottom"
-        }, ${calendar.gradient_start_color}, ${calendar.gradient_end_color})`,
-      };
-    }
-
-    if (calendar.bottom_type === "image" && calendar.bottom_image_url) {
-      return {
-        background: `url(${calendar.bottom_image_url}) center/cover no-repeat`,
-        color: "white",
-      };
-    }
-
-    return {};
-  };
 
   const scrollLeft = () => {
     if (scrollRef.current)
@@ -105,7 +81,7 @@ const CalendarList = () => {
                       {calendar.year_data && (
                         <span
                           style={{
-                            position: "absolute", 
+                            position: "absolute",
                             color: calendar.year_data.color,
                             fontSize: `${calendar.year_data.size}px`,
                             fontWeight: calendar.year_data.weight,
@@ -126,22 +102,51 @@ const CalendarList = () => {
 
                 {/* Bottom */}
                 <div
-                  className="h-[720px] px-3 py-4 flex flex-col gap-28 items-center text-center"
-                  style={getBottomStyle(calendar)}
+                  className="h-[720px] px-3 py-4 flex flex-col  items-center text-center"
+                  style={getBottomSectionBackground({
+                    style:
+                      calendar.bottom?.content_type_id === 26
+                        ? "style1"
+                        : calendar.bottom?.content_type_id === 27
+                        ? "style2"
+                        : calendar.bottom?.content_type_id === 28
+                        ? "style3"
+                        : null,
+                    bgColor: calendar.bottom?.color ??  calendar.bottom?.start_color,
+                    gradientEndColor: calendar.bottom?.end_color,
+                    gradientTheme: calendar.bottom?.theme,
+                    gradientStrength: calendar.bottom?.strength,
+                    gradientVariant: calendar.bottom?.direction,
+                    backgroundImage: calendar.bottom?.image,
+                  })}
                 >
-                  {["Grudzień", "Styczeń", "Luty"].map((month) => (
-                    <div
-                      key={month}
-                      className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
-                    >
-                      <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                        {month}
-                      </h3>
-                      <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
-                        [Siatka dni dla {month}]
-                      </div>
-                    </div>
-                  ))}
+                  {[calendar.field1, calendar.field2, calendar.field3].map(
+                    (field) => {
+                      if (!field) return null; // jeśli pole jest null
+
+                      const isText = "text" in field;
+                      const isImage = "path" in field;
+
+                      return (
+                        <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
+                          <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                            {isText
+                              ? field.text
+                              : isImage
+                              ? "Obrazek"
+                              : "Nieznany typ"}
+                          </h3>
+                          <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
+                            {isText
+                              ? `[Pole tekstowe]`
+                              : isImage
+                              ? `[Obrazek]`
+                              : `[Nieznany typ]`}
+                          </div>
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               </div>
             ))
