@@ -66,6 +66,9 @@ export default function CalendarEditor() {
   const [dragging, setDragging] = useState(false);
   const dragStartPos = useRef({ mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
   const spanRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+
   const toggleImageMode = (index) => {
     setIsImageMode((prev) => {
       const newMode = [...prev];
@@ -155,103 +158,117 @@ export default function CalendarEditor() {
     setFontSettings(updated);
   };
 
-  const handleSaveCalendar = () => {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-    let data = {};
-    if (image !== null) {
-      data.top_image = image.id;
+  const handleSaveCalendar = async () => {
+  const token = localStorage.getItem(ACCESS_TOKEN);
+
+  // Zamiast zwykłego obiektu robimy FormData
+  const formData = new FormData();
+
+  // ----- TOP IMAGE -----
+  if (image !== null) {
+    if (imageFromDisk) {
+      formData.append("imageFromDisk", "true");
+      formData.append("top_image", image); // raw plik
+    } else {
+      formData.append("imageFromDisk", "false");
+      formData.append("top_image", image.id); // tylko ID obrazka
     }
+  }
 
-    if (style === "style1") {
-      data.bottom_type = "color";
-      data.bottom_color = bgColor;
+  // ----- STYLE -----
+  if (style === "style1") {
+    formData.append("bottom_type", "color");
+    formData.append("bottom_color", bgColor);
+  }
+
+  if (style === "style2") {
+    if (gradientTheme === "classic") {
+      const direction =
+        {
+          diagonal: "to bottom right",
+          vertical: "to bottom",
+          horizontal: "to right",
+          radial: "radial",
+        }[gradientVariant] || "to bottom";
+
+      formData.append("bottom_type", "gradient");
+      formData.append("gradient_start_color", bgColor);
+      formData.append("gradient_end_color", gradientEndColor);
+      formData.append("gradient_direction", direction);
+      formData.append("gradient_strength", gradientStrength);
+      formData.append("gradient_theme", gradientTheme);
+    } else {
+      formData.append("bottom_type", "theme-gradient");
+      formData.append("gradient_theme", gradientTheme);
+      formData.append("gradient_start_color", bgColor);
+      formData.append("gradient_end_color", gradientEndColor);
     }
+  }
 
-    if (style === "style2") {
-      if (gradientTheme === "classic") {
-        const direction =
-          {
-            diagonal: "to bottom right",
-            vertical: "to bottom",
-            horizontal: "to right",
-            radial: "radial",
-          }[gradientVariant] || "to bottom";
+  if (style === "style3") {
+    formData.append("bottom_type", "image");
+    formData.append("bottom_image", backgroundImage.id);
+  }
 
-        data.bottom_type = "gradient";
-        data.gradient_start_color = bgColor;
-        data.gradient_end_color = gradientEndColor;
-        data.gradient_direction = direction;
-        data.gradient_strength = gradientStrength;
-        data.gradient_theme = gradientTheme;
-      } else {
-        data.bottom_type = "theme-gradient";
-        data.gradient_theme = gradientTheme;
-        data.gradient_start_color = bgColor;
-        data.gradient_end_color = gradientEndColor;
-      }
-    }
+  // ----- YEAR -----
+  if (yearActive) {
+    formData.append("yearColor", yearColor);
+    formData.append("yearFontSize", yearFontSize);
+    formData.append("yearFontFamily", yearFontFamily);
+    formData.append("yearFontWeight", yearFontWeight);
+    formData.append("yearPositionX", yearPosition.coords.x);
+    formData.append("yearPositionY", yearPosition.coords.y);
+    formData.append("yearText", yearText);
+  }
 
-    if (style === "style3") {
-      data.bottom_type = "image";
-      data.bottom_image = backgroundImage.id;
-    }
+  console.log("text", monthTexts);
+  console.log("font", fontSettings);
+  console.log("img", monthImages);
+  console.log("mode", isImageMode);
+  console.log("scale", imageScales);
 
-    if (yearActive) {
-      data.yearColor = yearColor;
-      data.yearFontSize = yearFontSize;
-      data.yearFontFamily = yearFontFamily;
-      data.yearFontWeight = yearFontWeight;
-      data.yearPositionX = yearPosition.coords.x;
-      data.yearPositionY = yearPosition.coords.y;
-      data.yearText = yearText;
-    }
+  // ----- MIESIĄCE -----
+  for (let i = 0; i < months.length; i++) {
+    const fieldName = `field${i + 1}`; // field1, field2...
 
-    console.log("text", monthTexts);
-    console.log("font", fontSettings);
-    console.log("img", monthImages);
-    console.log("mode", isImageMode);
-    console.log("scale", imageScales);
-
-    data.field1 = [];
-    data.field2 = [];
-    data.field3 = [];
-
-    for (let i = 0; i < months.length; i++) {
-      const fieldName = `field${i + 1}`; // field1, field2, field3...
-
-      if (!data[fieldName]) {
-        data[fieldName] = []; // upewniamy się, że istnieje
-      }
-
-      if (isImageMode[i]) {
-        data[fieldName].push({
+    if (isImageMode[i]) {
+      formData.append(
+        fieldName,
+        JSON.stringify({
           image: monthImages[i],
           scale: imageScales[i],
           positionX: positions[i].x,
           positionY: positions[i].y,
-        });
-      } else {
-        data[fieldName].push({
+        })
+      );
+    } else {
+      formData.append(
+        fieldName,
+        JSON.stringify({
           text: monthTexts[i],
           font: fontSettings[i],
-        });
-      }
+        })
+      );
     }
+  }
 
-    try {
-      const response = axios.post(`${apiUrl}/calendars/`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  // ----- REQUEST -----
+  try {
+    const response = await axios.post(`${apiUrl}/calendars/`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-      console.log("✅ Utworzono kalendarz:", data);
-      alert("✅ Kalendarz został zapisany!");
-    } catch (error) {
-      console.error("❌ Błąd zapisu:", error.response?.data || error.message);
-      alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
-    }
-  };
+    console.log("✅ Utworzono kalendarz:", response.data);
+    alert("✅ Kalendarz został zapisany!");
+  } catch (error) {
+    console.error("❌ Błąd zapisu:", error.response?.data || error.message);
+    alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
+  }
+};
+
 
   const onMouseDown = (e) => {
     e.preventDefault();
@@ -348,8 +365,37 @@ export default function CalendarEditor() {
     if (file) {
       setImage(file);
       setImageFromDisk(true);
+
+      // pobranie wymiarów obrazu
+      const img = new Image();
+      img.onload = () => {
+        setDimensions({ width: img.width, height: img.height });
+      };
+      img.src = URL.createObjectURL(file);
     }
   };
+
+  const sendImageToServer = async () => {
+    if (!image) return;
+
+    const formData = new FormData();
+    formData.append("file", image); // Django -> request.FILES["file"]
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/upload/",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      console.log("Upload OK:", response.data);
+    } catch (error) {
+      console.error("Upload error:", error);
+    }
+  };
+
+  
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-4 p-4">
@@ -371,6 +417,7 @@ export default function CalendarEditor() {
           </button>
         </div>
       </div>
+
       <div className="lg:col-span-3 space-y-4 ">
         {style === "style1" && (
           <ImgColor
@@ -463,9 +510,7 @@ export default function CalendarEditor() {
             {image ? (
               <>
                 <img
-                  src={
-                    imageFromDisk ? URL.createObjectURL(image) : image.url
-                  }
+                  src={imageFromDisk ? URL.createObjectURL(image) : image.url}
                   alt="Nagłówek"
                   className="w-full h-full object-cover"
                 />
