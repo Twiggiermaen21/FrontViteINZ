@@ -67,8 +67,10 @@ export default function CalendarEditor() {
   const dragStartPos = useRef({ mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
   const spanRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
-
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+ 
   const toggleImageMode = (index) => {
     setIsImageMode((prev) => {
       const newMode = [...prev];
@@ -343,18 +345,34 @@ export default function CalendarEditor() {
     };
   }, [dragging, xLimits, yLimits, setYearPosition]);
 
-  useEffect(() => {
+ const fetchImages = async () => {
+    if (!hasMore || loading) return;
+
+    setLoading(true);
     const token = localStorage.getItem(ACCESS_TOKEN);
 
-    axios
-      .get(`${apiUrl}/generate/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => setImages(res.data))
-      .catch((err) => console.error("Błąd podczas pobierania obrazów:", err));
+    try {
+      const res = await axios.get(`${apiUrl}/generate/`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { page, page_size: 12 }, // backend musi obsługiwać paginację
+      });
+
+      setImages((prev) => [...prev, ...res.data.results]);
+      setHasMore(!!res.data.next);
+      setPage((prev) => prev + 1);
+    } catch (err) {
+      console.error("Błąd podczas pobierania obrazów:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+useEffect(() => {
+    fetchImages();
   }, []);
+
+
+
 
   const handleImageSelect = (img) => {
     setImage(img);
@@ -404,6 +422,9 @@ export default function CalendarEditor() {
           style={style}
           setStyle={setStyle}
           images={images}
+          loading={loading}
+          hasMore={hasMore}
+          fetchImages={fetchImages}
           handleImageSelect={handleImageSelect}
           handleFileUpload={handleFileUpload}
           setImageFromDisk={setImageFromDisk}

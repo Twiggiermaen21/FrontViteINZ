@@ -1,49 +1,62 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const CalendarList = () => {
   const [calendars, setCalendars] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
   const scrollRef = useRef(null);
+
   const months = ["Grudzień", "Styczeń", "Luty"];
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem(ACCESS_TOKEN);
 
-      try {
-        const response = await axios.get(`${apiUrl}/calendars/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+  const fetchCalendars = async () => {
+    if (!hasMore || loading) return;
 
-        setCalendars(response.data);
-      } catch (err) {
-        console.error("Błąd podczas pobierania danych:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    setLoading(true);
+    const token = localStorage.getItem(ACCESS_TOKEN);
 
-  console.log("Calendars fetched:", calendars);
+    try {
+      const response = await axios.get(`${apiUrl}/calendars/`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { page, page_size: 5 },
+      });
+
+      setCalendars((prev) => [...prev, ...response.data.results]);
+      setHasMore(!!response.data.next);
+      setPage((prev) => prev + 1);
+    } catch (err) {
+      console.error("Błąd podczas pobierania danych:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Załaduj pierwszą stronę
+ const didFetch = useRef(false);
+
+useEffect(() => {
+  if (!didFetch.current) {
+    fetchCalendars();
+    didFetch.current = true;
+  }
+}, []);
 
   const scrollLeft = () => {
     if (scrollRef.current)
-      scrollRef.current.scrollBy({ left: -372 * 2, behavior: "smooth" }); // przewijanie o 2 elementy
+      scrollRef.current.scrollBy({ left: -372 * 2, behavior: "smooth" });
   };
 
   const scrollRight = () => {
     if (scrollRef.current)
       scrollRef.current.scrollBy({ left: 372 * 2, behavior: "smooth" });
   };
-
-  if (loading) return <p>Ładowanie kalendarzy...</p>;
 
   return (
     <div className="relative w-full max-w-[1512px] mx-auto">
@@ -55,13 +68,13 @@ const CalendarList = () => {
         <ChevronLeft />
       </button>
 
-      {/* Przewijalny wrapper z ograniczoną szerokością */}
+      {/* Wrapper z możliwością przewijania */}
       <div className="overflow-hidden px-12">
         <div
           ref={scrollRef}
           className="flex gap-6 transition-all duration-300 ease-in-out overflow-x-auto scrollbar-hide"
         >
-          {calendars === null || calendars.length === 0 ? (
+          {calendars.length === 0 && !loading ? (
             <p>Brak dostępnych kalendarzy.</p>
           ) : (
             calendars.map((calendar) => (
@@ -102,7 +115,7 @@ const CalendarList = () => {
 
                 {/* Bottom */}
                 <div
-                  className="h-[720px] px-3 py-4 flex flex-col  items-center text-center"
+                  className="h-[720px] px-3 py-4 flex flex-col items-center text-center"
                   style={getBottomSectionBackground({
                     style:
                       calendar.bottom?.content_type_id === 26
@@ -123,26 +136,26 @@ const CalendarList = () => {
                 >
                   {[calendar.field1, calendar.field2, calendar.field3].map(
                     (field, index) => {
-                      if (!field) return null; // jeśli pole jest null
+                      if (!field) return null;
 
                       const isText = "text" in field;
                       const isImage = "path" in field;
 
                       return (
-                        <>
-                          <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
-                            <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                              {months[index]}
-                            </h3>
-                            <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
-                              [Siatka dni dla {months[index]}]
-                            </div>
-                          </div>
-
+                        <div
+                          key={index}
+                          className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
+                        >
                           <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                            {months[index]}
+                          </h3>
+                          <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
+                            [Siatka dni dla {months[index]}]
+                          </div>
+                          <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
                             {isText ? field.text : isImage ? "Obrazek" : null}
                           </h3>
-                        </>
+                        </div>
                       );
                     }
                   )}
@@ -160,6 +173,21 @@ const CalendarList = () => {
       >
         <ChevronRight />
       </button>
+
+      {/* 🔹 Przyciski doładowania */}
+      <div className="text-center mt-4">
+        {hasMore ? (
+          <button
+            onClick={fetchCalendars}
+            disabled={loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? "Ładowanie..." : "Załaduj więcej"}
+          </button>
+        ) : (
+          <p className="text-gray-500">Brak więcej kalendarzy.</p>
+        )}
+      </div>
     </div>
   );
 };

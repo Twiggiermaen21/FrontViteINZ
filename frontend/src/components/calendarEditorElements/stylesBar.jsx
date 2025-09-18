@@ -1,6 +1,6 @@
 import React from "react";
 
-const StyleSidebar = ({ style, setStyle, images, handleImageSelect, handleFileUpload,setImageFromDisk }) => {
+const StyleSidebar = ({ style, setStyle, images,loading,hasMore,fetchImages, handleImageSelect, handleFileUpload,setImageFromDisk }) => {
   return (
     <>
       {/* Styl kalendarza */}
@@ -29,23 +29,38 @@ const StyleSidebar = ({ style, setStyle, images, handleImageSelect, handleFileUp
       </div>
 
       {/* Galeria grafik */}
-      <div className="border rounded p-4">
-        <h2 className="text-lg font-semibold mb-2">Galeria grafik</h2>
-        <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
-          {images.map((img) => (
-            <img
-              key={img.id || img.url}
-              src={img.url}
-              alt="Grafika AI"
-              className="cursor-pointer object-cover h-20 w-full border rounded hover:opacity-70"
-              onClick={() => {
-                handleImageSelect(img);
-                setImageFromDisk(false);
-              }}
-            />
-          ))}
-        </div>
+       <div className="border rounded p-4">
+      <h2 className="text-lg font-semibold mb-2">Galeria grafik</h2>
+      <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+        {images.map((item, index) => (
+          <img
+            key={index}
+            src={item.url}
+            alt="Grafika AI"
+            className="cursor-pointer object-cover h-20 w-full border rounded hover:opacity-70"
+            onClick={() => {
+              handleImageSelect(item);
+              setImageFromDisk(false);
+            }}
+          />
+        ))}
       </div>
+
+      {/* 🔹 Przyciski doładowania */}
+      <div className="text-center mt-3">
+        {hasMore ? (
+          <button
+            onClick={fetchImages}
+            disabled={loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loading ? "Ładowanie..." : "Załaduj więcej"}
+          </button>
+        ) : (
+          <p className="text-gray-500 text-sm">Brak więcej grafik.</p>
+        )}
+      </div>
+    </div>
 
       {/* Własna grafika */}
       <div className="border rounded p-4">
