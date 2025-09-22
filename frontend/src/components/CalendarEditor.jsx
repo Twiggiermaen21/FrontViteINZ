@@ -237,12 +237,15 @@ export default function CalendarEditor() {
       formData.append(
         fieldName,
         JSON.stringify({
-          image: monthImages[i],
+          image: "true",
           scale: imageScales[i],
           positionX: positions[i].x,
           positionY: positions[i].y,
         })
       );
+
+      formData.append(`${fieldName}_image`, monthImages[i]);
+
     } else {
       formData.append(
         fieldName,
@@ -392,29 +395,7 @@ useEffect(() => {
       img.src = URL.createObjectURL(file);
     }
   };
-
-  const sendImageToServer = async () => {
-    if (!image) return;
-
-    const formData = new FormData();
-    formData.append("file", image); // Django -> request.FILES["file"]
-
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/upload/",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      console.log("Upload OK:", response.data);
-    } catch (error) {
-      console.error("Upload error:", error);
-    }
-  };
-
   
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-4 p-4">
       <div className="lg:col-span-3 space-y-4">
