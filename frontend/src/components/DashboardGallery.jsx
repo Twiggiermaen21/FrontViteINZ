@@ -29,6 +29,11 @@ const ImageGallery = () => {
       setPage((prev) => prev + 1);
     } catch (err) {
       console.error("Błąd podczas pobierania obrazów:", err);
+      if (err.response?.status === 401) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // odświeży po 0.5 sekundy
+      }
     } finally {
       setLoading(false);
     }

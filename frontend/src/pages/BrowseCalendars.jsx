@@ -1,10 +1,10 @@
-import React from 'react';
-import CalendarList from '../components/CalendarList';
+import React from "react";
+import CalendarList from "../components/CalendarList";
 
 const BrowseCalendars = () => {
   return (
     <div>
-     <CalendarList />
+      <CalendarList />
     </div>
   );
 };

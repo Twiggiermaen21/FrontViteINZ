@@ -1,10 +1,10 @@
-import React from 'react';
-import CalendarEditor from '../components/CalendarEditor';
+import React from "react";
+import CalendarEditor from "../components/CalendarEditor";
 
 const CreateCalendar = () => {
   return (
     <div>
-   <CalendarEditor/>
+      <CalendarEditor />
     </div>
   );
 };

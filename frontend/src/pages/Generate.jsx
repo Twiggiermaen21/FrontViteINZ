@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { ACCESS_TOKEN, fields,fieldToEndpoint} from "../constants";
+import { ACCESS_TOKEN, fields, fieldToEndpoint } from "../constants";
 import { assets } from "../assets/assets";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
@@ -19,36 +19,41 @@ export default function Generate() {
     "Minimalist abstract shapes",
   ];
 
- useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem(ACCESS_TOKEN);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem(ACCESS_TOKEN);
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        const responses = await Promise.all(
+          fields.map((field) =>
+            axios.get(`${apiUrl}/${fieldToEndpoint[field]}/`, config)
+          )
+        );
+
+        const opt = {};
+        fields.forEach((field, i) => {
+          opt[field] = responses[i].data;
+        });
+
+        setOptions(opt);
+      } catch (err) {
+        console.error("Error fetching select data", err);
+        if (err.response?.status === 401) {
+          setTimeout(() => {
+            window.location.reload();
+          }, 500); // odświeży po 0.5 sekundy
         }
-      };
+      }
+    };
 
-      const responses = await Promise.all(
-       fields.map((field) =>
-          axios.get(`${apiUrl}/${fieldToEndpoint[field]}/`, config)
-        )
-      );
-
-      const opt = {};
-      fields.forEach((field, i) => {
-        opt[field] = responses[i].data;
-      });
-
-      setOptions(opt);
-    } catch (err) {
-      console.error("Error fetching select data", err);
-    }
-  };
-
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
   const handleSelectChange = (e) => {
     setSelected((prev) => ({
@@ -57,49 +62,53 @@ export default function Generate() {
     }));
   };
 
- const generateImage = async () => {
-  setLoading(true);
+  const generateImage = async () => {
+    setLoading(true);
 
-  try {
-    const payload = { prompt };
+    try {
+      const payload = { prompt };
 
-    // Tworzymy payload z selected lub losowymi wartościami
-    fields.forEach((field) => {
-      const selectedValue = selected[field];
-      const availableOptions = options[field];
+      // Tworzymy payload z selected lub losowymi wartościami
+      fields.forEach((field) => {
+        const selectedValue = selected[field];
+        const availableOptions = options[field];
 
-      if (selectedValue) {
-        payload[field] = selectedValue;
-      } else if (availableOptions && availableOptions.length > 0) {
-        const randomIndex = Math.floor(Math.random() * availableOptions.length);
-        payload[field] = availableOptions[randomIndex].id;
-      }
-    });
+        if (selectedValue) {
+          payload[field] = selectedValue;
+        } else if (availableOptions && availableOptions.length > 0) {
+          const randomIndex = Math.floor(
+            Math.random() * availableOptions.length
+          );
+          payload[field] = availableOptions[randomIndex].id;
+        }
+      });
 
-    console.log("Wysyłany payload (z losowymi gdzie trzeba):", payload);
+      console.log("Wysyłany payload (z losowymi gdzie trzeba):", payload);
 
-    const token = localStorage.getItem(ACCESS_TOKEN);
+      const token = localStorage.getItem(ACCESS_TOKEN);
 
-    const res = await axios.post(`${apiUrl}/generate/`, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const res = await axios.post(`${apiUrl}/generate/`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    setImageUrl(res.data.url);
-  } catch (err) {
-    console.error(err);
-    alert("Failed to generate image.");
-  } finally {
-    setLoading(false);
-  }
-};
+      setImageUrl(res.data.url);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to generate image.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-
+  console.log(options);
   return (
     <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl mx-auto py-12 px-4">
       <div className="flex-1 bg-white/20 backdrop-blur-md rounded-3xl p-8 shadow-lg">
-        <h2 className="text-3xl font-bold text-white mb-6">Generate AI Image</h2>
+        <h2 className="text-3xl font-bold text-white mb-6">
+          Generate AI Image
+        </h2>
 
         <div className="mb-6 space-y-2">
           <label className="block text-xs font-semibold tracking-wider text-white uppercase">
@@ -115,7 +124,9 @@ export default function Generate() {
         </div>
 
         <div className="mb-8">
-          <h3 className="text-sm font-semibold text-white mb-2">Try an example:</h3>
+          <h3 className="text-sm font-semibold text-white mb-2">
+            Try an example:
+          </h3>
           <div className="flex flex-wrap gap-3">
             {examplePrompts.map((ex, i) => (
               <button
@@ -141,11 +152,13 @@ export default function Generate() {
                 className="w-full p-2 rounded-xl text-gray-700"
               >
                 <option value="">Wybierz</option>
-                {(options[field] || []).map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.nazwa}
-                  </option>
-                ))}
+
+                {Array.isArray(options[field]) &&
+                  options[field].map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.nazwa}
+                    </option>
+                  ))}
               </select>
             </div>
           ))}

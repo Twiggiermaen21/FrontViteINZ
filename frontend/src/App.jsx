@@ -1,33 +1,32 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import NotFound from "./pages/NotFound"
-import ProtectedRoute from "./components/ProtectedRoute"
-import Layout from "./pages/Layout"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from "./pages/Layout";
 
-import Generate from "./pages/Generate"
-import StartPage from "./pages/StartPage"
-import Dashboard from "./pages/Dashboard"
-import Gallery from "./pages/Gallery"
-import BrowseCalendars from "./pages/BrowseCalendars"
-import CreateCalendar from "./pages/CreateCalendar"
-import EditCalendar from "./pages/EditCalendar"
-import EditImage from "./pages/EditImage"
-
+import Generate from "./pages/Generate";
+import StartPage from "./pages/StartPage";
+import Dashboard from "./pages/Dashboard";
+import Gallery from "./pages/Gallery";
+import BrowseCalendars from "./pages/BrowseCalendars";
+import CreateCalendar from "./pages/CreateCalendar";
+import EditCalendar from "./pages/EditCalendar";
+import EditImage from "./pages/EditImage";
 
 function Logout() {
-  localStorage.clear()
-  return <Navigate to="/" />
+  localStorage.clear();
+  return <Navigate to="/" />;
 }
 
 function RegisterAndLogout() {
-  localStorage.clear()
-  return <Register />
+  localStorage.clear();
+  return <Register />;
 }
 
 function App() {
   return (
-    <div >
+    <div>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<StartPage />} />
@@ -35,22 +34,27 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="*" element={<NotFound />}></Route>
 
-          <Route path='/ai' element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route
+            path="/ai"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="generate" element={<Generate />} />
             <Route path="dashboard" element={<Dashboard />} />
-             <Route path="gallery" element={<Gallery/>} />
-              <Route path="calendars" element={<BrowseCalendars />} />
-               <Route path="create-calendar" element={<CreateCalendar />} />
-                <Route path="edit-calendar" element={<EditCalendar />} />
-                <Route path="edit" element={<EditImage/>} />
+            <Route path="gallery" element={<Gallery />} />
+            <Route path="calendars" element={<BrowseCalendars />} />
+            <Route path="create-calendar" element={<CreateCalendar />} />
+            <Route path="edit-calendar" element={<EditCalendar />} />
+            <Route path="edit" element={<EditImage />} />
             <Route path="logout" element={<Logout />} />
-
-
           </Route>
         </Routes>
       </BrowserRouter>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
