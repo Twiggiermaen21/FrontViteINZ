@@ -39,15 +39,15 @@ const CalendarList = () => {
   };
 
   // Załaduj pierwszą stronę
- const didFetch = useRef(false);
+  const didFetch = useRef(false);
 
-useEffect(() => {
-  if (!didFetch.current) {
-    fetchCalendars();
-    didFetch.current = true;
-  }
-}, []);
-
+  useEffect(() => {
+    if (!didFetch.current) {
+      fetchCalendars();
+      didFetch.current = true;
+    }
+  }, []);
+  console.log(calendars);
   const scrollLeft = () => {
     if (scrollRef.current)
       scrollRef.current.scrollBy({ left: -372 * 2, behavior: "smooth" });
@@ -142,6 +142,7 @@ useEffect(() => {
                       const isImage = "path" in field;
 
                       return (
+                        <> 
                         <div
                           key={index}
                           className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
@@ -152,12 +153,34 @@ useEffect(() => {
                           <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
                             [Siatka dni dla {months[index]}]
                           </div>
-                          <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
-                            {isText ? field.text : isImage ? "Obrazek" : null}
-                          </h3>
-                        </div>
-                      );
+                        </div>  
+                          <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
+                            {isText
+                              ? field.text
+                              : isImage
+                              ? (calendar.images_for_fields.map((img, idx) =>
+                                   img.field_number  === index+1 ? (
+                                    <img
+                                      key={idx}
+                                      src={img.url}
+                                      alt="Image"
+                                      style={{
+                                        left: field.positionX,
+                                        top: field.positionY,
+                                        height: 60,
+                                        transform: `scale(${field.size})`,
+                                        transformOrigin: "top left",
+                                        userSelect: "none",
+                                      }}
+                                    />
+                                  ) :console.log("blad")
+                                ))
+                              : console.log("blad")}
+                          </div>
+                        
+                     </> );
                     }
+                  
                   )}
                 </div>
               </div>
