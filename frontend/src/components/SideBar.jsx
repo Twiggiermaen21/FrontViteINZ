@@ -74,7 +74,10 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
       </div>
 
       <div className="w-full brodaer-t border-gray-200 p-4 px-7 flex items-center justify-between">
-        <div className="flex gap-2 items-center cursor-pointer">
+        <div
+          className="flex gap-2 items-center cursor-pointer"
+          onClick={() => navigate("/ai/settings")}
+        >
           <img
             src={user?.picture ? user.picture : assets.avatar}
             alt="user avatar"

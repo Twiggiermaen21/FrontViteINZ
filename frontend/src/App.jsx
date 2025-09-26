@@ -14,6 +14,7 @@ import CreateCalendar from "./pages/CreateCalendar";
 import EditCalendar from "./pages/EditCalendar";
 import EditImage from "./pages/EditImage";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import Settings from "./pages/Settings";
 
 function Logout() {
   localStorage.clear();
@@ -52,6 +53,7 @@ function App() {
             <Route path="create-calendar" element={<CreateCalendar />} />
             <Route path="edit-calendar" element={<EditCalendar />} />
             <Route path="edit" element={<EditImage />} />
+            <Route path="settings" element={<Settings />} />
             <Route path="logout" element={<Logout />} />
           </Route>
         </Routes>
