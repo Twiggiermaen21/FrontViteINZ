@@ -52,6 +52,7 @@ export default function Login() {
 
           <GoogleLogin
             onSuccess={async (credentialResponse) => {
+              
               const res = await axios.post(
                 "http://localhost:8000/api/auth/google/",
                 { credential: credentialResponse.credential },
