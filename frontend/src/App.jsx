@@ -13,6 +13,7 @@ import BrowseCalendars from "./pages/BrowseCalendars";
 import CreateCalendar from "./pages/CreateCalendar";
 import EditCalendar from "./pages/EditCalendar";
 import EditImage from "./pages/EditImage";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 function Logout() {
   localStorage.clear();
@@ -26,14 +27,16 @@ function RegisterAndLogout() {
 
 function App() {
   return (
-    <div>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <BrowserRouter>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<StartPage />} />
           <Route path="/register" element={<RegisterAndLogout />} />
           <Route path="/login" element={<Login />} />
-          <Route path="*" element={<NotFound />}></Route>
+          <Route path="*" element={<NotFound />} />
 
+          {/* Protected routes */}
           <Route
             path="/ai"
             element={
@@ -53,7 +56,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </div>
+    </GoogleOAuthProvider>
   );
 }
 
