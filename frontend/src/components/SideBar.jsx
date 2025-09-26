@@ -21,9 +21,9 @@ const navbar = [
   { label: "Edytuj kalendarz", path: "/ai/edit-calendar", Icon: Edit3 },
 ];
 
-const SideBar = ({ sidebar, setSidebar,user }) => {
+const SideBar = ({ sidebar, setSidebar, user }) => {
   const navigate = useNavigate();
- 
+
   return (
     <div
       className={`w-60 bg-white border-r border-gray-200 flex flex-col items-center justify-between max-sm:absolute top-14 bottom-0
@@ -33,7 +33,7 @@ const SideBar = ({ sidebar, setSidebar,user }) => {
     >
       <div className="my-7 w-full">
         <img
-          src={user?.picture}
+          src={user?.picture ? user.picture : assets.avatar}
           alt="user avatar"
           className="w-13 rounded-full mx-auto"
           onError={(e) => (e.currentTarget.src = assets.avatar)}
@@ -76,13 +76,15 @@ const SideBar = ({ sidebar, setSidebar,user }) => {
       <div className="w-full brodaer-t border-gray-200 p-4 px-7 flex items-center justify-between">
         <div className="flex gap-2 items-center cursor-pointer">
           <img
-          src={user?.picture}
-          alt="user avatar"
-          className="w-13 rounded-full mx-auto"
-          onError={(e) => (e.currentTarget.src = assets.avatar)}
-        />
+            src={user?.picture ? user.picture : assets.avatar}
+            alt="user avatar"
+            className="w-13 rounded-full mx-auto"
+            onError={(e) => (e.currentTarget.src = assets.avatar)}
+          />
           <div>
-            <h1 className="text-sm font-medium">{user?.first_name + " " + user?.last_name}</h1>
+            <h1 className="text-sm font-medium">
+              {user?.first_name + " " + user?.last_name}
+            </h1>
             <p className="text-xs text-gray-500">Premium Plan</p>
           </div>
         </div>

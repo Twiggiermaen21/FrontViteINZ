@@ -40,7 +40,7 @@ export default function Form({ route, method }) {
                 };
             }
 
-            console.log("Payload:", payload);
+
             const res = await api.post(route, payload);
 
             if (method === "login") {
