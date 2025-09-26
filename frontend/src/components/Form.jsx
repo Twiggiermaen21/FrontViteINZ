@@ -25,8 +25,10 @@ const name = method === "login" ? "Login" : "Register";
         try {
             const res = await api.post(route, { username, password });
             if (method === "login") {
+                console.log("Login successful:", res.data);
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+                localStorage.setItem("user", JSON.stringify(res.data.user));
                 navigate("/ai");
             } else {
                 navigate("/login");
