@@ -163,7 +163,7 @@ export default function Form({ route, method }) {
                         />
                         <span className="text-gray-600 text-sm">Remember me</span>
                     </label>
-                    <a href="#" className="text-pink-500 font-semibold hover:underline">Forgot Password</a>
+                    <a href="/forgot-password" className="text-pink-500 font-semibold hover:underline">Forgot Password</a>
                 </div>
             )}
 
