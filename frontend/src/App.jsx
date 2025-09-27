@@ -5,6 +5,7 @@ import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./pages/Layout";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Generate from "./pages/Generate";
 import StartPage from "./pages/StartPage";
 import Dashboard from "./pages/Dashboard";
@@ -36,6 +37,7 @@ function App() {
           <Route path="/register" element={<RegisterAndLogout />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
 
           {/* Protected routes */}
