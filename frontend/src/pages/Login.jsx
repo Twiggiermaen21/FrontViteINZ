@@ -58,7 +58,7 @@ export default function Login() {
                 { credential: credentialResponse.credential },
                 { withCredentials: true }
               );
-              // console.log(credentialResponse)
+              console.log(res)
               localStorage.setItem(ACCESS_TOKEN, res.data.token.access);
               localStorage.setItem(REFRESH_TOKEN, res.data.token.refresh);
               localStorage.setItem("user", JSON.stringify(res.data.user));

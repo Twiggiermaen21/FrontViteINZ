@@ -201,6 +201,8 @@ export default function Settings() {
         </form>
       </div>
 
+
+
       {/* Zmiana Hasła */}
       <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
         <h2 className="text-xl font-semibold text-gray-700">Zmień hasło</h2>
