@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
+
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -53,26 +54,12 @@ const CalendarList = () => {
       didFetch.current = true;
     }
   }, []);
-  console.log(calendars);
-  const scrollLeft = () => {
-    if (scrollRef.current)
-      scrollRef.current.scrollBy({ left: -372 * 2, behavior: "smooth" });
-  };
-
-  const scrollRight = () => {
-    if (scrollRef.current)
-      scrollRef.current.scrollBy({ left: 372 * 2, behavior: "smooth" });
-  };
+ 
 
   return (
     <div className="relative w-full max-w-[1512px] mx-auto">
-      {/* Strzałka w lewo */}
-      <button
-        onClick={scrollLeft}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow rounded-full p-2 hover:bg-gray-100"
-      >
-        <ChevronLeft />
-      </button>
+  
+
 
       {/* Wrapper z możliwością przewijania */}
       <div className="overflow-hidden px-12">
@@ -195,13 +182,7 @@ const CalendarList = () => {
         </div>
       </div>
 
-      {/* Strzałka w prawo */}
-      <button
-        onClick={scrollRight}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow rounded-full p-2 hover:bg-gray-100"
-      >
-        <ChevronRight />
-      </button>
+  
 
       {/* 🔹 Przyciski doładowania */}
       <div className="text-center mt-4">
