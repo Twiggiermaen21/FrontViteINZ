@@ -1,20 +1,29 @@
 import React from "react";
+import {
+  toggleImageMode,
+  handleImageChange,
+  handleImageScaleChange,
+  handleMonthTextChange,
+  handleFontSettingChange,
+} from "../../utils/monthHandlers";
 
 const MonthEditor = ({
   month,
   index,
   isImageMode,
-  toggleImageMode,
+  
   fontSettings,
-  handleFontSettingChange,
   monthTexts,
   handleMonthTextChange,
   monthImages,
-  handleImageChange,
   imageScales,
-  handleImageScaleChange,
   fontFamilies,
   fontWeights,
+  setIsImageMode,
+  setImageScales,
+  setMonthImages,
+  setFontSettings,
+  setMonthTexts
 }) => {
   return (
     <div key={month} className="border p-4 rounded shadow">
@@ -24,7 +33,7 @@ const MonthEditor = ({
         <input
           type="checkbox"
           checked={isImageMode}
-          onChange={() => toggleImageMode(index)}
+          onChange={() => toggleImageMode(index, setIsImageMode)}
           className="form-checkbox h-5 w-5 text-blue-600"
         />
         <span>{isImageMode ? "Tryb: Zdjęcie" : "Tryb: Tekst"}</span>
@@ -38,7 +47,7 @@ const MonthEditor = ({
               className="border rounded px-2 py-1 w-full"
               value={fontSettings.fontFamily}
               onChange={(e) =>
-                handleFontSettingChange(index, "fontFamily", e.target.value)
+                handleMonthTextChange(index, e.target.value, monthTexts, setMonthTexts)
               }
             >
               {fontFamilies.map((font) => (
@@ -55,8 +64,8 @@ const MonthEditor = ({
               className="border rounded px-2 py-1 w-full"
               value={fontSettings.fontWeight}
               onChange={(e) =>
-                handleFontSettingChange(index, "fontWeight", e.target.value)
-              }
+  handleFontSettingChange(index, "fontWeight", e.target.value, fontSettings, setFontSettings)
+}
             >
               {fontWeights.map((weight) => (
                 <option key={weight} value={weight}>
@@ -72,8 +81,8 @@ const MonthEditor = ({
               type="color"
               value={fontSettings.fontColor}
               onChange={(e) =>
-                handleFontSettingChange(index, "fontColor", e.target.value)
-              }
+  handleFontSettingChange(index, "fontColor", e.target.value, fontSettings, setFontSettings)
+}
               className=" p-0 border rounded bg-gray-100 cursor-pointer"
             />
           </div>
@@ -98,7 +107,9 @@ const MonthEditor = ({
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => handleImageChange(index, e)}
+            onChange={(e) =>
+              handleImageChange(index, e, setMonthImages, setImageScales)
+            }
             className="mb-2"
           />
 
@@ -129,7 +140,9 @@ const MonthEditor = ({
               max="3"
               step="0.01"
               value={imageScales || 1}
-              onChange={(e) => handleImageScaleChange(index, e.target.value)}
+              onChange={(e) =>
+                handleImageScaleChange(index, e.target.value, setImageScales)
+              }
               className="w-full mt-2"
             />
           )}

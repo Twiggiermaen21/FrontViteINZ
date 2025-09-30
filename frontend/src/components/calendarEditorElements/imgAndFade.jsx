@@ -1,8 +1,7 @@
-import React from "react";
+import { extractColorsFromImage } from "../../utils/extractColorsFromImage"
 
 const GradientSettings = ({
   image,
-  extractColorsFromImage,
   bgColor,
   setBgColor,
   gradientEndColor,
@@ -20,7 +19,7 @@ const GradientSettings = ({
 
       {image && (
         <button
-          onClick={() => extractColorsFromImage(image.url)}
+          onClick={() => extractColorsFromImage(image.url, setBgColor, setGradientEndColor)}
           className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
         >
           Dobierz automatycznie kolory z grafiki

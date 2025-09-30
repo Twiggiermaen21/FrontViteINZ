@@ -1,6 +1,20 @@
-import React from "react";
+const StyleSidebar = ({ style, setStyle, images,loading,hasMore,fetchImages, setImage,setImageFromDisk,setDimensions }) => {
+  
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      setImageFromDisk(true);
 
-const StyleSidebar = ({ style, setStyle, images,loading,hasMore,fetchImages, handleImageSelect, handleFileUpload,setImageFromDisk }) => {
+      // pobranie wymiarów obrazu
+      const img = new Image();
+      img.onload = () => {
+        setDimensions({ width: img.width, height: img.height });
+      };
+      img.src = URL.createObjectURL(file);
+    }
+  };
+  
   return (
     <>
       {/* Styl kalendarza */}
@@ -39,7 +53,7 @@ const StyleSidebar = ({ style, setStyle, images,loading,hasMore,fetchImages, han
             alt="Grafika AI"
             className="cursor-pointer object-cover h-20 w-full border rounded hover:opacity-70"
             onClick={() => {
-              handleImageSelect(item);
+             setImage(item);
               setImageFromDisk(false);
             }}
           />

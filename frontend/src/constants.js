@@ -27,3 +27,14 @@ export const fieldToEndpoint = {
   realizm: "realizm",
   styl_narracyjny: "styl-narracyjny",
 };
+
+
+export const fontFamilies = [
+  "Arial",
+  "Courier New",
+  "Georgia",
+  "Tahoma",
+  "Verdana",
+  "Roboto",
+];
+export const fontWeights = ["300", "400", "500", "600", "700", "bold", "normal"];

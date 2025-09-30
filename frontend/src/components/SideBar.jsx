@@ -76,6 +76,10 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
 
       {/* DOLNA CZĘŚĆ */}
       <div className="w-full p-4 px-5 flex flex-col items-start space-y-2">
+
+
+
+        
   <button
     onClick={() => navigate("/ai/settings")}
     className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white transition-colors"

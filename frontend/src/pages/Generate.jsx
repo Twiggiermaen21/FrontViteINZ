@@ -162,7 +162,7 @@ export default function Generate() {
       {/* PRAWY PANEL - CUSTOM SCROLL */}
       <div className="lg:w-6/10 flex flex-col items-center justify-start bg-[#2a2b2b] rounded-4xl p-4 shadow-lg max-h-[80vh]">
         
-         <div className="  pr-2 overflow-y-auto custom-scroll">
+         <div className=" rounded-2xl pr-2 overflow-y-auto custom-scroll">
         {loading && (
           <div className="flex items-center justify-center w-full h-32">
             <div className="w-16 h-16 border-4 border-t-[#afe5e6] border-b-[#6d8f91] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
