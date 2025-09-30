@@ -8,6 +8,7 @@ import {
   Edit3,
   CalendarPlus,
   CalendarSearch,
+  Settings,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -26,22 +27,21 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
 
   return (
     <div
-      className={`w-60 bg-[#2a2b2b] border-r border-[#374b4b] flex flex-col items-center justify-between max-sm:absolute top-14 bottom-0
-        ${
-          sidebar ? "translate-x-0" : "max-sm:-translate-x-full"
-        } transition-all duration-300 ease-in-out`}
-    >
+       className={`
+    w-60 bg-[#2a2b2b] rounded-4xl  mt-4 z-40 flex flex-col justify-between
+    max-sm:absolute max-sm:top-0 max-sm:left-0 max-sm:h-full sm:m-4
+    transform transition-transform duration-300 ease-in-out
+    ${sidebar ? "translate-x-0 m-4 "  : "max-sm:-translate-x-full"}
+  `}
+>
       {/* GÓRNA CZĘŚĆ */}
       <div className="my-7 w-full">
         <img
-          src={user?.picture ? user.picture : assets.avatar}
+          src="/logo_ikona.png"
           alt="user avatar"
-          className="w-16 h-16 rounded-full mx-auto border-2 border-[#374b4b]"
-          onError={(e) => (e.currentTarget.src = assets.avatar)}
+          className="w-24 h-24 mx-auto"
+
         />
-        <h1 className="text-center mt-2 font-semibold text-white">
-          {user?.first_name + " " + user?.last_name}
-        </h1>
 
         <div className="px-4 mt-6 text-sm font-medium">
           {navbar.map(({ path, label, Icon }) => (
@@ -75,29 +75,23 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
       </div>
 
       {/* DOLNA CZĘŚĆ */}
-      <div className="w-full border-t border-[#374b4b] p-4 px-5 flex items-center justify-between">
-        <div
-          className="flex gap-2 items-center cursor-pointer"
-          onClick={() => navigate("/ai/settings")}
-        >
-          <img
-            src={user?.picture ? user.picture : assets.avatar}
-            alt="user avatar"
-            className="w-10 h-10 rounded-full border border-[#374b4b]"
-            onError={(e) => (e.currentTarget.src = assets.avatar)}
-          />
-          <div>
-            <h1 className="text-sm font-medium text-white">
-              {user?.first_name + " " + user?.last_name}
-            </h1>
-            <p className="text-xs text-[#989c9e]">Premium Plan</p>
-          </div>
-        </div>
-        <LogOut
-          onClick={() => navigate("/ai/logout")}
-          className="w-5 h-5 text-[#989c9e] hover:text-white transition cursor-pointer"
-        />
-      </div>
+      <div className="w-full p-4 px-5 flex flex-col items-start space-y-2">
+  <button
+    onClick={() => navigate("/ai/settings")}
+    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white transition-colors"
+  >
+    <Settings className="w-5 h-5 text-[#989c9e]" />
+    <span className="text-sm">Ustawienia</span>
+  </button>
+
+  <button
+    onClick={() => navigate("/ai/logout")}
+    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white transition-colors"
+  >
+    <LogOut className="w-5 h-5 text-[#989c9e]" />
+    <span className="text-sm">Wyloguj</span>
+  </button>
+</div>
     </div>
   );
 };

@@ -6,7 +6,13 @@ const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function Generate() {
   const [prompt, setPrompt] = useState("");
-  const [imageUrl, setImageUrl] = useState(null);
+  const [images, setImages] = useState([
+    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1759260406/generated_images/generated_b163444da3ed493a8878d8d0210ca2fa.jpg",
+    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1753272595/generated_images/generated_image_92.jpg",
+    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1753213490/generated_image_89_znxn81.jpg",
+    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1753213490/generated_image_87_pn8akp.jpg",
+    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1753213490/generated_image_88_ah7yrr.jpg",
+  ]);
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState({});
   const [selected, setSelected] = useState({});
@@ -18,6 +24,7 @@ export default function Generate() {
     "Minimalist abstract shapes",
   ];
 
+  // fetch options for selects
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,9 +64,11 @@ export default function Generate() {
     setLoading(true);
     try {
       const payload = { prompt };
+
       fields.forEach((field) => {
         const selectedValue = selected[field];
-        const availableOptions = options[field];
+        const availableOptions = options[field]?.results;
+
         if (selectedValue) {
           payload[field] = selectedValue;
         } else if (availableOptions?.length > 0) {
@@ -73,7 +82,7 @@ export default function Generate() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setImageUrl(res.data.url);
+      setImages((prev) => [...prev, res.data.url]);
     } catch (err) {
       console.error(err);
       alert("Failed to generate image.");
@@ -83,10 +92,9 @@ export default function Generate() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 w-full max-w-6xl mx-auto pt-8 px-4">
+    <div className="flex flex-col lg:flex-row gap-6 w-full  pt-8 px-4">
       {/* LEWY PANEL */}
-      <div className="flex-1 bg-[#2a2b2b] rounded-4xl p-8 shadow-lg ">
-        
+      <div className="lg:w-4/10 bg-[#2a2b2b] rounded-4xl p-8 shadow-lg">
         {/* PROMPT */}
         <div className="mb-6">
           <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
@@ -130,8 +138,8 @@ export default function Generate() {
                 className="w-full p-2 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
               >
                 <option value="">Choose</option>
-                {Array.isArray(options[field]) &&
-                  options[field].map((item) => (
+                {Array.isArray(options[field]?.results) &&
+                  options[field].results.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.nazwa}
                     </option>
@@ -151,20 +159,33 @@ export default function Generate() {
         </button>
       </div>
 
-      {/* PRAWY PANEL */}
-      <div className="flex-1 flex items-center justify-center bg-[#2a2b2b] rounded-4xl p-8 shadow-lg ">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt="Generated"
-            className="rounded-xl max-h-[500px] object-contain shadow-xl"
-          />
-        ) : (
-          <div className="text-[#989c9e] text-lg text-center opacity-70">
-            Your generated image will appear here.
+      {/* PRAWY PANEL - CUSTOM SCROLL */}
+      <div className="lg:w-6/10 flex flex-col items-center justify-start bg-[#2a2b2b] rounded-4xl p-4 shadow-lg max-h-[80vh]">
+        
+         <div className="  pr-2 overflow-y-auto custom-scroll">
+        {loading && (
+          <div className="flex items-center justify-center w-full h-32">
+            <div className="w-16 h-16 border-4 border-t-[#afe5e6] border-b-[#6d8f91] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
           </div>
         )}
+
+        {images.length === 0 && !loading && (
+          <div className="text-[#989c9e] text-lg text-center opacity-70 mt-4">
+            Your generated images will appear here.
+          </div>
+        )}
+
+        {images.map((url, index) => (
+          <img
+            key={index}
+            src={url}
+            alt={`Generated ${index}`}
+            className="rounded-xl w-full object-contain shadow-xl mb-4"
+          />
+        ))}
       </div>
+         </div>
+     
     </div>
   );
 }

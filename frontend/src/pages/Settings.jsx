@@ -25,7 +25,6 @@ export default function Settings() {
   const [errorPassword, setErrorPassword] = useState("");
   const [successPassword, setSuccessPassword] = useState("");
 
-  // Pre-fill danych użytkownika
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
@@ -36,7 +35,6 @@ export default function Settings() {
     }
   }, []);
 
-  // Axios instance
   const api = axios.create({
     baseURL: apiUrl,
     headers: {
@@ -52,7 +50,7 @@ export default function Settings() {
 
     try {
       await api.put("/user/update-profile/", {
-        username: username,
+        username,
         first_name: firstName,
         last_name: lastName,
       });
@@ -60,25 +58,19 @@ export default function Settings() {
       const user = JSON.parse(localStorage.getItem("user")) || {};
       localStorage.setItem(
         "user",
-        JSON.stringify({
-          ...user,
-          username,
-          first_name: firstName,
-          last_name: lastName,
-        })
+        JSON.stringify({ ...user, username, first_name: firstName, last_name: lastName })
       );
     } catch (err) {
       setErrorProfile(
         err.response?.data?.username ||
-          err.response?.data?.detail ||
-          "Błąd przy aktualizacji profilu"
+        err.response?.data?.detail ||
+        "Błąd przy aktualizacji profilu"
       );
     } finally {
       setLoadingProfile(false);
     }
   };
 
-  // Zmiana emaila
   const handleEmailChange = async (e) => {
     e.preventDefault();
     setLoadingEmail(true);
@@ -93,15 +85,14 @@ export default function Settings() {
     } catch (err) {
       setErrorEmail(
         err.response?.data?.email ||
-          err.response?.data?.detail ||
-          "Błąd przy zmianie emaila"
+        err.response?.data?.detail ||
+        "Błąd przy zmianie emaila"
       );
     } finally {
       setLoadingEmail(false);
     }
   };
 
-  // Zmiana hasła
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     setLoadingPassword(true);
@@ -126,9 +117,9 @@ export default function Settings() {
     } catch (err) {
       setErrorPassword(
         err.response?.data?.new_password?.[0] ||
-          err.response?.data?.current_password?.[0] ||
-          err.response?.data?.detail ||
-          "Błąd przy zmianie hasła"
+        err.response?.data?.current_password?.[0] ||
+        err.response?.data?.detail ||
+        "Błąd przy zmianie hasła"
       );
     } finally {
       setLoadingPassword(false);
@@ -136,106 +127,94 @@ export default function Settings() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-10">
-      <h1 className="text-3xl font-bold text-center text-gray-800">
-        Ustawienia użytkownika
-      </h1>
+    <div className="flex flex-col lg:flex-row gap-8 w-full max-w-6xl mx-auto pt-8 px-4">
+      {/* LEWY PANEL: Dane profilu */}
+      <div className="flex-1 bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-8">
+        <h1 className="text-2xl font-semibold text-white">Ustawienia użytkownika</h1>
 
-      {/* Zmiana profilu */}
-      <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-semibold text-gray-700">Dane profilu</h2>
+        {/* Profil */}
         <form onSubmit={handleProfileChange} className="space-y-4">
           <input
             type="text"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
           />
           <input
             type="text"
             placeholder="First Name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
           />
           <input
             type="text"
             placeholder="Last Name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
           />
           {errorProfile && <p className="text-red-500">{errorProfile}</p>}
           {successProfile && <p className="text-green-500">{successProfile}</p>}
           <button
             type="submit"
             disabled={loadingProfile}
-            className="w-full py-3 bg-gradient-to-r from-pink-400 to-orange-400 text-white rounded-md font-semibold hover:from-pink-500 hover:to-yellow-400 transition"
+            className="w-full py-3 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300"
           >
             {loadingProfile ? <LoadingIndicator /> : "Zaktualizuj profil"}
           </button>
         </form>
-      </div>
 
-      {/* Zmiana Emaila */}
-      <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-semibold text-gray-700">Zmień email</h2>
+        {/* Email */}
         <form onSubmit={handleEmailChange} className="space-y-4">
           <input
             type="email"
             placeholder="Nowy email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
           />
           {errorEmail && <p className="text-red-500">{errorEmail}</p>}
           {successEmail && <p className="text-green-500">{successEmail}</p>}
           <button
             type="submit"
             disabled={loadingEmail}
-            className="w-full py-3 bg-gradient-to-r from-pink-400 to-orange-400 text-white rounded-md font-semibold hover:from-pink-500 hover:to-yellow-400 transition"
+            className="w-full py-3 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300"
           >
             {loadingEmail ? <LoadingIndicator /> : "Zmień email"}
           </button>
         </form>
-      </div>
 
-
-
-      {/* Zmiana Hasła */}
-      <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-semibold text-gray-700">Zmień hasło</h2>
+        {/* Hasło */}
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <input
             type="password"
             placeholder="Aktualne hasło"
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
           />
           <input
             type="password"
             placeholder="Nowe hasło"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
           />
           <input
             type="password"
             placeholder="Potwierdź nowe hasło"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+            className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
           />
           {errorPassword && <p className="text-red-500">{errorPassword}</p>}
-          {successPassword && (
-            <p className="text-green-500">{successPassword}</p>
-          )}
+          {successPassword && <p className="text-green-500">{successPassword}</p>}
           <button
             type="submit"
             disabled={loadingPassword}
-            className="w-full py-3 bg-gradient-to-r from-orange-400 to-pink-400 text-white rounded-md font-semibold hover:from-orange-500 hover:to-pink-500 transition"
+            className="w-full py-3 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300"
           >
             {loadingPassword ? <LoadingIndicator /> : "Zmień hasło"}
           </button>
