@@ -23,8 +23,10 @@ const MonthEditor = ({
   setFontSettings,
   setMonthTexts,
 }) => {
+
+
   return (
-    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 sm:m-4 space-y-4">
+    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4  space-y-4">
       <h3 className="text-base font-semibold text-[#d2e4e2]">{month}</h3>
 
       {/* Tryb tekst/obraz */}
@@ -40,7 +42,7 @@ const MonthEditor = ({
 
       {!isImageMode ? (
         <>
-          {/* Czcionka */}
+          {/* Tekstowy tryb — czcionka, kolor, tekst */}
           <div>
             <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
               Rodzaj czcionki
@@ -65,7 +67,6 @@ const MonthEditor = ({
             </select>
           </div>
 
-          {/* Grubość czcionki */}
           <div>
             <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
               Grubość czcionki
@@ -91,7 +92,6 @@ const MonthEditor = ({
             </select>
           </div>
 
-          {/* Kolor tekstu */}
           <div>
             <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
               Kolor tekstu
@@ -112,7 +112,6 @@ const MonthEditor = ({
             />
           </div>
 
-          {/* Tekst miesiąca */}
           <textarea
             className="w-full rounded-lg p-2 bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b]"
             value={monthTexts[index]}
@@ -129,24 +128,26 @@ const MonthEditor = ({
         </>
       ) : (
         <>
-          {/* Wybór obrazu */}
-          <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
-            Wybierz zdjęcie
-          </label>
+          {/* Tryb obraz */}
+          <h3 className="text-base font-semibold text-[#d2e4e2] mb-2">
+            Wgraj własną grafikę
+          </h3>
           <input
             type="file"
             accept="image/*"
             onChange={(e) =>
               handleImageChange(index, e, setMonthImages, setImageScales)
             }
-            className="w-full rounded-lg text-sm cursor-pointer border border-[#374b4b] hover:border-[#6d8f91] mb-2"
+            className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer 
+              file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium 
+              file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90 mb-2"
           />
 
-          {/* Podgląd obrazu */}
-          {monthImages[index] && (
-            <div className="border rounded overflow-hidden relative w-full h-20">
+          {/* Podgląd obrazu (placeholder czarny jeśli brak) */}
+          <div className="border rounded overflow-hidden relative w-full h-20 mb-2 bg-black">
+            {monthImages && (
               <img
-                src={URL.createObjectURL(monthImages[index])}
+                src={URL.createObjectURL(monthImages)}
                 alt={`Zdjęcie ${month}`}
                 className="w-full h-full object-cover select-none pointer-events-none"
                 style={{
@@ -154,23 +155,21 @@ const MonthEditor = ({
                   transition: "transform 0.2s",
                 }}
               />
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Skalowanie */}
-          {monthImages[index] && (
-            <input
-              type="range"
-              min="0.5"
-              max="3"
-              step="0.01"
-              value={imageScales[index] || 1}
-              onChange={(e) =>
-                handleImageScaleChange(index, e.target.value, setImageScales)
-              }
-              className="w-full mt-2 accent-[#6d8f91]"
-            />
-          )}
+          {/* Pasek do skalowania */}
+          <input
+            type="range"
+            min="0.5"
+            max="3"
+            step="0.01"
+            value={imageScales }
+            onChange={(e) =>
+              handleImageScaleChange(index, e.target.value, setImageScales)
+            }
+            className="w-full mt-2 accent-[#6d8f91]"
+          />
         </>
       )}
     </div>

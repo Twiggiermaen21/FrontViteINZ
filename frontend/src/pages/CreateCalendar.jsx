@@ -23,6 +23,7 @@ export default function CreateCalendar() {
   const [bgColor, setBgColor] = useState("#ffffff");
   const [image, setImage] = useState(null);
   const [images, setImages] = useState([]);
+  const [imagesBackground, setImagesBackground] = useState([]);
   const [gradientVariant, setGradientVariant] = useState("diagonal");
   const [gradientEndColor, setGradientEndColor] = useState("#ffffff");
   const [gradientStrength, setGradientStrength] = useState("medium");
@@ -48,7 +49,7 @@ export default function CreateCalendar() {
       fontColor: "#333333",
     }))
   );
-  const [monthImages, setMonthImages] = useState(() => months.map(() => null));
+  const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
   const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
   const [imageScales, setImageScales] = useState(() => months.map(() => 1));
   const [positions, setPositions] = useState(() =>
@@ -62,7 +63,9 @@ export default function CreateCalendar() {
   const spanRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [page, setPage] = useState(1);
+  const [pageBackground, setPageBackground] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [hasMoreBackground, setHasMoreBackground] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const handleMonthTextChange = (index, value) => {
@@ -186,7 +189,7 @@ export default function CreateCalendar() {
     try {
       const res = await axios.get(`${apiUrl}/generate/`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { page, page_size: 12 }, // backend musi obsługiwać paginację
+        params: { page:page, page_size: 12 }, // backend musi obsługiwać paginację
       });
 
       setImages((prev) => [...prev, ...res.data.results]);
@@ -204,8 +207,38 @@ export default function CreateCalendar() {
     }
   };
 
+
+    const fetchImagesBackground = async () => {
+    if (!hasMore || loading) return;
+
+    setLoading(true);
+    const token = localStorage.getItem(ACCESS_TOKEN);
+
+    try {
+      const res = await axios.get(`${apiUrl}/generate/`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { page: pageBackground, page_size: 12 }, // backend musi obsługiwać paginację
+      });
+
+      setImagesBackground((prev) => [...prev, ...res.data.results]);
+      setHasMoreBackground(!!res.data.next);
+      setPageBackground((prev) => prev + 1);
+    } catch (err) {
+      console.error("Błąd podczas pobierania obrazów:", err);
+      if (err.response?.status === 401) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // odświeży po 0.5 sekundy
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   useEffect(() => {
     fetchImages();
+    fetchImagesBackground();
   }, []);
 
   useEffect(() => {
@@ -229,8 +262,11 @@ export default function CreateCalendar() {
     };
   }, [dragging, xLimits, yLimits]);
 
+  console.log("obrazy miesiaca", monthImages);
+
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-14 gap-4 p-4">
+    <div className="grid grid-cols-1 lg:grid-cols-14 gap-6 px-4">
       <div className="lg:col-span-3 space-y-2 ">
         <StyleSidebar
           style={style}
@@ -243,7 +279,7 @@ export default function CreateCalendar() {
           setDimensions={setDimensions}
           setImageFromDisk={setImageFromDisk}
         />
-        <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg flex justify-center items-center mt-4 sm:m-4">
+        <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg flex justify-center items-center mt-4">
           <button
             onClick={handleSaveCalendar}
             className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm shadow"
@@ -282,9 +318,12 @@ export default function CreateCalendar() {
         {/* Opcje dla stylu 3: tylko grafika */}
         {style === "style3" && (
           <BackgroundImg
-            images={images}
+            images={imagesBackground}
+            fetchImages={fetchImagesBackground}
             backgroundImage={backgroundImage}
             setBackgroundImage={setBackgroundImage}
+            hasMore={hasMoreBackground}
+            loading={loading}
           />
         )}
 
@@ -334,122 +373,121 @@ export default function CreateCalendar() {
           />
         ))}
       </div>
-    
 
       {/* Preview area */}
-      <div className="lg:col-span-5  mt-4 sm:m-4 ">
-        <div className=" bg-[#2a2b2b]  rounded-4xl shadow-lg  p-8">        
-        <div className=" rounded overflow-hidden shadow   ">
-          {/* Header */}
-          <div
-            ref={headerRef}
-            className="relative h-[222px] bg-gray-200 flex items-center justify-center"
-          >
-            {image ? (
-              <>
-                <img
-                  src={imageFromDisk ? URL.createObjectURL(image) : image.url}
-                  alt="Nagłówek"
-                  className="w-full h-full object-cover"
-                />
-                {/* Tekst z rokiem */}
-                {yearActive && (
-                  <span
-                    ref={spanRef}
-                    onMouseDown={(e) =>
-                      handleMouseDown(e, {
-                        yearPosition,
-                        setYearPosition,
-                        spanRef,
-                        xLimits,
-                        yLimits,
-                        setDragging,
-                        dragStartPos,
-                      })
-                    }
-                    style={{
-                      position: "absolute",
-                      color: yearColor,
-                      fontSize: `${yearFontSize}px`,
-                      fontWeight: yearFontWeight,
-                      fontFamily: yearFontFamily,
-                      cursor: "move",
-                      userSelect: "none",
-                      whiteSpace: "nowrap",
-                      pointerEvents: "auto",
-                      ...getYearPositionStyles(yearPosition),
-                    }}
-                  >
-                    {yearText}
-                  </span>
-                )}
-              </>
-            ) : (
-              <span className="text-gray-500">Brak grafiki nagłówka</span>
-            )}
-          </div>
+      <div className="lg:col-span-4  mt-4">
+        <div className=" bg-[#2a2b2b]  rounded-4xl shadow-lg  p-6">
+          <div className=" rounded overflow-hidden shadow   ">
+            {/* Header */}
+            <div
+              ref={headerRef}
+              className="relative h-[162px] bg-gray-200 flex items-center justify-center"
+            >
+              {image ? (
+                <>
+                  <img
+                    src={imageFromDisk ? URL.createObjectURL(image) : image.url}
+                    alt="Nagłówek"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Tekst z rokiem */}
+                  {yearActive && (
+                    <span
+                      ref={spanRef}
+                      onMouseDown={(e) =>
+                        handleMouseDown(e, {
+                          yearPosition,
+                          setYearPosition,
+                          spanRef,
+                          xLimits,
+                          yLimits,
+                          setDragging,
+                          dragStartPos,
+                        })
+                      }
+                      style={{
+                        position: "absolute",
+                        color: yearColor,
+                        fontSize: `${yearFontSize}px`,
+                        fontWeight: yearFontWeight,
+                        fontFamily: yearFontFamily,
+                        cursor: "move",
+                        userSelect: "none",
+                        whiteSpace: "nowrap",
+                        pointerEvents: "auto",
+                        ...getYearPositionStyles(yearPosition),
+                      }}
+                    >
+                      {yearText}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-gray-500">Brak grafiki nagłówka</span>
+              )}
+            </div>
 
-          {/* Bottom */}
-          <div
-            ref={bottomRef}
-            className="h-[720px] px-3 py-4 flex flex-col  items-center text-center"
-            style={getBottomSectionBackground({
-              style,
-              bgColor,
-              gradientEndColor,
-              gradientTheme,
-              gradientStrength,
-              gradientVariant,
-              backgroundImage,
-            })}
-          >
-            {months.map((month, index) => (
-              <Fragment key={month}>
-                <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
-                  <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                    {month}
-                  </h3>
-                  <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
-                    [Siatka dni dla {month}]
+            {/* Bottom */}
+            <div
+              ref={bottomRef}
+              className="h-[620px] p-2 flex flex-col  items-center text-center"
+              style={getBottomSectionBackground({
+                style,
+                bgColor,
+                gradientEndColor,
+                gradientTheme,
+                gradientStrength,
+                gradientVariant,
+                backgroundImage,
+              })}
+            >
+              {months.map((month, index) => (
+                <Fragment key={month}>
+                  <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
+                    <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                      {month}
+                    </h3>
+                    <div className="w-full h-[60px] text-sm text-gray-600 flex items-center justify-center">
+                      [Siatka dni dla {month}]
+                    </div>
                   </div>
-                </div>
-                {isImageMode[index] ? (
-                  <ImageEditor
-                    imageSrc={monthImages[index]}
-                    setImageSrc={(newValue) =>
-                      setMonthImages((prev) =>
-                        prev.map((img, i) => (i === index ? newValue : img))
-                      )
-                    }
-                    imageScale={imageScales[index]}
-                    setImageScale={(newValue) =>
-                      setImageScales((prev) =>
-                        prev.map((s, i) => (i === index ? newValue : s))
-                      )
-                    }
-                    position={positions[index]}
-                    setPosition={(newValue) =>
-                      setPositions((prev) =>
-                        prev.map((p, i) => (i === index ? newValue : p))
-                      )
-                    }
-                  />
-                ) : (
-                  <LimitedTextarea
-                    value={monthTexts[index]}
-                    index={index}
-                    onChange={handleMonthTextChange}
-                    placeholder="Wpisz tekst pod miesiącem..."
-                    fontFamily={fontSettings[index].fontFamily}
-                    fontWeight={fontSettings[index].fontWeight}
-                    fontColor={fontSettings[index].fontColor}
-                    maxChars={1000}
-                  />
-                )}
-              </Fragment>
-            ))}
+                  {isImageMode[index] ? (
+                    <ImageEditor
+                      imageSrc={monthImages[index]}
+                      setImageSrc={(newValue) =>
+                        setMonthImages((prev) =>
+                          prev.map((img, i) => (i === index ? newValue : img))
+                        )
+                      }
+                      imageScale={imageScales[index]}
+                      setImageScale={(newValue) =>
+                        setImageScales((prev) =>
+                          prev.map((s, i) => (i === index ? newValue : s))
+                        )
+                      }
+                      position={positions[index]}
+                      setPosition={(newValue) =>
+                        setPositions((prev) =>
+                          prev.map((p, i) => (i === index ? newValue : p))
+                        )
+                      }
+                    />
+                  ) : (
+                    <LimitedTextarea
+                      value={monthTexts[index]}
+                      index={index}
+                      onChange={handleMonthTextChange}
+                      placeholder="Wpisz tekst pod miesiącem..."
+                      fontFamily={fontSettings[index].fontFamily}
+                      fontWeight={fontSettings[index].fontWeight}
+                      fontColor={fontSettings[index].fontColor}
+                      maxChars={1000}
+                    />
+                  )}
+                </Fragment>
+              ))}
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </div>

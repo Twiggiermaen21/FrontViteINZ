@@ -13,7 +13,6 @@ export const getBottomSectionBackground = ({
 
   if (style === "style2") {
     if (gradientTheme !== "classic") {
-      // Predefiniowane stylizacje
       const themes = {
         aurora: {
           background: `radial-gradient(circle at 30% 30%, ${bgColor}, ${gradientEndColor}, ${bgColor})`,
@@ -36,7 +35,6 @@ export const getBottomSectionBackground = ({
       return themes[gradientTheme] || { background: bgColor };
     }
 
-    // klasyczny gradient
     const blendMap = { soft: "66", medium: "99", hard: "cc" };
     const alphaHex = blendMap[gradientStrength] || "99";
     const blendedEnd = gradientEndColor + alphaHex;
@@ -62,8 +60,11 @@ export const getBottomSectionBackground = ({
   }
 
   if (style === "style3" && backgroundImage) {
+    const imageUrl =
+      typeof backgroundImage === "string" ? backgroundImage : backgroundImage.url;
+
     return {
-      background: `url(${backgroundImage.url}) center/cover no-repeat`,
+      background: `url(${imageUrl}) center/cover no-repeat`,
       color: "white",
     };
   }

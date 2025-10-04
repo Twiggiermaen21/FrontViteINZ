@@ -36,11 +36,11 @@ export const handleImageScaleChange = (index, value, setImageScales) => {
 };
 
 // zmiana tekstu miesiąca
-// export const handleMonthTextChange = (index, value, monthTexts, setMonthTexts) => {
-//   const newTexts = [...monthTexts];
-//   newTexts[index] = value;
-//   setMonthTexts(newTexts);
-// };
+export const handleMonthTextChange = (index, value, monthTexts, setMonthTexts) => {
+  const newTexts = [...monthTexts];
+  newTexts[index] = value;
+  setMonthTexts(newTexts);
+};
 
 // zmiana ustawień czcionki
 // export const handleFontSettingChange = (index, field, value, fontSettings, setFontSettings) => {

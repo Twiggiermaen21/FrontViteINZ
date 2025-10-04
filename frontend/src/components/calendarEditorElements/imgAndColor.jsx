@@ -3,7 +3,7 @@ import { extractColorsFromImage } from "../../utils/extractColorsFromImage";
 
 const ImgColor = ({ bgColor, setBgColor, image, setGradientEndColor }) => {
   return (
-    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 sm:m-4">
+    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4">
       <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
         Kolor tła
       </h2>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 
 const StyleSidebar = ({
   style,
@@ -11,6 +11,8 @@ const StyleSidebar = ({
   setImageFromDisk,
   setDimensions,
 }) => {
+  const scrollRef = useRef(null);
+
   const styles = [
     { key: "style1", label: "Grafika + kolor" },
     { key: "style2", label: "Rozciągnięty gradient" },
@@ -32,10 +34,31 @@ const StyleSidebar = ({
     }
   };
 
+  // ✅ Infinite scroll — automatyczne ładowanie przy przewinięciu do końca
+  const handleScroll = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container || loading || !hasMore) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+
+    if (isAtBottom) {
+      fetchImages();
+    }
+  }, [loading, hasMore, fetchImages]);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
   return (
     <>
       {/* Styl kalendarza */}
-      <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 sm:m-4">
+      <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4">
         <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
           Styl kalendarza
         </h2>
@@ -58,12 +81,17 @@ const StyleSidebar = ({
         </div>
       </div>
 
-      {/* Galeria grafik */}
-      <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 sm:m-4">
+      {/* Galeria grafik z infinite scroll */}
+      <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4">
         <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
           Galeria grafik
         </h2>
-        <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto">
+
+        {/* ✅ Scrollowalny kontener */}
+        <div
+          ref={scrollRef}
+          className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scroll"
+        >
           {images.map((item, index) => (
             <img
               key={index}
@@ -78,26 +106,17 @@ const StyleSidebar = ({
           ))}
         </div>
 
-        {/* Przyciski doładowania */}
+        {/* ✅ Komunikaty na dole */}
         <div className="text-center mt-3">
-          {hasMore ? (
-            <button
-              onClick={fetchImages}
-              disabled={loading}
-              className="px-4 py-2 rounded-lg shadow text-sm font-medium
-                bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]
-                hover:opacity-90 disabled:opacity-50"
-            >
-              {loading ? "Ładowanie..." : "Załaduj więcej"}
-            </button>
-          ) : (
+          {loading && (
+            <p className="text-[#989c9e] text-sm">Ładowanie grafik...</p>
+          )}
+          {!hasMore && !loading && (
             <p className="text-[#989c9e] text-sm">Brak więcej grafik.</p>
           )}
         </div>
-      </div>
 
-      {/* Własna grafika */}
-      <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 sm:m-4">
+
         <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
           Wgraj własną grafikę
         </h2>
@@ -106,15 +125,12 @@ const StyleSidebar = ({
           type="file"
           accept="image/*"
           onChange={handleFileUpload}
-          className="block w-full text-sm text-[#d2e4e2] 
-            file:mr-3 file:py-2 file:px-3
-            file:rounded-lg file:border-0
-            file:text-sm file:font-medium
-            file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f]
-            hover:file:opacity-90
-            cursor-pointer"
+                    className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90"
+
         />
       </div>
+
+      
     </>
   );
 };
