@@ -19,7 +19,7 @@ const YearText = ({
   setXLimits,
   setYLimits,
   xLimits,
-  yLimits
+  yLimits,
 }) => {
   const [isCustom, setIsCustom] = useState(false);
 
@@ -61,7 +61,6 @@ const YearText = ({
         newPosition = { position: value, coords: { x: 100, y: 100 } };
         break;
       case "custom":
-        // nic nie zmieniamy, zostają obecne coords
         newPosition = { position: "custom", coords: yearPosition.coords };
         break;
       default:
@@ -71,55 +70,59 @@ const YearText = ({
     setYearPosition(newPosition);
   };
 
-const updateLimitsByFontSize = (fontSize) => {
-  // tutaj przykładowa logika, możesz dopasować według potrzeb
-  if (fontSize <= 24) {
-    setXLimits({ min: 50, max: 325 });
-    setYLimits({ min: 20, max: 235 });
-  } else if (fontSize <= 48) {
-    setXLimits({ min: 60, max: 300 });
-    setYLimits({ min: 30, max: 220 });
-  } else {
-    setXLimits({ min: 90, max: 280 });
-    setYLimits({ min: 40, max: 200 });
-  }
-};
-const handleFontSizeChange = (e) => {
-  const newSize = Number(e.target.value);
-  setYearFontSize(newSize);
-  updateLimitsByFontSize(newSize);
+  const updateLimitsByFontSize = (fontSize) => {
+    if (fontSize <= 24) {
+      setXLimits({ min: 50, max: 325 });
+      setYLimits({ min: 20, max: 235 });
+    } else if (fontSize <= 48) {
+      setXLimits({ min: 60, max: 300 });
+      setYLimits({ min: 30, max: 220 });
+    } else {
+      setXLimits({ min: 90, max: 280 });
+      setYLimits({ min: 40, max: 200 });
+    }
+  };
 
-  // jeśli obecne coords są poza nowymi limitami, je też ograniczamy
-  setYearPosition((prev) => ({
-    ...prev,
-    coords: {
-      x: Math.min(Math.max(prev.coords.x, xLimits.min), xLimits.max),
-      y: Math.min(Math.max(prev.coords.y, yLimits.min), yLimits.max),
-    },
-  }));
-};
+  const handleFontSizeChange = (e) => {
+    const newSize = Number(e.target.value);
+    setYearFontSize(newSize);
+    updateLimitsByFontSize(newSize);
 
+    setYearPosition((prev) => ({
+      ...prev,
+      coords: {
+        x: Math.min(Math.max(prev.coords.x, xLimits.min), xLimits.max),
+        y: Math.min(Math.max(prev.coords.y, yLimits.min), yLimits.max),
+      },
+    }));
+  };
 
   return (
-    <div className="border rounded p-4 ">
-      <h2 className="text-lg font-semibold">Napis z rokiem</h2>
-      <label className="inline-flex items-center space-x-2 mb-4 cursor-pointer">
+    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 sm:m-4 space-y-4">
+      <h2 className="text-base font-semibold text-[#d2e4e2]">
+        Napis z rokiem
+      </h2>
+
+      {/* Aktywacja / dezaktywacja */}
+      <label className="flex items-center gap-2 cursor-pointer text-[#d2e4e2]">
         <input
           type="checkbox"
           checked={yearActive}
           onChange={() => setYearActive(!yearActive)}
-          className="form-checkbox h-5 w-5 text-blue-600"
+          className="h-5 w-5 text-[#6d8f91] border-[#374b4b] rounded focus:ring-[#6d8f91]"
         />
         <span>{yearActive ? "Aktywny" : "Nieaktywny"}</span>
       </label>
 
-      {/* Select z latami */}
+      {/* Rok */}
       <div>
-        <label className="block text-sm font-medium mb-1">Wybierz rok</label>
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
+          Wybierz rok
+        </label>
         <select
           value={yearText}
           onChange={(e) => setYearText(e.target.value)}
-          className="w-full border rounded px-2 py-1 text-sm"
+          className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
         >
           {Array.from({ length: 11 }, (_, i) => 2020 + i).map((year) => (
             <option key={year} value={year}>
@@ -129,38 +132,46 @@ const handleFontSizeChange = (e) => {
         </select>
       </div>
 
+      {/* Kolor */}
       <div>
-        <label className="block text-sm font-medium mb-1">Kolor napisu</label>
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
+          Kolor napisu
+        </label>
         <input
           type="color"
           value={yearColor}
           onChange={(e) => setYearColor(e.target.value)}
-          className="w-full h-10 border rounded"
+          className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91]"
         />
       </div>
 
-   <div>
-  <label className="block text-sm font-medium mb-1">
-    Rozmiar czcionki (px)
-  </label>
-  <input
-    type="range"
-    min="12"
-    max="72"
-    value={yearFontSize}
-    onChange={handleFontSizeChange}
-    className="w-full"
-  />
-  <div className="text-xs text-gray-600 text-right">{yearFontSize}px</div>
-</div>
+      {/* Rozmiar */}
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
+          Rozmiar czcionki (px)
+        </label>
+        <input
+          type="range"
+          min="12"
+          max="72"
+          value={yearFontSize}
+          onChange={handleFontSizeChange}
+          className="w-full accent-[#6d8f91]"
+        />
+        <div className="text-xs text-[#989c9e] text-right">
+          {yearFontSize}px
+        </div>
+      </div>
+
+      {/* Czcionka */}
+      <div>
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Rodzaj czcionki
         </label>
         <select
           value={yearFontFamily}
           onChange={(e) => setYearFontFamily(e.target.value)}
-          className="w-full border rounded px-2 py-1 text-sm"
+          className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91]"
         >
           <option value="Arial">Arial</option>
           <option value="'Roboto', sans-serif">Roboto</option>
@@ -171,14 +182,16 @@ const handleFontSizeChange = (e) => {
           <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
         </select>
       </div>
+
+      {/* Grubość */}
       <div>
-        <label className="block text-sm font-medium mb-1">
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Grubość czcionki
         </label>
         <select
           value={yearFontWeight}
           onChange={(e) => setYearFontWeight(e.target.value)}
-          className="w-full border rounded px-2 py-1 text-sm"
+          className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91]"
         >
           <option value="normal">Normal</option>
           <option value="bold">Pogrubiona</option>
@@ -187,79 +200,79 @@ const handleFontSizeChange = (e) => {
         </select>
       </div>
 
-   <div>
-  <label className="block text-sm font-medium mb-1">Pozycja napisu</label>
-  <select
-    value={isCustom ? "custom" : yearPosition.position}
-    onChange={(e) => handleYearPositionChange(e.target.value)}
-    className="w-full border rounded px-2 py-1 text-sm"
-  >
-    <option value="top-left">Góra - lewo</option>
-    <option value="top-center">Góra - środek</option>
-    <option value="top-right">Góra - prawo</option>
-    <option value="center-left">Środek - lewo</option>
-    <option value="center">Środek - środek</option>
-    <option value="center-right">Środek - prawo</option>
-    <option value="bottom-left">Dół - lewo</option>
-    <option value="bottom-center">Dół - środek</option>
-    <option value="bottom-right">Dół - prawo</option>
-    {isCustom && (
-      <option value="custom">
-        Własna (X:{yearPosition.coords.x}, Y:{yearPosition.coords.y})
-      </option>
-    )}
-  </select>
+      {/* Pozycja */}
+      <div>
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
+          Pozycja napisu
+        </label>
+        <select
+          value={isCustom ? "custom" : yearPosition.position}
+          onChange={(e) => handleYearPositionChange(e.target.value)}
+          className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91]"
+        >
+          <option value="top-left">Góra - lewo</option>
+          <option value="top-center">Góra - środek</option>
+          <option value="top-right">Góra - prawo</option>
+          <option value="center-left">Środek - lewo</option>
+          <option value="center">Środek - środek</option>
+          <option value="center-right">Środek - prawo</option>
+          <option value="bottom-left">Dół - lewo</option>
+          <option value="bottom-center">Dół - środek</option>
+          <option value="bottom-right">Dół - prawo</option>
+          {isCustom && (
+            <option value="custom">
+              Własna (X:{yearPosition.coords.x}, Y:{yearPosition.coords.y})
+            </option>
+          )}
+        </select>
 
-  {isCustom && (
-  <div className="mt-2 grid grid-cols-2 gap-2">
-    <div>
-      <label className="block text-xs mb-1">
-        X ({xLimits.min} - {xLimits.max})
-      </label>
-      <input
-        type="number"
-        min={xLimits.min}
-        max={xLimits.max}
-        value={yearPosition.coords.x}
-        onChange={(e) => {
-          let val = Number(e.target.value);
-          if (val < xLimits.min) val = xLimits.min;
-          if (val > xLimits.max) val = xLimits.max;
-          setYearPosition((prev) => ({
-            ...prev,
-            coords: { ...prev.coords, x: val },
-          }));
-        }}
-        className="w-full border rounded px-2 py-1 text-sm"
-      />
-    </div>
-    <div>
-      <label className="block text-xs mb-1">
-        Y ({yLimits.min} - {yLimits.max})
-      </label>
-      <input
-        type="number"
-        min={yLimits.min}
-        max={yLimits.max}
-        value={yearPosition.coords.y}
-        onChange={(e) => {
-          let val = Number(e.target.value);
-          if (val < yLimits.min) val = yLimits.min;
-          if (val > yLimits.max) val = yLimits.max;
-          setYearPosition((prev) => ({
-            ...prev,
-            coords: { ...prev.coords, y: val },
-          }));
-        }}
-        className="w-full border rounded px-2 py-1 text-sm"
-      />
-    </div>
-  </div>
-)}
-
-</div>
-
-
+        {isCustom && (
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs text-[#d2e4e2] mb-1">
+                X ({xLimits.min} - {xLimits.max})
+              </label>
+              <input
+                type="number"
+                min={xLimits.min}
+                max={xLimits.max}
+                value={yearPosition.coords.x}
+                onChange={(e) => {
+                  let val = Number(e.target.value);
+                  if (val < xLimits.min) val = xLimits.min;
+                  if (val > xLimits.max) val = xLimits.max;
+                  setYearPosition((prev) => ({
+                    ...prev,
+                    coords: { ...prev.coords, x: val },
+                  }));
+                }}
+                className="w-full rounded-lg px-2 py-1 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b]"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-[#d2e4e2] mb-1">
+                Y ({yLimits.min} - {yLimits.max})
+              </label>
+              <input
+                type="number"
+                min={yLimits.min}
+                max={yLimits.max}
+                value={yearPosition.coords.y}
+                onChange={(e) => {
+                  let val = Number(e.target.value);
+                  if (val < yLimits.min) val = yLimits.min;
+                  if (val > yLimits.max) val = yLimits.max;
+                  setYearPosition((prev) => ({
+                    ...prev,
+                    coords: { ...prev.coords, y: val },
+                  }));
+                }}
+                className="w-full rounded-lg px-2 py-1 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b]"
+              />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

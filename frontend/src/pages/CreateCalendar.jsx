@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import axios from "axios";
-import { ACCESS_TOKEN,fontFamilies,fontWeights } from "../constants";
+import { ACCESS_TOKEN, fontFamilies, fontWeights } from "../constants";
 import StyleSidebar from "../components/calendarEditorElements/stylesBar";
 import ImgColor from "../components/calendarEditorElements/imgAndColor";
 import GradientSettings from "../components/calendarEditorElements/imgAndFade";
@@ -11,8 +11,11 @@ import ImageEditor from "../components/calendarEditorElements/ImageEditor";
 import MonthEditor from "../components/calendarEditorElements/textOrImg";
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
-
-
+import {
+  handleMouseDown,
+  handleMouseMove,
+  handleMouseUp,
+} from "../utils/dragUtils";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function CreateCalendar() {
@@ -61,8 +64,6 @@ export default function CreateCalendar() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
- 
-
 
   const handleMonthTextChange = (index, value) => {
     const newTexts = [...monthTexts];
@@ -70,197 +71,113 @@ export default function CreateCalendar() {
     setMonthTexts(newTexts);
   };
 
- 
-
   const handleSaveCalendar = async () => {
-  const token = localStorage.getItem(ACCESS_TOKEN);
+    const token = localStorage.getItem(ACCESS_TOKEN);
 
-  // Zamiast zwykłego obiektu robimy FormData
-  const formData = new FormData();
+    // Zamiast zwykłego obiektu robimy FormData
+    const formData = new FormData();
 
-  // ----- TOP IMAGE -----
-  if (image !== null) {
-    if (imageFromDisk) {
-      formData.append("imageFromDisk", "true");
-      formData.append("top_image", image); // raw plik
-    } else {
-      formData.append("imageFromDisk", "false");
-      formData.append("top_image", image.id); // tylko ID obrazka
-    }
-  }
-
-  // ----- STYLE -----
-  if (style === "style1") {
-    formData.append("bottom_type", "color");
-    formData.append("bottom_color", bgColor);
-  }
-
-  if (style === "style2") {
-    if (gradientTheme === "classic") {
-      const direction =
-        {
-          diagonal: "to bottom right",
-          vertical: "to bottom",
-          horizontal: "to right",
-          radial: "radial",
-        }[gradientVariant] || "to bottom";
-
-      formData.append("bottom_type", "gradient");
-      formData.append("gradient_start_color", bgColor);
-      formData.append("gradient_end_color", gradientEndColor);
-      formData.append("gradient_direction", direction);
-      formData.append("gradient_strength", gradientStrength);
-      formData.append("gradient_theme", gradientTheme);
-    } else {
-      formData.append("bottom_type", "theme-gradient");
-      formData.append("gradient_theme", gradientTheme);
-      formData.append("gradient_start_color", bgColor);
-      formData.append("gradient_end_color", gradientEndColor);
-    }
-  }
-
-  if (style === "style3") {
-    formData.append("bottom_type", "image");
-    formData.append("bottom_image", backgroundImage.id);
-  }
-
-  // ----- YEAR -----
-  if (yearActive) {
-    formData.append("yearColor", yearColor);
-    formData.append("yearFontSize", yearFontSize);
-    formData.append("yearFontFamily", yearFontFamily);
-    formData.append("yearFontWeight", yearFontWeight);
-    formData.append("yearPositionX", yearPosition.coords.x);
-    formData.append("yearPositionY", yearPosition.coords.y);
-    formData.append("yearText", yearText);
-  }
-
-  console.log("text", monthTexts);
-  console.log("font", fontSettings);
-  console.log("img", monthImages);
-  console.log("mode", isImageMode);
-  console.log("scale", imageScales);
-
-  // ----- MIESIĄCE -----
-  for (let i = 0; i < months.length; i++) {
-    const fieldName = `field${i + 1}`; // field1, field2...
-
-    if (isImageMode[i]) {
-      formData.append(
-        fieldName,
-        JSON.stringify({
-          image: "true",
-          scale: imageScales[i],
-          positionX: positions[i].x,
-          positionY: positions[i].y,
-        })
-      );
-
-      formData.append(`${fieldName}_image`, monthImages[i]);
-
-    } else {
-      formData.append(
-        fieldName,
-        JSON.stringify({
-          text: monthTexts[i],
-          font: fontSettings[i],
-        })
-      );
-    }
-  }
-
-  // ----- REQUEST -----
-  try {
-    const response = await axios.post(`${apiUrl}/calendars/`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    console.log("✅ Utworzono kalendarz:", response.data);
-    alert("✅ Kalendarz został zapisany!");
-  } catch (error) {
-    console.error("❌ Błąd zapisu:", error.response?.data || error.message);
-    alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
-  }
-};
-
-
-  const onMouseDown = (e) => {
-    e.preventDefault();
-    setDragging(true);
-
-    let startX, startY;
-
-    const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
-
-    if (yearPosition.coords) {
-      startX = clamp(yearPosition.coords.x, xLimits.min, xLimits.max);
-      startY = clamp(yearPosition.coords.y, yLimits.min, yLimits.max);
-    } else {
-      // Zamiana preset na konkretne coords
-      const rect = spanRef.current.getBoundingClientRect();
-      const parentRect = spanRef.current.parentElement.getBoundingClientRect();
-
-      startX = rect.left - parentRect.left + rect.width / 2;
-      startY = rect.top - parentRect.top + rect.height / 2;
-
-      // Ograniczenie wartości do zakresu
-      startX = clamp(startX, xLimits.min, xLimits.max);
-      startY = clamp(startY, yLimits.min, yLimits.max);
-
-      setYearPosition({ coords: { x: startX, y: startY } });
+    // ----- TOP IMAGE -----
+    if (image !== null) {
+      if (imageFromDisk) {
+        formData.append("imageFromDisk", "true");
+        formData.append("top_image", image); // raw plik
+      } else {
+        formData.append("imageFromDisk", "false");
+        formData.append("top_image", image.id); // tylko ID obrazka
+      }
     }
 
-    dragStartPos.current = {
-      mouseX: e.clientX,
-      mouseY: e.clientY,
-      elemX: startX,
-      elemY: startY,
-    };
+    // ----- STYLE -----
+    if (style === "style1") {
+      formData.append("bottom_type", "color");
+      formData.append("bottom_color", bgColor);
+    }
+
+    if (style === "style2") {
+      if (gradientTheme === "classic") {
+        const direction =
+          {
+            diagonal: "to bottom right",
+            vertical: "to bottom",
+            horizontal: "to right",
+            radial: "radial",
+          }[gradientVariant] || "to bottom";
+
+        formData.append("bottom_type", "gradient");
+        formData.append("gradient_start_color", bgColor);
+        formData.append("gradient_end_color", gradientEndColor);
+        formData.append("gradient_direction", direction);
+        formData.append("gradient_strength", gradientStrength);
+        formData.append("gradient_theme", gradientTheme);
+      } else {
+        formData.append("bottom_type", "theme-gradient");
+        formData.append("gradient_theme", gradientTheme);
+        formData.append("gradient_start_color", bgColor);
+        formData.append("gradient_end_color", gradientEndColor);
+      }
+    }
+
+    if (style === "style3") {
+      formData.append("bottom_type", "image");
+      formData.append("bottom_image", backgroundImage.id);
+    }
+
+    // ----- YEAR -----
+    if (yearActive) {
+      formData.append("yearColor", yearColor);
+      formData.append("yearFontSize", yearFontSize);
+      formData.append("yearFontFamily", yearFontFamily);
+      formData.append("yearFontWeight", yearFontWeight);
+      formData.append("yearPositionX", yearPosition.coords.x);
+      formData.append("yearPositionY", yearPosition.coords.y);
+      formData.append("yearText", yearText);
+    }
+    // ----- MIESIĄCE -----
+    for (let i = 0; i < months.length; i++) {
+      const fieldName = `field${i + 1}`; // field1, field2...
+
+      if (isImageMode[i]) {
+        formData.append(
+          fieldName,
+          JSON.stringify({
+            image: "true",
+            scale: imageScales[i],
+            positionX: positions[i].x,
+            positionY: positions[i].y,
+          })
+        );
+
+        formData.append(`${fieldName}_image`, monthImages[i]);
+      } else {
+        formData.append(
+          fieldName,
+          JSON.stringify({
+            text: monthTexts[i],
+            font: fontSettings[i],
+          })
+        );
+      }
+    }
+
+    // ----- REQUEST -----
+    try {
+      const response = await axios.post(`${apiUrl}/calendars/`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("✅ Utworzono kalendarz:", response.data);
+      alert("✅ Kalendarz został zapisany!");
+    } catch (error) {
+      console.error("❌ Błąd zapisu:", error.response?.data || error.message);
+      alert("❌ Nie udało się zapisać kalendarza. Sprawdź dane.");
+    }
   };
 
-  useEffect(() => {
-    const onMouseMove = (e) => {
-      if (!dragging) return;
-
-      const deltaX = e.clientX - dragStartPos.current.mouseX;
-      const deltaY = e.clientY - dragStartPos.current.mouseY;
-
-      const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
-
-      setYearPosition((prev) => ({
-        ...prev,
-        coords: {
-          x: clamp(
-            dragStartPos.current.elemX + deltaX,
-            xLimits.min,
-            xLimits.max
-          ),
-          y: clamp(
-            dragStartPos.current.elemY + deltaY,
-            yLimits.min,
-            yLimits.max
-          ),
-        },
-      }));
-    };
-
-    const onMouseUp = () => {
-      if (dragging) setDragging(false);
-    };
-
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-
-    return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
-  }, [dragging, xLimits, yLimits, setYearPosition]);
-
- const fetchImages = async () => {
+  const fetchImages = async () => {
     if (!hasMore || loading) return;
 
     setLoading(true);
@@ -278,22 +195,43 @@ export default function CreateCalendar() {
     } catch (err) {
       console.error("Błąd podczas pobierania obrazów:", err);
       if (err.response?.status === 401) {
-  setTimeout(() => {
-    window.location.reload();
-  }, 500); // odświeży po 0.5 sekundy
-}
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // odświeży po 0.5 sekundy
+      }
     } finally {
       setLoading(false);
     }
   };
 
-useEffect(() => {
+  useEffect(() => {
     fetchImages();
   }, []);
 
+  useEffect(() => {
+    const onMove = (e) =>
+      handleMouseMove(e, {
+        dragging,
+        dragStartPos,
+        xLimits,
+        yLimits,
+        setYearPosition,
+      });
+
+    const onUp = () => handleMouseUp(setDragging);
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [dragging, xLimits, yLimits]);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-4 p-4">
-      <div className="lg:col-span-3 space-y-4">
+      <div className="lg:col-span-3 space-y-2 ">
         <StyleSidebar
           style={style}
           setStyle={setStyle}
@@ -302,20 +240,20 @@ useEffect(() => {
           hasMore={hasMore}
           fetchImages={fetchImages}
           setImage={setImage}
-        setDimensions={setDimensions}
+          setDimensions={setDimensions}
           setImageFromDisk={setImageFromDisk}
         />
-        <div className="border rounded p-4 justify-center items-center flex">
+        <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg flex justify-center items-center mt-4 sm:m-4">
           <button
             onClick={handleSaveCalendar}
-            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm shadow"
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm shadow"
           >
             Zapisz kalendarz
           </button>
         </div>
       </div>
 
-      <div className="lg:col-span-3 space-y-4 ">
+      <div className="lg:col-span-3 space-y-2 ">
         {style === "style1" && (
           <ImgColor
             bgColor={bgColor}
@@ -372,7 +310,7 @@ useEffect(() => {
           yLimits={yLimits}
         />
       </div>
-      <div className="lg:col-span-3 space-y-4 ">
+      <div className="lg:col-span-3 space-y-2 ">
         {months.map((month, index) => (
           <MonthEditor
             key={month}
@@ -390,21 +328,22 @@ useEffect(() => {
             fontWeights={fontWeights}
             setIsImageMode={setIsImageMode}
             setImageScales={setImageScales}
-              setMonthImages={setMonthImages}
-              setFontSettings={setFontSettings}
-              setMonthTexts={setMonthTexts}
+            setMonthImages={setMonthImages}
+            setFontSettings={setFontSettings}
+            setMonthTexts={setMonthTexts}
           />
         ))}
       </div>
-      <div className="lg:col-span-1" />
+    
 
       {/* Preview area */}
-      <div className="lg:col-span-3">
-        <div className="border rounded w-[372px] h-[972px] mx-auto bg-white overflow-hidden shadow">
+      <div className="lg:col-span-5  mt-4 sm:m-4 ">
+        <div className=" bg-[#2a2b2b]  rounded-4xl shadow-lg  p-8">        
+        <div className=" rounded overflow-hidden shadow   ">
           {/* Header */}
           <div
             ref={headerRef}
-            className="relative h-[252px] bg-gray-200 flex items-center justify-center"
+            className="relative h-[222px] bg-gray-200 flex items-center justify-center"
           >
             {image ? (
               <>
@@ -417,7 +356,17 @@ useEffect(() => {
                 {yearActive && (
                   <span
                     ref={spanRef}
-                    onMouseDown={onMouseDown}
+                    onMouseDown={(e) =>
+                      handleMouseDown(e, {
+                        yearPosition,
+                        setYearPosition,
+                        spanRef,
+                        xLimits,
+                        yLimits,
+                        setDragging,
+                        dragStartPos,
+                      })
+                    }
                     style={{
                       position: "absolute",
                       color: yearColor,
@@ -500,6 +449,7 @@ useEffect(() => {
               </Fragment>
             ))}
           </div>
+        </div>
         </div>
       </div>
     </div>

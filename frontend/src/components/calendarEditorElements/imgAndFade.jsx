@@ -1,4 +1,4 @@
-import { extractColorsFromImage } from "../../utils/extractColorsFromImage"
+import { extractColorsFromImage } from "../../utils/extractColorsFromImage";
 
 const GradientSettings = ({
   image,
@@ -14,50 +14,60 @@ const GradientSettings = ({
   setGradientStrength,
 }) => {
   return (
-    <div className="border rounded p-4 space-y-4">
-      <h2 className="text-lg font-semibold mb-2">Ustawienia gradientu</h2>
+    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 sm:m-4 space-y-4">
+      <h2 className="text-base font-semibold text-[#d2e4e2]">
+        Ustawienia gradientu
+      </h2>
 
+      {/* Automatyczne pobieranie kolorów */}
       {image && (
         <button
-          onClick={() => extractColorsFromImage(image.url, setBgColor, setGradientEndColor)}
-          className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+          onClick={() =>
+            extractColorsFromImage(image.url, setBgColor, setGradientEndColor)
+          }
+          className="w-full mt-2 px-4 py-2 rounded-lg text-sm font-medium
+            bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]
+            hover:opacity-90 transition-colors"
         >
-          Dobierz automatycznie kolory z grafiki
+          Dobierz kolory z grafiki
         </button>
       )}
 
+      {/* Kolor początkowy */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Kolor początkowy
         </label>
         <input
           type="color"
           value={bgColor}
           onChange={(e) => setBgColor(e.target.value)}
-          className="w-full h-10 border rounded"
+          className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
         />
       </div>
 
+      {/* Kolor końcowy */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Kolor końcowy
         </label>
         <input
           type="color"
           value={gradientEndColor}
           onChange={(e) => setGradientEndColor(e.target.value)}
-          className="w-full h-10 border rounded"
+          className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
         />
       </div>
 
+      {/* Motyw gradientu */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Motyw gradientu
         </label>
         <select
           value={gradientTheme}
           onChange={(e) => setGradientTheme(e.target.value)}
-          className="w-full border rounded px-2 py-1 text-sm"
+          className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
         >
           <option value="classic">Klasyczny (z kolorów)</option>
           <option value="aurora">Aurora</option>
@@ -67,31 +77,34 @@ const GradientSettings = ({
         </select>
       </div>
 
-{gradientTheme=='classic' && (
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Wariant
-        </label>
-        <select
-          value={gradientVariant}
-          onChange={(e) => setGradientVariant(e.target.value)}
-          className="w-full border rounded px-2 py-1 text-sm"
-        >
-          <option value="diagonal">Diagonalny (↘)</option>
-          <option value="vertical">Pionowy (↓)</option>
-          <option value="horizontal">Poziomy (→)</option>
-          <option value="radial">Radialny (okrągły)</option>
-        </select>
-      </div>
+      {/* Wariant (tylko dla classic) */}
+      {gradientTheme === "classic" && (
+        <div>
+          <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
+            Wariant
+          </label>
+          <select
+            value={gradientVariant}
+            onChange={(e) => setGradientVariant(e.target.value)}
+            className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
+          >
+            <option value="diagonal">Diagonalny (↘)</option>
+            <option value="vertical">Pionowy (↓)</option>
+            <option value="horizontal">Poziomy (→)</option>
+            <option value="radial">Radialny (okrągły)</option>
+          </select>
+        </div>
       )}
+
+      {/* Intensywność */}
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Intensywność przejścia
         </label>
         <select
           value={gradientStrength}
           onChange={(e) => setGradientStrength(e.target.value)}
-          className="w-full border rounded px-2 py-1 text-sm"
+          className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
         >
           <option value="soft">Miękki</option>
           <option value="medium">Średni</option>

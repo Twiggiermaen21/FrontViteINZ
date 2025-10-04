@@ -1,24 +1,32 @@
 import React from "react";
-import { extractColorsFromImage } from "../../utils/extractColorsFromImage"
+import { extractColorsFromImage } from "../../utils/extractColorsFromImage";
 
 const ImgColor = ({ bgColor, setBgColor, image, setGradientEndColor }) => {
   return (
-    <div className="border rounded p-4">
-      <h2 className="text-lg font-semibold mb-2">Kolor tła</h2>
+    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 sm:m-4">
+      <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
+        Kolor tła
+      </h2>
 
+      {/* Wybór koloru */}
       <input
         type="color"
         value={bgColor}
         onChange={(e) => setBgColor(e.target.value)}
-        className="w-full h-10 border rounded"
+        className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
       />
 
+      {/* Automatyczne dopasowanie kolorów */}
       {image && (
         <button
-          onClick={() => extractColorsFromImage(image.url, setBgColor, setGradientEndColor)}
-          className="mt-2 w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+          onClick={() =>
+            extractColorsFromImage(image.url, setBgColor, setGradientEndColor)
+          }
+          className="mt-4 w-full px-4 py-2 rounded-lg text-sm font-medium
+            bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]
+            hover:opacity-90 transition-colors"
         >
-          Dobierz automatycznie kolory z grafiki
+          Dobierz automatycznie z grafiki
         </button>
       )}
     </div>
