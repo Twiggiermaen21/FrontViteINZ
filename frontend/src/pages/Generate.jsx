@@ -16,7 +16,7 @@ export default function Generate() {
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState({});
   const [selected, setSelected] = useState({});
-
+  const [imageName, setImageName] = useState("");
   const examplePrompts = [
     "A futuristic city skyline at night",
     "Cute cat wearing glasses",
@@ -64,7 +64,7 @@ export default function Generate() {
     setLoading(true);
     try {
       const payload = { prompt };
-
+      payload["name"] = imageName || "Generated Image";
       fields.forEach((field) => {
         const selectedValue = selected[field];
         const availableOptions = options[field]?.results;
@@ -72,7 +72,9 @@ export default function Generate() {
         if (selectedValue) {
           payload[field] = selectedValue;
         } else if (availableOptions?.length > 0) {
-          const randomIndex = Math.floor(Math.random() * availableOptions.length);
+          const randomIndex = Math.floor(
+            Math.random() * availableOptions.length
+          );
           payload[field] = availableOptions[randomIndex].id;
         }
       });
@@ -111,7 +113,9 @@ export default function Generate() {
 
         {/* EXAMPLES */}
         <div className="mb-8">
-          <h3 className="text-sm font-semibold text-white mb-3">Try an example:</h3>
+          <h3 className="text-sm font-semibold text-white mb-3">
+            Try an example:
+          </h3>
           <div className="flex flex-wrap gap-3">
             {examplePrompts.map((ex, i) => (
               <button
@@ -148,7 +152,19 @@ export default function Generate() {
             </div>
           ))}
         </div>
-
+        <label
+          htmlFor="imageName"
+          className="block text-xs font-semibold text-[#989c9e] uppercase mb-1"
+        >
+          Image Name
+        </label>
+        <input
+          type="text"
+          value={imageName}
+          onChange={(e) => setImageName(e.target.value)}
+          placeholder="Enter image name"
+          className="w-full p-2 mb-4 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+        />
         {/* BUTTON */}
         <button
           onClick={generateImage}
@@ -161,31 +177,29 @@ export default function Generate() {
 
       {/* PRAWY PANEL - CUSTOM SCROLL */}
       <div className="lg:w-6/10 flex flex-col items-center justify-start bg-[#2a2b2b] rounded-4xl p-4 shadow-lg max-h-[80vh]">
-        
-         <div className=" rounded-2xl pr-2 overflow-y-auto custom-scroll">
-        {loading && (
-          <div className="flex items-center justify-center w-full h-32">
-            <div className="w-16 h-16 border-4 border-t-[#afe5e6] border-b-[#6d8f91] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
+        <div className=" rounded-2xl pr-2 overflow-y-auto custom-scroll">
+          {loading && (
+            <div className="flex items-center justify-center w-full h-32">
+              <div className="w-16 h-16 border-4 border-t-[#afe5e6] border-b-[#6d8f91] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
 
-        {images.length === 0 && !loading && (
-          <div className="text-[#989c9e] text-lg text-center opacity-70 mt-4">
-            Your generated images will appear here.
-          </div>
-        )}
+          {images.length === 0 && !loading && (
+            <div className="text-[#989c9e] text-lg text-center opacity-70 mt-4">
+              Your generated images will appear here.
+            </div>
+          )}
 
-        {images.map((url, index) => (
-          <img
-            key={index}
-            src={url}
-            alt={`Generated ${index}`}
-            className="rounded-xl w-full object-contain shadow-xl mb-4"
-          />
-        ))}
+          {images.map((url, index) => (
+            <img
+              key={index}
+              src={url}
+              alt={`Generated ${index}`}
+              className="rounded-xl w-full object-contain shadow-xl mb-4"
+            />
+          ))}
+        </div>
       </div>
-         </div>
-     
     </div>
   );
 }

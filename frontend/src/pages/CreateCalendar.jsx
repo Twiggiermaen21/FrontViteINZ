@@ -67,6 +67,7 @@ export default function CreateCalendar() {
   const [hasMore, setHasMore] = useState(true);
   const [hasMoreBackground, setHasMoreBackground] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [calendarName, setCalendarName] = useState("");
 
   const handleMonthTextChange = (index, value) => {
     const newTexts = [...monthTexts];
@@ -79,7 +80,7 @@ export default function CreateCalendar() {
 
     // Zamiast zwykłego obiektu robimy FormData
     const formData = new FormData();
-
+    formData.append("name", calendarName);
     // ----- TOP IMAGE -----
     if (image !== null) {
       if (imageFromDisk) {
@@ -262,8 +263,6 @@ export default function CreateCalendar() {
     };
   }, [dragging, xLimits, yLimits]);
 
-  console.log("obrazy miesiaca", monthImages);
-
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-6 px-4">
@@ -280,6 +279,12 @@ export default function CreateCalendar() {
           setImageFromDisk={setImageFromDisk}
         />
         <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg flex justify-center items-center mt-4">
+          <input
+          type="text"
+          value={calendarName}
+          onChange={(e) => setCalendarName(e.target.value)}
+          className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
+        />
           <button
             onClick={handleSaveCalendar}
             className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm shadow"

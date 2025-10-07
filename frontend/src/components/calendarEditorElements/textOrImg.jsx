@@ -98,6 +98,7 @@ const MonthEditor = ({
             </label>
             <input
               type="color"
+              
               value={fontSettings.fontColor}
               onChange={(e) =>
                 handleFontSettingChange(
@@ -111,20 +112,6 @@ const MonthEditor = ({
               className="w-full h-10 rounded-lg cursor-pointer border border-[#374b4b] hover:border-[#6d8f91]"
             />
           </div>
-
-          <textarea
-            className="w-full rounded-lg p-2 bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b]"
-            value={monthTexts[index]}
-            onChange={(e) => handleMonthTextChange(index, e.target.value)}
-            rows={1}
-            maxLength={1000}
-            placeholder="Wpisz tekst..."
-            style={{
-              fontFamily: fontSettings.fontFamily,
-              fontWeight: fontSettings.fontWeight,
-              color: fontSettings.fontColor,
-            }}
-          />
         </>
       ) : (
         <>
@@ -142,21 +129,6 @@ const MonthEditor = ({
               file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium 
               file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90 mb-2"
           />
-
-          {/* Podgląd obrazu (placeholder czarny jeśli brak) */}
-          <div className="border rounded overflow-hidden relative w-full h-20 mb-2 bg-black">
-            {monthImages && (
-              <img
-                src={URL.createObjectURL(monthImages)}
-                alt={`Zdjęcie ${month}`}
-                className="w-full h-full object-cover select-none pointer-events-none"
-                style={{
-                  transform: `scale(${imageScales[index] || 1})`,
-                  transition: "transform 0.2s",
-                }}
-              />
-            )}
-          </div>
 
           {/* Pasek do skalowania */}
           <input

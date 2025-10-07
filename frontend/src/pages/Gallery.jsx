@@ -8,7 +8,7 @@ const Gallery = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(null); // obraz wybrany do podglądu
+  const [selectedImage, setSelectedImage] = useState(null); 
 
   const fetchImages = async () => {
     if (loading) return;
@@ -45,6 +45,8 @@ const Gallery = () => {
     }
   };
 
+  console.log("images", images);
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-semibold mb-4 text-white">Gallery</h1>
@@ -73,7 +75,7 @@ const Gallery = () => {
                   />
                   <div className="absolute inset-0 bg-[#00000080] flex items-end p-2 opacity-0 group-hover:opacity-100 transition">
                     <span className="text-sm text-[#a0f0f0]">
-                      Prompt: {img.prompt?.slice(0, 30)}...
+                      Name: {img.name}
                     </span>
                   </div>
                 </div>

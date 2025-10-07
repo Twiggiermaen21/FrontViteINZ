@@ -34,7 +34,7 @@ const GradientSettings = ({
       )}
 
       {/* Kolor początkowy */}
-      <div>
+      <div className="flex gap-4">
         <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Kolor początkowy
         </label>
@@ -44,10 +44,10 @@ const GradientSettings = ({
           onChange={(e) => setBgColor(e.target.value)}
           className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
         />
-      </div>
+      
 
       {/* Kolor końcowy */}
-      <div>
+      
         <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Kolor końcowy
         </label>
