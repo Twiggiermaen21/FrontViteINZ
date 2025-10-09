@@ -64,7 +64,7 @@ const BackgroundImg = ({
                     ? "ring-2 ring-[#6d8f91] border-[#6d8f91]"
                     : "border-[#374b4b] hover:border-[#6d8f91]"
                 }`}
-              onClick={() => setBackgroundImage(img.url)}
+              onClick={() => setBackgroundImage(img)}
             />
           ))}
         </div>

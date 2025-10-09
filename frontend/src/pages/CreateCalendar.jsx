@@ -75,6 +75,8 @@ export default function CreateCalendar() {
     setMonthTexts(newTexts);
   };
 
+console.log("bootom image", backgroundImage);
+
   const handleSaveCalendar = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
 
@@ -166,6 +168,7 @@ export default function CreateCalendar() {
 
     // ----- REQUEST -----
     try {
+      console.log("Wysyłam dane:", Object.fromEntries(formData.entries()));
       const response = await axios.post(`${apiUrl}/calendars/`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -278,20 +281,32 @@ export default function CreateCalendar() {
           setDimensions={setDimensions}
           setImageFromDisk={setImageFromDisk}
         />
-        <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg flex justify-center items-center mt-4">
-          <input
-          type="text"
-          value={calendarName}
-          onChange={(e) => setCalendarName(e.target.value)}
-          className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
-        />
-          <button
-            onClick={handleSaveCalendar}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm shadow"
-          >
-            Zapisz kalendarz
-          </button>
-        </div>
+        <div className="bg-[#2a2b2b] rounded-3xl p-5 shadow-lg mt-4">
+  <label className="block text-sm font-medium text-[#d2e4e2] mb-2">
+    Wpisz nazwę kalendarza
+  </label>
+
+  <input
+    type="text"
+    value={calendarName}
+    onChange={(e) => setCalendarName(e.target.value)}
+    placeholder="np. Kalendarz firmowy 2025"
+    className="w-full h-12 rounded-lg px-3 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] focus:border-[#6d8f91] focus:outline-none transition-colors"
+  />
+
+  <button
+    onClick={handleSaveCalendar}
+    disabled={!calendarName.trim()}
+    className={`mt-4 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200
+      ${
+        calendarName.trim()
+          ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+          : "bg-[#3b3c3c] text-[#8a8a8a] cursor-not-allowed"
+      }`}
+  >
+    Zapisz kalendarz
+  </button>
+</div>
       </div>
 
       <div className="lg:col-span-3 space-y-2 ">

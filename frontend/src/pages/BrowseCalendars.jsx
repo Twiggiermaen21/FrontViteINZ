@@ -95,7 +95,7 @@ const BrowseCalendars = () => {
   console.log("kalendarze", calendars);
 
   return (
-    <div className="relative w-full max-w-[1512px] mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4">
+    <div className="relative w-full mt-8  max-w-[1812px] mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4">
       <h1 className="text-3xl font-bold text-white mb-4">
         Przeglądaj kalendarze
       </h1>
@@ -115,10 +115,10 @@ const BrowseCalendars = () => {
                 </h1>
                 <div
                   key={calendar.id}
-                  className="w-[372px] h-[972px] bg-white border rounded overflow-hidden shadow shrink-0"
+                  className="w-[272px] h-[666px] bg-white border rounded overflow-hidden shadow shrink-0"
                 >
                   {/* Header */}
-                  <div className="relative h-[252px] bg-gray-200 flex items-center justify-center overflow-hidden">
+                  <div className="relative h-[152px] bg-gray-200 flex items-center justify-center overflow-hidden">
                     {calendar.top_image ? (
                       <>
                         <img
@@ -168,7 +168,7 @@ const BrowseCalendars = () => {
                       gradientTheme: calendar.bottom?.theme,
                       gradientStrength: calendar.bottom?.strength,
                       gradientVariant: calendar.bottom?.direction,
-                      backgroundImage: calendar.bottom?.image,
+                      backgroundImage: calendar.bottom?.url,
                     })}
                   >
                     {[calendar.field1, calendar.field2, calendar.field3].map(
