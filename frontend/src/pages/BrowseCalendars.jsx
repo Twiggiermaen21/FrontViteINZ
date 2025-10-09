@@ -92,7 +92,7 @@ const BrowseCalendars = () => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  console.log("kalendarze", calendars);
+ 
 
   return (
     <div className="relative w-full mt-8  max-w-[1812px] mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4">
@@ -108,13 +108,13 @@ const BrowseCalendars = () => {
           {calendars.length === 0 && !loading ? (
             <p className="text-[#989c9e]">Brak dostępnych kalendarzy.</p>
           ) : (
-            calendars.map((calendar) => (
-              <div key={calendar.id} className="flex-shrink-0">
+            calendars.map((calendar,index) => (
+              <div key={index} className="flex-shrink-0">
                 <h1 className="text-xl  font-bold text-white mb-2">
                   {calendar.name}
                 </h1>
                 <div
-                  key={calendar.id}
+                  key={index}
                   className="w-[272px] h-[666px] bg-white border rounded overflow-hidden shadow shrink-0"
                 >
                   {/* Header */}

@@ -45,8 +45,6 @@ const Gallery = () => {
     }
   };
 
-  console.log("images", images);
-
   return (
     <div className="p-6">
       <h1 className="text-3xl font-semibold mb-4 text-white">Gallery</h1>
@@ -64,7 +62,7 @@ const Gallery = () => {
             ) : (
               images.map((img, index) => (
                 <div
-                  key={img.id || index}
+                  key={index }
                   className="relative group rounded-lg overflow-hidden border border-[#374b4b] bg-[#2a2b2b] shadow-sm cursor-pointer"
                   onClick={() => setSelectedImage(img)}
                 >
@@ -93,40 +91,55 @@ const Gallery = () => {
 
       {/* Modal powiększonego obrazu */}
       {selectedImage && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6">
-          <div className="relative max-w-4xl w-full bg-[#1e1f1f] rounded-2xl shadow-lg overflow-hidden">
-            {/* Zamknięcie */}
-            <button
-              className="absolute top-3 right-3 text-white text-2xl hover:text-[#a0f0f0] transition"
-              onClick={() => setSelectedImage(null)}
-            >
-              ✕
-            </button>
+  <div
+    className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6"
+    onClick={() => setSelectedImage(null)} // kliknięcie poza obrazem też zamyka
+  >
+    <div
+      className="relative max-w-4xl w-full bg-[#1e1f1f] rounded-2xl shadow-lg overflow-hidden"
+      onClick={(e) => e.stopPropagation()} // blokuje zamknięcie po kliknięciu w obraz
+    >
+      {/* Ikonka powrotu */}
+      <button
+        className="absolute top-3 left-3 text-white text-2xl hover:text-[#a0f0f0] transition"
+        onClick={() => setSelectedImage(null)}
+      >
+        ←
+      </button>
 
-            {/* Obraz */}
-            <img
-              src={selectedImage.url}
-              alt="Selected"
-              className="w-full max-h-[70vh] object-contain bg-black"
-            />
+      {/* Zamknięcie (✕) */}
+      <button
+        className="absolute top-3 right-3 text-white text-2xl hover:text-[#a0f0f0] transition"
+        onClick={() => setSelectedImage(null)}
+      >
+        ✕
+      </button>
 
-            {/* Szczegóły */}
-            <div className="p-4 border-t border-[#2c2e2d] text-[#d1d5db]">
-              <h2 className="text-lg font-semibold mb-2">Details</h2>
-              <p>
-                <span className="font-medium text-[#a0f0f0]">Prompt:</span>{" "}
-                {selectedImage.prompt}
-              </p>
-              {selectedImage.created_at && (
-                <p className="mt-2 text-sm text-[#9ca3af]">
-                  Generated at:{" "}
-                  {new Date(selectedImage.created_at).toLocaleString()}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Obraz */}
+      <img
+        src={selectedImage.url}
+        alt="Selected"
+        className="w-full max-h-[70vh] object-contain bg-black"
+      />
+
+      {/* Szczegóły */}
+      <div className="p-4 border-t border-[#2c2e2d] text-[#d1d5db]">
+        <h2 className="text-lg font-semibold mb-2">Details</h2>
+        <p>
+          <span className="font-medium text-[#a0f0f0]">Prompt:</span>{" "}
+          {selectedImage.prompt}
+        </p>
+        {selectedImage.created_at && (
+          <p className="mt-2 text-sm text-[#9ca3af]">
+            Generated at:{" "}
+            {new Date(selectedImage.created_at).toLocaleString()}
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

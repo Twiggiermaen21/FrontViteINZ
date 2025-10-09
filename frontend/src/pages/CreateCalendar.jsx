@@ -75,7 +75,8 @@ export default function CreateCalendar() {
     setMonthTexts(newTexts);
   };
 
-console.log("bootom image", backgroundImage);
+
+
 
   const handleSaveCalendar = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
@@ -168,7 +169,6 @@ console.log("bootom image", backgroundImage);
 
     // ----- REQUEST -----
     try {
-      console.log("Wysyłam dane:", Object.fromEntries(formData.entries()));
       const response = await axios.post(`${apiUrl}/calendars/`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
