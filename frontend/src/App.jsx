@@ -16,7 +16,7 @@ import EditCalendar from "./pages/EditCalendar";
 import EditImage from "./pages/EditImage";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Settings from "./pages/Settings";
-
+import FlappyBird from "./components/menuElements/FlappyBird";
 function Logout() {
   localStorage.clear();
   return <Navigate to="/" />;
@@ -58,6 +58,7 @@ function App() {
             <Route path="edit" element={<EditImage />} />
             <Route path="settings" element={<Settings />} />
             <Route path="logout" element={<Logout />} />
+            <Route path="game" element={<FlappyBird />} />
           </Route>
         </Routes>
       </BrowserRouter>

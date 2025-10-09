@@ -13,6 +13,10 @@ const Layout = () => {
       setUser(JSON.parse(storedUser));
     }
   }, []);
+
+
+
+  
   return (
     <div className="flex min-h-screen bg-[#1e1f1f] text-white">
       {/* SIDEBAR */}

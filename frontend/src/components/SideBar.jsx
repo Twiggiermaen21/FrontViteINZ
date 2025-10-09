@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { assets } from "../assets/assets";
 import {
   House,
@@ -24,23 +24,34 @@ const navbar = [
 
 const SideBar = ({ sidebar, setSidebar, user }) => {
   const navigate = useNavigate();
+  const [clicks, setClicks] = useState(0);
 
+  useEffect(() => {
+    if (clicks === 5) {
+      navigate("/ai/game");
+      setClicks(0); // reset po przejściu
+    }
+
+    // Reset po 2 sekundach bez klikania
+    const timer = setTimeout(() => setClicks(0), 2000);
+    return () => clearTimeout(timer);
+  }, [clicks, navigate]);
   return (
     <div
-       className={`
+      className={`
     w-60 bg-[#2a2b2b] rounded-4xl  mt-4 z-40 flex flex-col justify-between
     max-sm:absolute max-sm:top-0 max-sm:left-0 max-sm:h-full sm:m-4
     transform transition-transform duration-300 ease-in-out
-    ${sidebar ? "translate-x-0 m-4 "  : "max-sm:-translate-x-full"}
+    ${sidebar ? "translate-x-0 m-4 " : "max-sm:-translate-x-full"}
   `}
->
+    >
       {/* GÓRNA CZĘŚĆ */}
       <div className="my-7 w-full">
         <img
           src="/logo_ikona.png"
           alt="user avatar"
-          className="w-24 h-24 mx-auto"
-
+          className="w-24 h-24 mx-auto cursor-pointer transition-transform duration-200 hover:scale-105"
+          onClick={() => setClicks((c) => c + 1)}
         />
 
         <div className="px-4 mt-6 text-sm font-medium">
@@ -76,26 +87,22 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
 
       {/* DOLNA CZĘŚĆ */}
       <div className="w-full p-4 px-5 flex flex-col items-start space-y-2">
+        <button
+          onClick={() => navigate("/ai/settings")}
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white transition-colors"
+        >
+          <Settings className="w-5 h-5 text-[#989c9e]" />
+          <span className="text-sm">Ustawienia</span>
+        </button>
 
-
-
-        
-  <button
-    onClick={() => navigate("/ai/settings")}
-    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white transition-colors"
-  >
-    <Settings className="w-5 h-5 text-[#989c9e]" />
-    <span className="text-sm">Ustawienia</span>
-  </button>
-
-  <button
-    onClick={() => navigate("/ai/logout")}
-    className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white transition-colors"
-  >
-    <LogOut className="w-5 h-5 text-[#989c9e]" />
-    <span className="text-sm">Wyloguj</span>
-  </button>
-</div>
+        <button
+          onClick={() => navigate("/ai/logout")}
+          className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white transition-colors"
+        >
+          <LogOut className="w-5 h-5 text-[#989c9e]" />
+          <span className="text-sm">Wyloguj</span>
+        </button>
+      </div>
     </div>
   );
 };
