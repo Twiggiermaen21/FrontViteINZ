@@ -23,22 +23,28 @@ const MonthEditor = ({
   setFontSettings,
   setMonthTexts,
 }) => {
-
-
   return (
     <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4  space-y-4">
-      <h3 className="text-base font-semibold text-[#d2e4e2]">{month}</h3>
+      <h3 className="flex items-center gap-3 text-base font-semibold mb-2 text-[#d2e4e2]">
+  <div
+    onClick={() => toggleImageMode(index, setIsImageMode)}
+    className={`relative w-12 h-6 flex items-center rounded-full cursor-pointer transition-all duration-300 ${
+      isImageMode ? "bg-[#6d8f91]" : "bg-[#374b4b]"
+    }`}
+  >
+    <div
+      className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center text-[10px] font-bold text-[#374b4b] ${
+        isImageMode ? "translate-x-6" : "translate-x-[2px]"
+      }`}
+    >
+      {isImageMode ? "🖼️" : "T"}
+    </div>
+  </div>
+
+  <span className="text-lg font-bold tracking-wide">{month}</span>
+</h3>
 
       {/* Tryb tekst/obraz */}
-      <label className="flex items-center gap-2 cursor-pointer text-[#d2e4e2]">
-        <input
-          type="checkbox"
-          checked={isImageMode}
-          onChange={() => toggleImageMode(index, setIsImageMode)}
-          className="h-5 w-5 text-[#6d8f91] border-[#374b4b] rounded focus:ring-[#6d8f91]"
-        />
-        <span>{isImageMode ? "Tryb: Zdjęcie" : "Tryb: Tekst"}</span>
-      </label>
 
       {!isImageMode ? (
         <>
@@ -98,7 +104,6 @@ const MonthEditor = ({
             </label>
             <input
               type="color"
-              
               value={fontSettings.fontColor}
               onChange={(e) =>
                 handleFontSettingChange(
@@ -136,7 +141,7 @@ const MonthEditor = ({
             min="0.5"
             max="3"
             step="0.01"
-            value={imageScales }
+            value={imageScales}
             onChange={(e) =>
               handleImageScaleChange(index, e.target.value, setImageScales)
             }
