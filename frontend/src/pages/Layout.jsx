@@ -14,9 +14,6 @@ const Layout = () => {
     }
   }, []);
 
-
-
-  
   return (
     <div className="flex min-h-screen bg-[#1e1f1f] text-white">
       {/* SIDEBAR */}
@@ -42,7 +39,7 @@ const Layout = () => {
           <div className="flex items-center space-x-4">
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gradient-to-br from-[#6d8f91] to-[#afe5e6] p-[2px]">
               <img
-                src={user?.picture ? user.picture : assets.avatar}
+                src={user?.profile_image ? user.profile_image : assets.avatar}
                 alt="user avatar"
                 className="w-full h-full rounded-full object-cover"
                 onError={(e) => (e.currentTarget.src = assets.avatar)}

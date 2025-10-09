@@ -44,7 +44,7 @@ export default function Form({ route, method }) {
             const res = await api.post(route, payload);
 
             if (method === "login") {
-                console.log(res);
+                console.log("Odpowiedź z serwera:", res);
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
                 localStorage.setItem("user", JSON.stringify(res.data.user));
