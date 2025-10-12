@@ -15,8 +15,12 @@ export default function Generate() {
   ]);
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState({});
-  const [selected, setSelected] = useState({});
+  const [selectedValues, setSelectedValues] = useState({});
+  const [addingNewField, setAddingNewField] = useState(null);
+  const [newOptionValue, setNewOptionValue] = useState("");
   const [imageName, setImageName] = useState("");
+  const [isStaff, setIsStaff] = useState(false);
+
   const examplePrompts = [
     "A futuristic city skyline at night",
     "Cute cat wearing glasses",
@@ -24,7 +28,7 @@ export default function Generate() {
     "Minimalist abstract shapes",
   ];
 
-  // fetch options for selects
+  // 🧩 Pobieranie opcji dla selectów
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,22 +57,80 @@ export default function Generate() {
     fetchData();
   }, []);
 
-  const handleSelectChange = (e) => {
-    setSelected((prev) => ({
-      ...prev,
-      [e.target.name]: parseInt(e.target.value),
-    }));
+  // 🧠 Zmiana w selectach
+  const handleSelectChange = (e, field) => {
+    const value = e.target.value;
+    if (value === "__add_new__") {
+      setAddingNewField(field);
+      setNewOptionValue("");
+    } else {
+      setSelectedValues((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
+  // 🆕 Dodawanie nowej opcji do backendu
+  const handleConfirmNewOption = async (field) => {
+    const trimmed = newOptionValue.trim();
+    if (!trimmed) {
+      cancelAddingNewOption();
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem(ACCESS_TOKEN);
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const endpoint = fieldToEndpoint[field];
+      if (!endpoint) {
+        console.error(`Brak endpointa dla pola: ${field}`);
+        cancelAddingNewOption();
+        return;
+      }
+
+      // 🔹 POST na backend (np. /api/colors/)
+      console.log(trimmed)
+      console.log(config)
+      const res = await axios.post(
+        `${apiUrl}/${endpoint}/`,
+        { nazwa: trimmed },
+        config
+      );
+
+      // 🔹 Dodaj do lokalnych opcji
+      setOptions((prev) => {
+        const existing = prev[field]?.results || [];
+        const updated = [...existing, res.data];
+        return {
+          ...prev,
+          [field]: { ...prev[field], results: updated },
+        };
+      });
+
+      // 🔹 Ustaw jako wybraną nową wartość
+      setSelectedValues((prev) => ({ ...prev, [field]: res.data.id }));
+
+      console.log(`✅ Dodano nową wartość "${trimmed}" do ${endpoint}`);
+    } catch (err) {
+      console.error("❌ Błąd przy dodawaniu nowej opcji:", err);
+      alert("Nie udało się dodać nowej opcji do bazy danych.");
+    } finally {
+      cancelAddingNewOption();
+    }
+  };
+
+  const cancelAddingNewOption = () => {
+    setAddingNewField(null);
+    setNewOptionValue("");
+  };
+
+  // 🧠 Generowanie obrazka
   const generateImage = async () => {
     setLoading(true);
     try {
-      const payload = { prompt };
-      payload["name"] = imageName || "Generated Image";
+      const payload = { prompt, name: imageName || "Generated Image" };
       fields.forEach((field) => {
-        const selectedValue = selected[field];
+        const selectedValue = selectedValues[field];
         const availableOptions = options[field]?.results;
-
         if (selectedValue) {
           payload[field] = selectedValue;
         } else if (availableOptions?.length > 0) {
@@ -94,9 +156,9 @@ export default function Generate() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 w-full  pt-8 px-4">
+    <div className="flex flex-col lg:flex-row gap-6 w-full pt-8 px-4">
       {/* LEWY PANEL */}
-      <div className="lg:w-4/10 bg-[#2a2b2b] rounded-4xl p-8 shadow-lg">
+      <div className="lg:w-4/10 bg-[#2a2b2b] rounded-4xl p-8 shadow-lg relative">
         {/* PROMPT */}
         <div className="mb-6">
           <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
@@ -131,27 +193,55 @@ export default function Generate() {
 
         {/* SELECTY */}
         <div className="grid grid-cols-3 gap-4 mb-6">
-          {fields.map((field) => (
-            <div key={field}>
-              <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-1">
-                {field.replace("_", " ")}
-              </label>
-              <select
-                name={field}
-                onChange={handleSelectChange}
-                className="w-full p-2 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-              >
-                <option value="">Choose</option>
-                {Array.isArray(options[field]?.results) &&
-                  options[field].results.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.nazwa}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          ))}
+          {fields.map((field) => {
+            const fieldOptions = Array.isArray(options[field]?.results)
+              ? options[field].results
+              : [];
+
+            const isAddingNew = addingNewField === field;
+
+            return (
+              <div key={field}>
+                <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-1">
+                  {field.replace("_", " ")}
+                </label>
+
+                {isStaff && isAddingNew ? (
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="Enter new value"
+                    value={newOptionValue}
+                    onChange={(e) => setNewOptionValue(e.target.value)}
+                    onBlur={() => handleConfirmNewOption(field)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleConfirmNewOption(field);
+                      if (e.key === "Escape") cancelAddingNewOption();
+                    }}
+                    className="w-full p-2 rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+                  />
+                ) : (
+                  <select
+                    name={field}
+                    value={selectedValues[field] || ""}
+                    onChange={(e) => handleSelectChange(e, field)}
+                    className="w-full p-2 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+                  >
+                    <option value="">Choose</option>
+                    {fieldOptions.map((item) => (
+                      <option key={item.id || item.nazwa} value={item.id || item.nazwa}>
+                        {item.nazwa}
+                      </option>
+                    ))}
+                    {isStaff && <option value="__add_new__">➕ Add new...</option>}
+                  </select>
+                )}
+              </div>
+            );
+          })}
         </div>
+
+        {/* IMAGE NAME */}
         <label
           htmlFor="imageName"
           className="block text-xs font-semibold text-[#989c9e] uppercase mb-1"
@@ -165,6 +255,7 @@ export default function Generate() {
           placeholder="Enter image name"
           className="w-full p-2 mb-4 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
         />
+
         {/* BUTTON */}
         <button
           onClick={generateImage}
@@ -173,23 +264,40 @@ export default function Generate() {
         >
           {loading ? "Generating..." : "Generate"}
         </button>
+
+        {/* STAFF TOGGLE */}
+        <label className="mt-2 block text-xs font-semibold text-[#989c9e] uppercase mb-1">
+          Staff Mode
+        </label>
+        <div
+          onClick={() => setIsStaff(!isStaff)}
+          className={`bottom-6 right-6 w-[78px] h-[30px] flex items-center rounded-full cursor-pointer transition-all duration-300 ${
+            isStaff ? "bg-[#6d8f91]" : "bg-[#374b4b]"
+          }`}
+        >
+          <div
+            className={`absolute w-[26px] h-[26px] bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center text-[11px] font-bold text-[#374b4b] ${
+              isStaff ? "translate-x-[46px]" : "translate-x-[4px]"
+            }`}
+          >
+            {isStaff ? "ON" : "OFF"}
+          </div>
+        </div>
       </div>
 
-      {/* PRAWY PANEL - CUSTOM SCROLL */}
+      {/* PRAWY PANEL */}
       <div className="lg:w-6/10 flex flex-col items-center justify-start bg-[#2a2b2b] rounded-4xl p-4 shadow-lg max-h-[80vh]">
-        <div className=" rounded-2xl pr-2 overflow-y-auto custom-scroll">
+        <div className="rounded-2xl pr-2 overflow-y-auto custom-scroll">
           {loading && (
             <div className="flex items-center justify-center w-full h-32">
               <div className="w-16 h-16 border-4 border-t-[#afe5e6] border-b-[#6d8f91] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
             </div>
           )}
-
           {images.length === 0 && !loading && (
             <div className="text-[#989c9e] text-lg text-center opacity-70 mt-4">
               Your generated images will appear here.
             </div>
           )}
-
           {images.map((url, index) => (
             <img
               key={index}

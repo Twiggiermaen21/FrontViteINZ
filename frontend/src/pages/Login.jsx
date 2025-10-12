@@ -54,7 +54,7 @@ export default function Login() {
             onSuccess={async (credentialResponse) => {
               
               const res = await axios.post(
-                "http://localhost:8000/api/auth/google/",
+                "http://localhost:8000/auth/google/",
                 { credential: credentialResponse.credential },
                 { withCredentials: true }
               );
