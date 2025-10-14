@@ -223,11 +223,6 @@ export default function CalendarEditor() {
     formData.append("yearText", yearText);
   }
 
-  console.log("text", monthTexts);
-  console.log("font", fontSettings);
-  console.log("img", monthImages);
-  console.log("mode", isImageMode);
-  console.log("scale", imageScales);
 
   // ----- MIESIĄCE -----
   for (let i = 0; i < months.length; i++) {
