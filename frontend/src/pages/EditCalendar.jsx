@@ -3,56 +3,72 @@ import { useCalendars } from "../utils/useCalendars";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 
 const EditCalendar = () => {
-  const { calendars, loading } = useCalendars();
-  console.log("Calendars loaded:", calendars);
+  const { calendars, loading, scrollRef } = useCalendars();
   const [selectedCalendar, setSelectedCalendar] = useState(null);
-const months = ["Grudzień", "Styczeń", "Luty"];
+  const months = ["Grudzień", "Styczeń", "Luty"];
+  console.log(calendars);
   return (
-    <div className="flex w-full  max-w-[1812px] mx-auto mt-8 bg-[#2a2b2b] rounded-4xl shadow-lg overflow-hidden">
-      {/* Lewa kolumna */}
-      <div className="w-1/3 bg-[#1f2020] border-r border-gray-700 p-6 overflow-y-auto custom-scroll">
-        <h2 className="text-2xl font-bold text-white mb-4">
-          Wybierz kalendarz
-        </h2>
+    <div className="flex gap-6 w-full max-w-[1812px] mx-auto mt-4 ">
+      {/* 🩶 Lewa kolumna z przewijaną listą */}
+      <div className="w-[26%] bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 border-r border-gray-700  flex flex-col">
 
-        {loading ? (
-          <p className="text-gray-400">Ładowanie...</p>
-        ) : calendars.length === 0 ? (
-          <p className="text-gray-400">Brak kalendarzy.</p>
-        ) : (
-          <ul className="space-y-2">
-            {calendars.map((calendar) => (
-              <li
-                key={calendar.id}
-                onClick={() => setSelectedCalendar(calendar)}
-                className={`p-3 rounded-lg cursor-pointer transition ${
-                  selectedCalendar?.id === calendar.id
-                    ? "bg-blue-600 text-white"
-                    : "bg-[#2f3131] hover:bg-[#3a3d3d] text-gray-200"
-                }`}
-              >
-                {calendar.name}
-              </li>
-            ))}
-          </ul>
-        )}
+        <h2 className="text-xl font-bold text-white mb-4">Wybierz kalendarz</h2>
+
+        {/* 🔹 Scroll tylko na liście kalendarzy */}
+        <div
+          className="overflow-y-auto custom-scroll max-h-[80vh] pr-2"
+          ref={scrollRef}
+        >
+          {loading && calendars.length === 0 ? (
+            <p className="text-gray-400">Ładowanie...</p>
+          ) : calendars.length === 0 ? (
+            <p className="text-gray-400">Brak dostępnych kalendarzy.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {calendars.map((calendar) => {
+                const isActive = selectedCalendar?.id === calendar.id;
+
+                return (
+                  <li
+                    key={calendar.id}
+                    className={`p-3 rounded-lg bg-[#2f3131] hover:bg-[#3a3d3d] text-gray-200 cursor-pointer transition" 
+        ${
+          isActive
+            ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
+            : "text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white"
+        }`}
+                    onClick={() => setSelectedCalendar(calendar)}
+                  >
+                    <h1 className="text-lg">{calendar.name}</h1>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          {loading && calendars.length > 0 && (
+            <p className="text-gray-500 text-sm mt-3 text-center">
+              Ładowanie kolejnych...
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* Prawa kolumna */}
-      <div className="flex-1 bg-[#2a2b2b] p-4 overflow-y-auto custom-scroll">
+      {/* 🩵 Prawa kolumna — bez scrolla */}
+      <div className="flex-1 bg-[#2a2b2b] rounded-4xl mt-4  p-8 flex justify-center items-start">
         {!selectedCalendar ? (
           <p className="text-gray-400 text-lg">
             Wybierz kalendarz z listy po lewej, aby rozpocząć edycję.
           </p>
         ) : (
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-4">
+          <div className="flex flex-col items-center">
+            <h1 className="text-1xl font-bold text-white mb-2">
               Edycja: {selectedCalendar.name}
             </h1>
-            <div
-              className="max-w-[272px]  bg-white border rounded shadow"
-            >
-              <div className="relative h-[152px] bg-gray-200 flex items-center justify-center overflow-hidden">
+
+            {/* 📅 Podgląd kalendarza */}
+            <div className="max-w-[272px] bg-white border rounded-lg shadow overflow-hidden">
+              <div className="relative h-[152px] bg-gray-200 flex items-center justify-center">
                 {selectedCalendar.top_image_url ? (
                   <img
                     src={selectedCalendar.top_image_url}
@@ -85,54 +101,51 @@ const months = ["Grudzień", "Styczeń", "Luty"];
                   backgroundImage: selectedCalendar.bottom?.url,
                 })}
               >
-                {[selectedCalendar.field1, selectedCalendar.field2, selectedCalendar.field3].map(
-                  (field, index) => {
-                    if (!field) return null;
-                    const key = `${selectedCalendar.id}-${index}`; // unikalny key dla pola w kalendarzu
+                {[
+                  selectedCalendar.field1,
+                  selectedCalendar.field2,
+                  selectedCalendar.field3,
+                ].map((field, index) => {
+                  if (!field) return null;
+                  const key = `${selectedCalendar.id}-${index}`;
+                  const isText = "text" in field;
+                  const isImage = "path" in field;
 
-                        const isText = "text" in field;
-                        const isImage = "path" in field;
+                  return (
+                    <div key={key} className="w-full mb-3">
+                      <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
+                        <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                          {months[index]}
+                        </h3>
+                        <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
+                          [Siatka dni dla {months[index]}]
+                        </div>
+                      </div>
 
-                        return (
-                          <>
-                          <div
-                            key={key}
-                            className="w-full border rounded bg-white shadow p-2 flex flex-col items-center mb-2"
-                          >
-                            <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                              {months[index]}
-                            </h3>
-                            <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
-                              [Siatka dni dla {months[index]}]
-                            </div>
-                            </div>
-                            <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
-                              {isText
-                                ? field.text
-                                : isImage
-                                ? selectedCalendar.images_for_fields
-                                    .filter(
-                                      (img) => img.field_number === index + 1
-                                    )
-                                    .map((img) => (
-                                      <img
-                                        key={`${selectedCalendar.id}-${index}-${img.id}`} // unikalny key
-                                        src={img.url}
-                                        alt="Image"
-                                        style={{
-                                          height: 60,
-                                          transform: `scale(${field.size})`,
-                                          transformOrigin: "top left",
-                                          userSelect: "none",
-                                        }}
-                                      />
-                                    ))
-                                : null}
-                            </div>
-                          </>
-                        );
-                      }
-                    )}
+                      <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
+                        {isText
+                          ? field.text
+                          : isImage
+                          ? selectedCalendar.images_for_fields
+                              .filter((img) => img.field_number === index + 1)
+                              .map((img) => (
+                                <img
+                                  key={`${selectedCalendar.id}-${index}-${img.id}`}
+                                  src={img.url}
+                                  alt="Image"
+                                  style={{
+                                    height: 60,
+                                    transform: `scale(${field.size})`,
+                                    transformOrigin: "top left",
+                                    userSelect: "none",
+                                  }}
+                                />
+                              ))
+                          : null}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
