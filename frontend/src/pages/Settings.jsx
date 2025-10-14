@@ -33,7 +33,7 @@ export default function Settings() {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log(user)
+    console.log(user);
     if (user) {
       setUsername(user.username || "");
       setFirstName(user.first_name || "");
@@ -81,6 +81,7 @@ export default function Settings() {
       );
     } finally {
       setLoadingProfile(false);
+       window.location.reload();
     }
   };
 
@@ -103,6 +104,7 @@ export default function Settings() {
       );
     } finally {
       setLoadingEmail(false);
+      window.location.reload();
     }
   };
 
@@ -164,15 +166,18 @@ export default function Settings() {
       const user = JSON.parse(localStorage.getItem("user")) || {};
       localStorage.setItem(
         "user",
-        JSON.stringify({ ...user, profile_image: response.data.profile_image_url })
+        JSON.stringify({
+          ...user,
+          profile_image: response.data.profile_image_url,
+        })
       );
     } catch (err) {
       setErrorImage("Nie udało się zapisać zdjęcia profilowego.");
     } finally {
       setLoadingImage(false);
+      window.location.reload();
     }
   };
-console.log(localStorage.getItem("user"))
   return (
     <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl mx-auto pt-8 px-4">
       {/* LEWA STRONA — zdjęcie profilowe */}
@@ -188,8 +193,6 @@ console.log(localStorage.getItem("user"))
             className="w-full h-full object-cover rounded-full border-4 border-[#afe5e6] shadow-lg"
           />
         </div>
-
-       
 
         <input
           id="imageUpload"

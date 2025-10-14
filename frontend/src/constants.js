@@ -16,7 +16,7 @@ export const fields = [
 ];
 
 export const fieldToEndpoint = {
-  styl_artystyczny: "styl-artystyczny",
+  styl_artystyczny: "styl_artystyczny",
   kompozycja: "kompozycja",
   kolorystyka: "kolorystyka",
   atmosfera: "atmosfera",
@@ -25,7 +25,7 @@ export const fieldToEndpoint = {
   perspektywa: "perspektywa",
   detale: "detale",
   realizm: "realizm",
-  styl_narracyjny: "styl-narracyjny",
+  styl_narracyjny: "styl_narracyjny",
 };
 
 

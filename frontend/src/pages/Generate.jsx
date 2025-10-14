@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN, fields, fieldToEndpoint } from "../constants";
-
+import { Trash2 } from "lucide-react";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function Generate() {
@@ -20,6 +20,7 @@ export default function Generate() {
   const [newOptionValue, setNewOptionValue] = useState("");
   const [imageName, setImageName] = useState("");
   const [isStaff, setIsStaff] = useState(false);
+  const [staff, setStaff] = useState(false);
 
   const examplePrompts = [
     "A futuristic city skyline at night",
@@ -30,6 +31,13 @@ export default function Generate() {
 
   // 🧩 Pobieranie opcji dla selectów
   useEffect(() => {
+    const Modestaff = () => {
+      const user = localStorage.getItem("user");
+      if (user) {
+        const parsed = JSON.parse(user);
+        setStaff(parsed.is_staff); // ✅ poprawnie ustawiamy stan
+      }
+    };
     const fetchData = async () => {
       try {
         const token = localStorage.getItem(ACCESS_TOKEN);
@@ -53,7 +61,7 @@ export default function Generate() {
         }
       }
     };
-
+    Modestaff();
     fetchData();
   }, []);
 
@@ -88,8 +96,8 @@ export default function Generate() {
       }
 
       // 🔹 POST na backend (np. /api/colors/)
-      console.log(trimmed)
-      console.log(config)
+      console.log(trimmed);
+      console.log(config);
       const res = await axios.post(
         `${apiUrl}/${endpoint}/`,
         { nazwa: trimmed },
@@ -155,6 +163,51 @@ export default function Generate() {
     }
   };
 
+const handleDeleteOption = async (field, id) => {
+  const confirmDelete = window.confirm("Czy na pewno chcesz usunąć ten element?");
+  if (!confirmDelete) return;
+
+  try {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    // 🔹 Usunięcie w backendzie
+    await axios.delete(`${apiUrl}/${fieldToEndpoint[field]}/${id}/`, config);
+
+    // 🔹 Odśwież tylko dany select w options
+    setOptions((prevOptions) => {
+      const updatedOptions = { ...prevOptions };
+
+      // 🛠 Konwersja typów, jeśli id jest string/number
+      updatedOptions[field].results = updatedOptions[field].results.filter(
+        (item) => String(item.id) !== String(id)
+      );
+
+      return updatedOptions;
+    });
+
+    // 🔹 Jeśli była wybrana usunięta opcja, wyczyść select
+    setSelectedValues((prev) => {
+      if (String(prev[field]) === String(id)) {
+        return { ...prev, [field]: "" };
+      }
+      return prev;
+    });
+
+    // 🔹 Opcjonalnie zakończ tryb dodawania
+    if (addingNewField === field) setAddingNewField(null);
+
+    // alert nie jest konieczny, można pominąć
+  } catch (err) {
+    console.error("Błąd podczas usuwania:", err);
+    alert("Nie udało się usunąć elementu ❌");
+  }
+};
+
+
+
+
+
   return (
     <div className="flex flex-col lg:flex-row gap-6 w-full pt-8 px-4">
       {/* LEWY PANEL */}
@@ -192,54 +245,73 @@ export default function Generate() {
         </div>
 
         {/* SELECTY */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          {fields.map((field) => {
-            const fieldOptions = Array.isArray(options[field]?.results)
-              ? options[field].results
-              : [];
+       
+<div
+  className="max-h-[200px] overflow-y-auto pr-2 grid grid-cols-1 gap-4 mb-6 custom-scroll"
+>
+  {fields.map((field) => {
+    const fieldOptions = Array.isArray(options[field]?.results)
+      ? options[field].results
+      : [];
 
-            const isAddingNew = addingNewField === field;
+    const isAddingNew = addingNewField === field;
 
-            return (
-              <div key={field}>
-                <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-1">
-                  {field.replace("_", " ")}
-                </label>
+    return (
+      <div key={field} className="relative">
+        <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-1">
+          {field.replace("_", " ")}
+        </label>
 
-                {isStaff && isAddingNew ? (
-                  <input
-                    type="text"
-                    autoFocus
-                    placeholder="Enter new value"
-                    value={newOptionValue}
-                    onChange={(e) => setNewOptionValue(e.target.value)}
-                    onBlur={() => handleConfirmNewOption(field)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleConfirmNewOption(field);
-                      if (e.key === "Escape") cancelAddingNewOption();
-                    }}
-                    className="w-full p-2 rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-                  />
-                ) : (
-                  <select
-                    name={field}
-                    value={selectedValues[field] || ""}
-                    onChange={(e) => handleSelectChange(e, field)}
-                    className="w-full p-2 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-                  >
-                    <option value="">Choose</option>
-                    {fieldOptions.map((item) => (
-                      <option key={item.id || item.nazwa} value={item.id || item.nazwa}>
-                        {item.nazwa}
-                      </option>
-                    ))}
-                    {isStaff && <option value="__add_new__">➕ Add new...</option>}
-                  </select>
-                )}
-              </div>
-            );
-          })}
+        <div className="flex items-center gap-2">
+          {isStaff && isAddingNew ? (
+            <input
+              type="text"
+              autoFocus
+              placeholder="Enter new value"
+              value={newOptionValue}
+              onChange={(e) => setNewOptionValue(e.target.value)}
+              onBlur={() => handleConfirmNewOption(field)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleConfirmNewOption(field);
+                if (e.key === "Escape") cancelAddingNewOption();
+              }}
+              className="flex-1 p-2 rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+            />
+          ) : (
+            <select
+              name={field}
+              value={selectedValues[field] || ""}
+              onChange={(e) => handleSelectChange(e, field)}
+              className="flex-1 p-2 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+            >
+              <option value="">Choose</option>
+              {fieldOptions.map((item) => (
+                <option key={item.id || item.nazwa} value={item.id || item.nazwa}>
+                  {item.nazwa}
+                </option>
+              ))}
+              {isStaff && <option value="__add_new__">➕ Add new...</option>}
+            </select>
+          )}
+
+          {/* 🔥 Ikona kosza obok pola */}
+          {isStaff &&
+            selectedValues[field] !== "" &&
+            selectedValues[field] !== undefined && (
+              <button
+                onClick={() => handleDeleteOption(field, selectedValues[field])}
+                className="p-2 text-red-400 hover:text-red-600 transition"
+                title="Usuń wybraną opcję"
+              >
+                <Trash2 size={18} />
+              </button>
+            )}
         </div>
+      </div>
+    );
+  })}
+</div>
+
 
         {/* IMAGE NAME */}
         <label
@@ -264,25 +336,28 @@ export default function Generate() {
         >
           {loading ? "Generating..." : "Generate"}
         </button>
-
-        {/* STAFF TOGGLE */}
-        <label className="mt-2 block text-xs font-semibold text-[#989c9e] uppercase mb-1">
-          Staff Mode
-        </label>
-        <div
-          onClick={() => setIsStaff(!isStaff)}
-          className={`bottom-6 right-6 w-[78px] h-[30px] flex items-center rounded-full cursor-pointer transition-all duration-300 ${
-            isStaff ? "bg-[#6d8f91]" : "bg-[#374b4b]"
-          }`}
-        >
-          <div
-            className={`absolute w-[26px] h-[26px] bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center text-[11px] font-bold text-[#374b4b] ${
-              isStaff ? "translate-x-[46px]" : "translate-x-[4px]"
-            }`}
-          >
-            {isStaff ? "ON" : "OFF"}
-          </div>
-        </div>
+        {staff && (
+          <>
+            {/* STAFF TOGGLE */}
+            <label className="mt-2 block text-xs font-semibold text-[#989c9e] uppercase mb-1">
+              Staff Mode
+            </label>
+            <div
+              onClick={() => setIsStaff(!isStaff)}
+              className={`bottom-6 right-6 w-[78px] h-[30px] flex items-center rounded-full cursor-pointer transition-all duration-300 ${
+                isStaff ? "bg-[#6d8f91]" : "bg-[#374b4b]"
+              }`}
+            >
+              <div
+                className={`absolute w-[26px] h-[26px] bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center text-[11px] font-bold text-[#374b4b] ${
+                  isStaff ? "translate-x-[46px]" : "translate-x-[4px]"
+                }`}
+              >
+                {isStaff ? "ON" : "OFF"}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* PRAWY PANEL */}
