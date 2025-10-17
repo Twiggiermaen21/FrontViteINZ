@@ -19,13 +19,15 @@ const EditRightPanel = ({
   dragging,
   setDragging,
 }) => {
+  console.log(selectedCalendar);
+
   const [style, setStyle] = useState(null);
   const styles = [
     { key: "style1", label: "Grafika + kolor" },
     { key: "style2", label: "Rozciągnięty gradient" },
     { key: "style3", label: "Grafika na całym tle" },
   ];
- const handleMonthTextChange = (index, value) => {
+  const handleMonthTextChange = (index, value) => {
     const newTexts = [...monthTexts];
     newTexts[index] = value;
     setMonthTexts(newTexts);
@@ -41,13 +43,12 @@ const EditRightPanel = ({
   const scrollRef = useRef(null);
 
   const months = ["Grudzień", "Styczeń", "Luty"];
-const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
+  const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
   const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
   const [imageScales, setImageScales] = useState(() => months.map(() => 1));
- const [monthTexts, setMonthTexts] = useState(["", "", ""]);
+  const [monthTexts, setMonthTexts] = useState(["", "", ""]);
 
-
-  const [yearText, setYearText] = useState("2025");
+  const [yearText, setYearText] = useState("2026");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
 
@@ -58,7 +59,7 @@ const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
       fontColor: "#333333",
     }))
   );
-  const [yearFontWeight, setYearFontWeight] = useState("bold");
+ const [yearFontWeight, setYearFontWeight] = useState("bold");
   const [yearFontFamily, setYearFontFamily] = useState("Arial");
 
   const [xLimits, setXLimits] = useState({ min: 50, max: 325 });
@@ -102,6 +103,17 @@ const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
   // 🔹 Synchronizacja year z selectedCalendar
   useEffect(() => {
     if (!selectedCalendar || !yearActive) return;
+    if (
+      (yearText ||
+        yearColor ||
+        yearFontFamily ||
+        yearFontWeight ||
+        yearFontSize) !== null
+    )
+      return;
+
+  
+
 
     const yd = selectedCalendar.year_data || {};
     const needUpdate =
@@ -173,12 +185,12 @@ const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
 
     if (selectedCalendar.year_data) {
       const yd = selectedCalendar.year_data;
-      setYearActive(true);
-      setYearText(yd.text || "2025");
+    
+      setYearText(yd.text || "2026");
       setYearColor(yd.color || "#ffffff");
-      setYearFontSize(Number(yd.size) || 32);
-      setYearFontWeight(yd.weight || "bold");
-      setYearFontFamily(yd.font || "Arial");
+      setYearFontSize(Number(yd.size)|| 32);
+      setYearFontWeight(yd.weight);
+      setYearFontFamily(yd.font);
       setYearPosition({
         coords: {
           x: Number(yd.positionX) || 50,
@@ -313,43 +325,41 @@ const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
               />
             </svg>
           </div>
-          
-{openSection === "bottom" && (
-  <>
-  <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4">
-            <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
-              Styl kalendarza
-            </h2>
 
-            <div className="flex flex-col gap-2">
-              {styles.map(({ key, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setStyle(key)}
-                  className={`w-full text-left px-3.5 py-2.5 rounded-lg text-sm transition-colors
+          {openSection === "bottom" && (
+            <>
+              <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4">
+                <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
+                  Styl kalendarza
+                </h2>
+
+                <div className="flex flex-col gap-2">
+                  {styles.map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => setStyle(key)}
+                      className={`w-full text-left px-3.5 py-2.5 rounded-lg text-sm transition-colors
                 ${
                   style === key
                     ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
                     : "text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white"
                 }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <BottomImageSection style={style} 
-          selectedCalendar={selectedCalendar}
-          setSelectedCalendar={setSelectedCalendar}
-          
-          />
-          
-          </>
-)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <BottomImageSection
+                style={style}
+                selectedCalendar={selectedCalendar}
+                setSelectedCalendar={setSelectedCalendar}
+              />
+            </>
+          )}
         </div>
 
-
- <div>
+        <div>
           <div
             className={`p-3 rounded-lg cursor-pointer flex justify-between items-center transition ${
               openSection === "months"
@@ -358,7 +368,7 @@ const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
             }`}
             onClick={() => toggleSection("months")}
           >
-            <span>🖼️ Text Górny</span>
+            <span>🖼️ edytor sekcji miesiecy</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className={`w-5 h-5 transition-transform duration-300 ${
@@ -377,34 +387,32 @@ const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
             </svg>
           </div>
           {openSection === "months" && (
- <div className="lg:col-span-3 space-y-2 ">
-        {months.map((month, index) => (
-          <MonthEditor
-            key={month}
-            month={month}
-            index={index}
-            isImageMode={isImageMode[index]}
-            // toggleImageMode={toggleImageMode}
-            fontSettings={fontSettings}
-            // handleFontSettingChange={handleFontSettingChange}
-            monthTexts={monthTexts[index]}
-            handleMonthTextChange={handleMonthTextChange}
-            monthImages={monthImages[index]}
-            imageScales={imageScales[index]}
-            fontFamilies={fontFamilies}
-            fontWeights={fontWeights}
-            setIsImageMode={setIsImageMode}
-            setImageScales={setImageScales}
-            setMonthImages={setMonthImages}
-            setFontSettings={setFontSettings}
-            setMonthTexts={setMonthTexts}
-          />
-        ))}
-      </div>
+            <div className="lg:col-span-3 space-y-2 ">
+              {months.map((month, index) => (
+                <MonthEditor
+                  key={month}
+                  month={month}
+                  index={index}
+                  isImageMode={isImageMode[index]}
+                  // toggleImageMode={toggleImageMode}
+                  fontSettings={fontSettings}
+                  // handleFontSettingChange={handleFontSettingChange}
+                  monthTexts={monthTexts[index]}
+                  handleMonthTextChange={handleMonthTextChange}
+                  monthImages={monthImages[index]}
+                  imageScales={imageScales[index]}
+                  fontFamilies={fontFamilies}
+                  fontWeights={fontWeights}
+                  setIsImageMode={setIsImageMode}
+                  setImageScales={setImageScales}
+                  setMonthImages={setMonthImages}
+                  setFontSettings={setFontSettings}
+                  setMonthTexts={setMonthTexts}
+                />
+              ))}
+            </div>
           )}
-          </div>
-
-
+        </div>
       </div>
     </div>
   );

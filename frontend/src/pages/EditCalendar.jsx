@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { useCalendars } from "../utils/useCalendars";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 import EditRightPanel from "../components/editCalendarElements/EditPanel";
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
+import LimitedTextarea from "../components/calendarEditorElements/contentEdittableText";
+import ImageEditor from "../components/calendarEditorElements/ImageEditor";
 import { fontFamilies, fontWeights } from "../constants";
 import {
   handleMouseDown,
@@ -15,7 +17,7 @@ const EditCalendar = () => {
   const [selectedCalendar, setSelectedCalendar] = useState(null);
   const [yearPosition, setYearPosition] = useState({ x: 0, y: 0 });
   const [isCustom, setIsCustom] = useState(false);
-  const [yearActive, setYearActive] = useState(true);
+  const [yearActive, setYearActive] = useState(false);
   const months = ["Grudzień", "Styczeń", "Luty"];
   const dragStartPos = useRef({ mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
   const spanRef = useRef(null);
@@ -23,8 +25,25 @@ const EditCalendar = () => {
   const [yLimits, setYLimits] = useState({ min: 20, max: 235 });
   const [dragging, setDragging] = useState(false);
 
-
-
+  const [monthTexts, setMonthTexts] = useState(["", "", ""]);
+  const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
+  const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
+  const [imageScales, setImageScales] = useState(() => months.map(() => 1));
+  const [positions, setPositions] = useState(() =>
+    months.map(() => ({ x: 0, y: 0 }))
+  );
+  const [fontSettings, setFontSettings] = useState(
+    months.map(() => ({
+      fontFamily: "Arial",
+      fontWeight: "400",
+      fontColor: "#333333",
+    }))
+  );
+  const handleMonthTextChange = (index, value) => {
+    const newTexts = [...monthTexts];
+    newTexts[index] = value;
+    setMonthTexts(newTexts);
+  };
   useEffect(() => {
     const onMove = (e) =>
       handleMouseMove(e, {
@@ -75,7 +94,10 @@ const EditCalendar = () => {
             ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
             : "text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white"
         }`}
-                    onClick={() => setSelectedCalendar(calendar)}
+                    onClick={() => {
+  setSelectedCalendar(calendar);
+  setYearActive(!!calendar.year_data);
+}}
                   >
                     <h1 className="text-lg">{calendar.name}</h1>
                   </li>
@@ -176,51 +198,53 @@ const EditCalendar = () => {
                     backgroundImage: selectedCalendar.bottom?.url,
                   })}
                 >
-                  {[
-                    selectedCalendar.field1,
-                    selectedCalendar.field2,
-                    selectedCalendar.field3,
-                  ].map((field, index) => {
-                    if (!field) return null;
-                    const key = `${selectedCalendar.id}-${index}`;
-                    const isText = "text" in field;
-                    const isImage = "path" in field;
-
-                    return (
-                      <div key={key} className="w-full mb-3">
-                        <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
-                          <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                            {months[index]}
-                          </h3>
-                          <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
-                            [Siatka dni dla {months[index]}]
-                          </div>
-                        </div>
-
-                        <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
-                          {isText
-                            ? field.text
-                            : isImage
-                            ? selectedCalendar.images_for_fields
-                                .filter((img) => img.field_number === index + 1)
-                                .map((img) => (
-                                  <img
-                                    key={`${selectedCalendar.id}-${index}-${img.id}`}
-                                    src={img.url}
-                                    alt="Image"
-                                    style={{
-                                      height: 60,
-                                      transform: `scale(${field.size})`,
-                                      transformOrigin: "top left",
-                                      userSelect: "none",
-                                    }}
-                                  />
-                                ))
-                            : null}
+                  {months.map((month, index) => (
+                    <Fragment key={month}>
+                      <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
+                        <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                          {month}
+                        </h3>
+                        <div className="w-full h-[60px] text-sm text-gray-600 flex items-center justify-center">
+                          [Siatka dni dla {month}]
                         </div>
                       </div>
-                    );
-                  })}
+                      {isImageMode[index] ? (
+                        <ImageEditor
+                          imageSrc={monthImages[index]}
+                          setImageSrc={(newValue) =>
+                            setMonthImages((prev) =>
+                              prev.map((img, i) =>
+                                i === index ? newValue : img
+                              )
+                            )
+                          }
+                          imageScale={imageScales[index]}
+                          setImageScale={(newValue) =>
+                            setImageScales((prev) =>
+                              prev.map((s, i) => (i === index ? newValue : s))
+                            )
+                          }
+                          position={positions[index]}
+                          setPosition={(newValue) =>
+                            setPositions((prev) =>
+                              prev.map((p, i) => (i === index ? newValue : p))
+                            )
+                          }
+                        />
+                      ) : (
+                        <LimitedTextarea
+                          value={monthTexts[index]}
+                          index={index}
+                          onChange={handleMonthTextChange}
+                          placeholder="Wpisz tekst pod miesiącem..."
+                          fontFamily={fontSettings[index].fontFamily}
+                          fontWeight={fontSettings[index].fontWeight}
+                          fontColor={fontSettings[index].fontColor}
+                          maxChars={1000}
+                        />
+                      )}
+                    </Fragment>
+                  ))}
                 </div>
               </div>
 
