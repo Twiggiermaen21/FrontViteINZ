@@ -6,7 +6,7 @@ import EditRightPanel from "../components/editCalendarElements/EditPanel";
 const EditCalendar = () => {
   const { calendars, loading, scrollRef } = useCalendars();
   const [selectedCalendar, setSelectedCalendar] = useState(null);
- 
+ console.log(selectedCalendar)
   const months = ["Grudzień", "Styczeń", "Luty"];
 
   return (
