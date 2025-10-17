@@ -1,11 +1,12 @@
 // EditRightPanel.jsx
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { ACCESS_TOKEN } from "../../constants";
+import { ACCESS_TOKEN, fontFamilies, fontWeights } from "../../constants";
 import TopImageSection from "./TopImageSection";
 import BottomImageSection from "./BottomImageSection";
 import YearText from "../calendarEditorElements/yearText";
-
+import MonthEditor from "../calendarEditorElements/textOrImg";
+import ImageEditor from "../calendarEditorElements/ImageEditor";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const EditRightPanel = ({
@@ -18,13 +19,17 @@ const EditRightPanel = ({
   dragging,
   setDragging,
 }) => {
-  const [style, setStyle] = useState("style1");
+  const [style, setStyle] = useState(null);
   const styles = [
     { key: "style1", label: "Grafika + kolor" },
     { key: "style2", label: "Rozciągnięty gradient" },
     { key: "style3", label: "Grafika na całym tle" },
   ];
-
+ const handleMonthTextChange = (index, value) => {
+    const newTexts = [...monthTexts];
+    newTexts[index] = value;
+    setMonthTexts(newTexts);
+  };
   const [openSection, setOpenSection] = useState("topImage");
   const [images, setImages] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -36,6 +41,11 @@ const EditRightPanel = ({
   const scrollRef = useRef(null);
 
   const months = ["Grudzień", "Styczeń", "Luty"];
+const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
+  const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
+  const [imageScales, setImageScales] = useState(() => months.map(() => 1));
+ const [monthTexts, setMonthTexts] = useState(["", "", ""]);
+
 
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
@@ -337,6 +347,64 @@ const EditRightPanel = ({
           </>
 )}
         </div>
+
+
+ <div>
+          <div
+            className={`p-3 rounded-lg cursor-pointer flex justify-between items-center transition ${
+              openSection === "months"
+                ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
+                : "bg-[#2a2b2b] text-gray-300 hover:bg-[#343636]"
+            }`}
+            onClick={() => toggleSection("months")}
+          >
+            <span>🖼️ Text Górny</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`w-5 h-5 transition-transform duration-300 ${
+                openSection === "months" ? "rotate-180" : "rotate-0"
+              }`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 9l6 6 6-6"
+              />
+            </svg>
+          </div>
+          {openSection === "months" && (
+ <div className="lg:col-span-3 space-y-2 ">
+        {months.map((month, index) => (
+          <MonthEditor
+            key={month}
+            month={month}
+            index={index}
+            isImageMode={isImageMode[index]}
+            // toggleImageMode={toggleImageMode}
+            fontSettings={fontSettings}
+            // handleFontSettingChange={handleFontSettingChange}
+            monthTexts={monthTexts[index]}
+            handleMonthTextChange={handleMonthTextChange}
+            monthImages={monthImages[index]}
+            imageScales={imageScales[index]}
+            fontFamilies={fontFamilies}
+            fontWeights={fontWeights}
+            setIsImageMode={setIsImageMode}
+            setImageScales={setImageScales}
+            setMonthImages={setMonthImages}
+            setFontSettings={setFontSettings}
+            setMonthTexts={setMonthTexts}
+          />
+        ))}
+      </div>
+          )}
+          </div>
+
+
       </div>
     </div>
   );
