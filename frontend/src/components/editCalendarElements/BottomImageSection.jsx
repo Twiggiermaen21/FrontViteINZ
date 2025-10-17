@@ -1,112 +1,112 @@
 // BottomImageSection.jsx
-import React, { useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
+import ImgColor from "../calendarEditorElements/imgAndColor";
+import GradientSettings from "../calendarEditorElements/imgAndFade";
+import BackgroundImg from "../calendarEditorElements/imgAndImg";
+import axios from "axios";
+import { ACCESS_TOKEN } from "../../constants";
+
+const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const BottomImageSection = ({
-  openSection,
-  toggleSection,
-  images,
-  selectedImageUrl,
-  setSelectedCalendar,
-  selectedCalendar,
-  setSelectedImageUrl,
-  handleImageSelect,
-  loading,
-  hasMore,
-  scrollRef,
+ style,
+ selectedCalendar,
+ setSelectedCalendar
+
 }) => {
-  const [uploadImage, setUploadImage] = useState(null);
+  
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setUploadImage(file);
-      const objectUrl = URL.createObjectURL(file);
+  const [bgColor, setBgColor] = useState("#ffffff");
+  const [imagesBackground, setImagesBackground] = useState([]);
+  const [gradientVariant, setGradientVariant] = useState("diagonal");
+  const [gradientEndColor, setGradientEndColor] = useState("#ffffff");
+  const [gradientStrength, setGradientStrength] = useState("medium");
+  const [gradientTheme, setGradientTheme] = useState("classic");
+  const [backgroundImage, setBackgroundImage] = useState(null);
+const [pageBackground, setPageBackground] = useState(1);
+  
+  const [hasMoreBackground, setHasMoreBackground] = useState(true);
+    const [loading, setLoading] = useState(false);
 
-      // aktualizacja podglądu
-      setSelectedImageUrl(objectUrl);
+const fetchImagesBackground = async () => {
+    if (!hasMoreBackground || loading) return;
 
-      // aktualizacja selectedCalendar.bottom_image_url
-      setSelectedCalendar((prev) => ({
-        ...prev,
-        bottom_image_url: objectUrl,
-      }));
+    setLoading(true);
+    const token = localStorage.getItem(ACCESS_TOKEN);
 
-      console.log("Nowy bottom image URL:", objectUrl);
+    try {
+      const res = await axios.get(`${apiUrl}/generate/`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { page: pageBackground, page_size: 12 }, // backend musi obsługiwać paginację
+      });
+
+      setImagesBackground((prev) => [...prev, ...res.data.results]);
+      setHasMoreBackground(!!res.data.next);
+      setPageBackground((prev) => prev + 1);
+    } catch (err) {
+      console.error("Błąd podczas pobierania obrazów:", err);
+      if (err.response?.status === 401) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 500); // odświeży po 0.5 sekundy
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
+
+const fetchedOnce = useRef(false);
+
+useEffect(() => {
+  if (style === "style3" && !fetchedOnce.current) {
+    fetchImagesBackground();
+    fetchedOnce.current = true;
+  }
+}, [style]);
+
+
+
   return (
-    <div>
-      <div
-        className={`p-3 rounded-lg cursor-pointer flex justify-between items-center transition ${
-          openSection === "bottomImage"
-            ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
-            : "bg-[#2a2b2b] text-gray-300 hover:bg-[#343636]"
-        }`}
-        onClick={() => toggleSection("bottomImage")}
-      >
-        <span>🖼️ Grafika dolna</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className={`w-5 h-5 transition-transform duration-300 ${
-            openSection === "bottomImage" ? "rotate-180" : "rotate-0"
-          }`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-        </svg>
-      </div>
-
-      {openSection === "bottomImage" && (
-        <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 animate-fadeIn">
-          <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
-            Galeria grafik
-          </h2>
-
-          <div
-            ref={scrollRef}
-            className="grid grid-cols-2 gap-3 max-h-72 overflow-hidden overflow-y-auto custom-scroll"
-          >
-            {images.map((item) => (
-              <div
-                key={item.url}
-                onClick={() => handleImageSelect(item.url)}
-                className={`relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
-                  selectedImageUrl === item.url
-                    ? "ring-4 ring-[#6d8f91] scale-[1.02]"
-                    : "hover:opacity-80"
-                }`}
-              >
-                <img src={item.url} alt="Grafika AI" className="object-cover" />
-              </div>
-            ))}
-          </div>
-
-          {loading && (
-            <p className="text-center text-gray-400 mt-2">Ładowanie...</p>
-          )}
-          {!hasMore && (
-            <p className="text-center text-gray-500 mt-2">
-              To już wszystkie grafiki 🎉
-            </p>
-          )}
-
-          <h2 className="text-base font-semibold text-[#d2e4e2] mt-5 mb-3">
-            Wgraj własną grafikę
-          </h2>
-
-          <input
-            id="bottomImageUpload"
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90"
+ 
+     <div className="lg:col-span-3 space-y-2 ">
+        {style === "style1" && (
+          <ImgColor
+            bgColor={bgColor}
+            setBgColor={setBgColor}
+            image={image}
+            setGradientEndColor={setGradientEndColor}
           />
-        </div>
-      )}
+        )}
+        {/* Opcje dla gradientu */}
+        {style === "style2" && (
+          <GradientSettings
+            image={image}
+            bgColor={bgColor}
+            setBgColor={setBgColor}
+            gradientEndColor={gradientEndColor}
+            setGradientEndColor={setGradientEndColor}
+            gradientVariant={gradientVariant}
+            setGradientVariant={setGradientVariant}
+            gradientTheme={gradientTheme}
+            setGradientTheme={setGradientTheme}
+            gradientStrength={gradientStrength}
+            setGradientStrength={setGradientStrength}
+          />
+        )}
+
+        {/* Opcje dla stylu 3: tylko grafika */}
+        {style === "style3" && (
+          <BackgroundImg
+            images={imagesBackground}
+            fetchImages={fetchImagesBackground}
+            backgroundImage={backgroundImage}
+            setBackgroundImage={setBackgroundImage}
+            hasMore={hasMoreBackground}
+            loading={loading}
+          />
+        )}
+     
     </div>
   );
 };

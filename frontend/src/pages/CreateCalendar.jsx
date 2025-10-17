@@ -29,8 +29,10 @@ export default function CreateCalendar() {
   const [gradientStrength, setGradientStrength] = useState("medium");
   const [gradientTheme, setGradientTheme] = useState("classic");
   const [backgroundImage, setBackgroundImage] = useState(null);
+  
   const headerRef = useRef();
   const bottomRef = useRef();
+
   const [yearActive, setYearActive] = useState(false);
   const [yearText, setYearText] = useState("2025");
   const [yearColor, setYearColor] = useState("#ffffff");
