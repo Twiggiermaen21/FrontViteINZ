@@ -40,10 +40,8 @@ const EditCalendar = () => {
     }))
   );
   const handleMonthTextChange = (index, value) => {
-    const newTexts = [...monthTexts];
-    newTexts[index] = value;
-    setMonthTexts(newTexts);
-  };
+  setMonthTexts(prev => prev.map((txt, i) => (i === index ? value : txt)));
+};
   useEffect(() => {
     const onMove = (e) =>
       handleMouseMove(e, {
@@ -64,6 +62,50 @@ const EditCalendar = () => {
       window.removeEventListener("mouseup", onUp);
     };
   }, [dragging, xLimits, yLimits]);
+
+  useEffect(() => {
+  if (!selectedCalendar) return;
+
+  // aktualizujemy isImageMode
+  if (selectedCalendar.images_for_fields) {
+    updateImageModes(selectedCalendar.images_for_fields);
+  }
+
+  // aktualizujemy monthTexts tylko jeśli istnieją pola tekstowe
+  
+    updateMonthTextsFromFields(selectedCalendar);
+  
+}, [selectedCalendar?.id]);
+console.log(monthTexts)
+  const updateImageModes = (fields) => {
+    const newModes = [false, false, false];
+    console.log("fields",fields)
+    const newImages = ["","",""];
+    fields.forEach((field) => {
+      if (field.field_number >= 1 && field.field_number <= 3) {
+        newModes[field.field_number - 1] = true;
+        newImages[field.field_number - 1] = field.url;
+
+
+
+      }
+    });
+    setIsImageMode(newModes);
+    console.log("url",newImages)
+    setMonthImages(newImages);
+  };
+const updateMonthTextsFromFields = (calendar) => {
+  if (!calendar) return;
+
+  const newTexts = [
+    calendar.field1?.text || "", // jeśli field1 istnieje, weź text, inaczej ""
+    calendar.field2?.text || "",
+    calendar.field3?.text || "",
+  ];
+
+  setMonthTexts(newTexts);
+};
+
 
   return (
     <div className="flex gap-6 w-full max-w-[1812px] mx-auto mt-4 ">
@@ -95,9 +137,9 @@ const EditCalendar = () => {
             : "text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white"
         }`}
                     onClick={() => {
-  setSelectedCalendar(calendar);
-  setYearActive(!!calendar.year_data);
-}}
+                      setSelectedCalendar(calendar);
+                      setYearActive(!!calendar.year_data);
+                    }}
                   >
                     <h1 className="text-lg">{calendar.name}</h1>
                   </li>
@@ -258,6 +300,16 @@ const EditCalendar = () => {
                 setYearPosition={setYearPosition}
                 dragging={dragging}
                 setDragging={setDragging}
+                isImageMode={isImageMode}
+                setIsImageMode={setIsImageMode}
+                imageScales={imageScales}
+                setImageScales={setImageScales}
+                monthTexts={monthTexts}
+                setMonthTexts={setMonthTexts}
+                monthImages={monthImages}
+                setMonthImages={setMonthImages}
+                fontSettings={fontSettings}
+                setFontSettings={setFontSettings}
               />
             </div>
           </>

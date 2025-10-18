@@ -18,6 +18,16 @@ const EditRightPanel = ({
   setYearPosition,
   dragging,
   setDragging,
+  isImageMode,
+setIsImageMode,
+imageScales,
+setImageScales,
+monthTexts,
+setMonthTexts,
+monthImages,
+setMonthImages,
+fontSettings,
+setFontSettings
 }) => {
   console.log(selectedCalendar);
 
@@ -27,11 +37,9 @@ const EditRightPanel = ({
     { key: "style2", label: "Rozciągnięty gradient" },
     { key: "style3", label: "Grafika na całym tle" },
   ];
-  const handleMonthTextChange = (index, value) => {
-    const newTexts = [...monthTexts];
-    newTexts[index] = value;
-    setMonthTexts(newTexts);
-  };
+ const handleMonthTextChange = (index, value) => {
+  setMonthTexts(prev => prev.map((txt, i) => (i === index ? value : txt)));
+};
   const [openSection, setOpenSection] = useState("topImage");
   const [images, setImages] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -43,22 +51,14 @@ const EditRightPanel = ({
   const scrollRef = useRef(null);
 
   const months = ["Grudzień", "Styczeń", "Luty"];
-  const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
-  const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
-  const [imageScales, setImageScales] = useState(() => months.map(() => 1));
-  const [monthTexts, setMonthTexts] = useState(["", "", ""]);
+
+ 
 
   const [yearText, setYearText] = useState("2026");
   const [yearColor, setYearColor] = useState("#ffffff");
   const [yearFontSize, setYearFontSize] = useState(32);
 
-  const [fontSettings, setFontSettings] = useState(
-    months.map(() => ({
-      fontFamily: "Arial",
-      fontWeight: "400",
-      fontColor: "#333333",
-    }))
-  );
+
  const [yearFontWeight, setYearFontWeight] = useState("bold");
   const [yearFontFamily, setYearFontFamily] = useState("Arial");
 
@@ -199,18 +199,8 @@ const EditRightPanel = ({
       });
     }
 
-    // ustawienia pól
-    setFontSettings(
-      [
-        selectedCalendar.field1,
-        selectedCalendar.field2,
-        selectedCalendar.field3,
-      ].map((field) => ({
-        fontFamily: field?.font || "Arial",
-        fontWeight: field?.weight || "400",
-        fontColor: field?.color || "#333333",
-      }))
-    );
+    
+  
 
     initialYearLoaded.current = true; // ✅ tylko raz
   }, [selectedCalendar]);
@@ -226,6 +216,11 @@ const EditRightPanel = ({
       top_image_url: url,
     }));
   };
+
+
+
+
+
 
   return (
     <div className="flex-1 bg-[#1f2020] rounded-2xl p-6 border border-gray-700">
@@ -407,7 +402,7 @@ const EditRightPanel = ({
                   setImageScales={setImageScales}
                   setMonthImages={setMonthImages}
                   setFontSettings={setFontSettings}
-                  setMonthTexts={setMonthTexts}
+                 
                 />
               ))}
             </div>

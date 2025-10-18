@@ -6,6 +6,7 @@ const ImageEditor = ({imageSrc,setImageSrc,imageScale,setImageScale,position,set
   const [dragging, setDragging] = useState(false);
   const [startDragPos, setStartDragPos] = useState({ x: 0, y: 0 });
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : imageSrc;
 
   const containerRef = useRef(null);
 
@@ -69,7 +70,7 @@ const ImageEditor = ({imageSrc,setImageSrc,imageScale,setImageScale,position,set
             style={{ height: 60 }}
           >
             <img
-              src={URL.createObjectURL(imageSrc)}
+              src={displaySrc} 
               alt="Uploaded"
               draggable={false}
            
