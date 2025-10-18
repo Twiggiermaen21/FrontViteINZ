@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { Fragment, use, useEffect, useRef, useState } from "react";
 import { useCalendars } from "../utils/useCalendars";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 import EditRightPanel from "../components/editCalendarElements/EditPanel";
@@ -15,9 +15,21 @@ import {
 const EditCalendar = () => {
   const { calendars, loading, scrollRef } = useCalendars();
   const [selectedCalendar, setSelectedCalendar] = useState(null);
-  const [yearPosition, setYearPosition] = useState({ x: 0, y: 0 });
+  const [yearPosition, setYearPosition] = useState({
+    coords: { x: 50, y: 20 },
+  });
+  const [yearText, setYearText] = useState("2026");
+  const [yearColor, setYearColor] = useState("#ffffff");
+  const [yearFontSize, setYearFontSize] = useState(32);
+
+  const [yearFontWeight, setYearFontWeight] = useState("bold");
+  const [yearFontFamily, setYearFontFamily] = useState("Arial");
+  const [updateYear,setUpdateYear] = useState(false);
+
+
   const [isCustom, setIsCustom] = useState(false);
   const [yearActive, setYearActive] = useState(false);
+
   const months = ["Grudzień", "Styczeń", "Luty"];
   const dragStartPos = useRef({ mouseX: 0, mouseY: 0, elemX: 0, elemY: 0 });
   const spanRef = useRef(null);
@@ -40,8 +52,8 @@ const EditCalendar = () => {
     }))
   );
   const handleMonthTextChange = (index, value) => {
-  setMonthTexts(prev => prev.map((txt, i) => (i === index ? value : txt)));
-};
+    setMonthTexts((prev) => prev.map((txt, i) => (i === index ? value : txt)));
+  };
   useEffect(() => {
     const onMove = (e) =>
       handleMouseMove(e, {
@@ -64,47 +76,94 @@ const EditCalendar = () => {
   }, [dragging, xLimits, yLimits]);
 
   useEffect(() => {
-  if (!selectedCalendar) return;
+    if (!selectedCalendar) return;
 
-  // aktualizujemy isImageMode
-  if (selectedCalendar.images_for_fields) {
-    updateImageModes(selectedCalendar.images_for_fields);
-  }
+    // aktualizujemy isImageMode
+    if (selectedCalendar.images_for_fields) {
+      updateImageModes(selectedCalendar.images_for_fields);
+    }
+  updateYearData();
+    // aktualizujemy monthTexts tylko jeśli istnieją pola tekstowe
 
-  // aktualizujemy monthTexts tylko jeśli istnieją pola tekstowe
-  
     updateMonthTextsFromFields(selectedCalendar);
+  }, [selectedCalendar?.id]);
+
+  // useEffect(() => {
+  //   if (!selectedCalendar) return;
+
+  //   updateYearData();
+
+   
+
+
+  // },[selectedCalendar]);
+
+
+
   
-}, [selectedCalendar?.id]);
-console.log(monthTexts)
   const updateImageModes = (fields) => {
     const newModes = [false, false, false];
-    console.log("fields",fields)
-    const newImages = ["","",""];
+
+    const newImages = ["", "", ""];
     fields.forEach((field) => {
       if (field.field_number >= 1 && field.field_number <= 3) {
         newModes[field.field_number - 1] = true;
         newImages[field.field_number - 1] = field.url;
-
-
-
       }
     });
     setIsImageMode(newModes);
-    console.log("url",newImages)
+
     setMonthImages(newImages);
   };
-const updateMonthTextsFromFields = (calendar) => {
-  if (!calendar) return;
+  const updateMonthTextsFromFields = (calendar) => {
+    if (!calendar) return;
 
-  const newTexts = [
-    calendar.field1?.text || "", // jeśli field1 istnieje, weź text, inaczej ""
-    calendar.field2?.text || "",
-    calendar.field3?.text || "",
-  ];
+    const newTexts = [
+      calendar.field1?.text || "", // jeśli field1 istnieje, weź text, inaczej ""
+      calendar.field2?.text || "",
+      calendar.field3?.text || "",
+    ];
 
-  setMonthTexts(newTexts);
-};
+    setMonthTexts(newTexts);
+  };
+
+  const [pom,setPom]= useState(null);
+
+
+  const updateYearData = () => {
+    setYearPosition(({
+    coords: {  x: selectedCalendar.year_data?.positionX,
+      y: selectedCalendar.year_data?.positionY, },
+  }));
+    setYearText(selectedCalendar.year_data?.text);
+    setYearColor(selectedCalendar.year_data?.color);
+    setYearFontSize(selectedCalendar.year_data
+?.size);
+    
+    setYearFontWeight(selectedCalendar.year_data?.weight);
+    setYearFontFamily(selectedCalendar.year_data?.font);
+
+  };
+  
+  console.log(selectedCalendar)
+console.log("pom",pom)
+
+
+useEffect(()=>{
+if(pom!==null){
+ setSelectedCalendar((prev) => ({
+    ...prev,
+   year_data:pom
+  })); 
+
+  console.log("done")
+}
+
+ 
+
+ 
+},[pom])
+
 
 
   return (
@@ -292,6 +351,7 @@ const updateMonthTextsFromFields = (calendar) => {
 
               {/* ⚙️ Panel edycji (po prawej) */}
               <EditRightPanel
+                setPom={setPom}
                 selectedCalendar={selectedCalendar}
                 setYearActive={setYearActive}
                 yearActive={yearActive}
@@ -310,6 +370,16 @@ const updateMonthTextsFromFields = (calendar) => {
                 setMonthImages={setMonthImages}
                 fontSettings={fontSettings}
                 setFontSettings={setFontSettings}
+                yearText={yearText}
+                setYearText={setYearText}
+                yearColor={yearColor}
+                setYearColor={setYearColor}
+                yearFontSize={yearFontSize}
+                setYearFontSize={setYearFontSize}
+                yearFontWeight={yearFontWeight}
+                setYearFontWeight={setYearFontWeight}
+                yearFontFamily={yearFontFamily}
+                setYearFontFamily={setYearFontFamily}
               />
             </div>
           </>

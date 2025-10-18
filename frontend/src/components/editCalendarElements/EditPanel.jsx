@@ -10,6 +10,7 @@ import ImageEditor from "../calendarEditorElements/ImageEditor";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const EditRightPanel = ({
+  setPom,
   selectedCalendar,
   setYearActive,
   yearActive,
@@ -19,48 +20,51 @@ const EditRightPanel = ({
   dragging,
   setDragging,
   isImageMode,
-setIsImageMode,
-imageScales,
-setImageScales,
-monthTexts,
-setMonthTexts,
-monthImages,
-setMonthImages,
-fontSettings,
-setFontSettings
-}) => {
-  console.log(selectedCalendar);
+  setIsImageMode,
+  imageScales,
+  setImageScales,
+  monthTexts,
+  setMonthTexts,
+  monthImages,
+  setMonthImages,
+  fontSettings,
+  setFontSettings,
 
+  yearText,
+  setYearText,
+  yearColor,
+  setYearColor,
+  yearFontSize,
+  setYearFontSize,
+  yearFontWeight,
+  setYearFontWeight,
+  yearFontFamily,
+  setYearFontFamily,
+}) => {
   const [style, setStyle] = useState(null);
   const styles = [
     { key: "style1", label: "Grafika + kolor" },
     { key: "style2", label: "Rozciągnięty gradient" },
     { key: "style3", label: "Grafika na całym tle" },
   ];
- const handleMonthTextChange = (index, value) => {
-  setMonthTexts(prev => prev.map((txt, i) => (i === index ? value : txt)));
-};
+  const handleMonthTextChange = (index, value) => {
+    setMonthTexts((prev) => prev.map((txt, i) => (i === index ? value : txt)));
+  };
   const [openSection, setOpenSection] = useState("topImage");
   const [images, setImages] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [selectedImageUrl, setSelectedImageUrl] = useState(
-    selectedCalendar?.top_image_url || null
+    selectedCalendar?.top_image || null
   );
   const scrollRef = useRef(null);
 
   const months = ["Grudzień", "Styczeń", "Luty"];
-
- 
-
-  const [yearText, setYearText] = useState("2026");
-  const [yearColor, setYearColor] = useState("#ffffff");
-  const [yearFontSize, setYearFontSize] = useState(32);
-
-
- const [yearFontWeight, setYearFontWeight] = useState("bold");
-  const [yearFontFamily, setYearFontFamily] = useState("Arial");
+  const [saving, setSaving] = useState(false);
+  const [calendarName, setCalendarName] = useState(
+    selectedCalendar?.name || ""
+  );
 
   const [xLimits, setXLimits] = useState({ min: 50, max: 325 });
   const [yLimits, setYLimits] = useState({ min: 20, max: 235 });
@@ -101,59 +105,56 @@ setFontSettings
     }
   };
   // 🔹 Synchronizacja year z selectedCalendar
-  useEffect(() => {
-    if (!selectedCalendar || !yearActive) return;
-    if (
-      (yearText ||
-        yearColor ||
-        yearFontFamily ||
-        yearFontWeight ||
-        yearFontSize) !== null
-    )
-      return;
+  // useEffect(() => {
+  //   if (!selectedCalendar || !yearActive) return;
+  //   if (
+  //     (yearText ||
+  //       yearColor ||
+  //       yearFontFamily ||
+  //       yearFontWeight ||
+  //       yearFontSize) !== null
+  //   )
+  //     return;
 
-  
+  //   const yd = selectedCalendar.year_data || {};
+  //   const needUpdate =
+  //     yd.text !== yearText ||
+  //     yd.color !== yearColor ||
+  //     yd.font !== yearFontFamily ||
+  //     yd.weight !== yearFontWeight ||
+  //     Number(yd.size) !== yearFontSize ||
+  //     Number(yd.positionX) !== yearPosition.x ||
+  //     Number(yd.positionY) !== yearPosition.y;
 
+  //   if (!needUpdate) return;
 
-    const yd = selectedCalendar.year_data || {};
-    const needUpdate =
-      yd.text !== yearText ||
-      yd.color !== yearColor ||
-      yd.font !== yearFontFamily ||
-      yd.weight !== yearFontWeight ||
-      Number(yd.size) !== yearFontSize ||
-      Number(yd.positionX) !== yearPosition.x ||
-      Number(yd.positionY) !== yearPosition.y;
-
-    if (!needUpdate) return;
-
-    setSelectedCalendar((prev) => {
-      if (!prev) return prev; // bezpieczeństwo
-      return {
-        ...prev,
-        year_data: {
-          ...prev.year_data,
-          text: yearText,
-          color: yearColor,
-          font: yearFontFamily,
-          weight: yearFontWeight,
-          size: yearFontSize,
-          positionX: yearPosition.x,
-          positionY: yearPosition.y,
-        },
-      };
-    });
-  }, [
-    yearText,
-    yearColor,
-    yearFontSize,
-    yearFontFamily,
-    yearFontWeight,
-    yearPosition.x,
-    yearPosition.y,
-    yearActive,
-    selectedCalendar?.id, // ✅ tylko id, nie cały obiekt
-  ]);
+  //   setSelectedCalendar((prev) => {
+  //     if (!prev) return prev; // bezpieczeństwo
+  //     return {
+  //       ...prev,
+  //       year_data: {
+  //         ...prev.year_data,
+  //         text: yearText,
+  //         color: yearColor,
+  //         font: yearFontFamily,
+  //         weight: yearFontWeight,
+  //         size: yearFontSize,
+  //         positionX: yearPosition.x,
+  //         positionY: yearPosition.y,
+  //       },
+  //     };
+  //   });
+  // }, [
+  //   yearText,
+  //   yearColor,
+  //   yearFontSize,
+  //   yearFontFamily,
+  //   yearFontWeight,
+  //   yearPosition.x,
+  //   yearPosition.y,
+  //   yearActive,
+  //   selectedCalendar?.id, // ✅ tylko id, nie cały obiekt
+  // ]);
 
   // 🔹 Pierwsze pobranie
   useEffect(() => {
@@ -180,47 +181,108 @@ setFontSettings
     return () => container.removeEventListener("scroll", handleScroll);
   }, [scrollRef, loading, hasMore]);
 
-  useEffect(() => {
-    if (!selectedCalendar || initialYearLoaded.current) return;
+  // useEffect(() => {
+  //   if (!selectedCalendar || initialYearLoaded.current) return;
 
-    if (selectedCalendar.year_data) {
-      const yd = selectedCalendar.year_data;
+  //   if (selectedCalendar.year_data) {
+  //     const yd = selectedCalendar.year_data;
+
+  //     setYearText(yd.text || "2026");
+  //     setYearColor(yd.color || "#ffffff");
+  //     setYearFontSize(Number(yd.size) || 32);
+  //     setYearFontWeight(yd.weight);
+  //     setYearFontFamily(yd.font);
+  //     setYearPosition({
+  //       coords: {
+  //         x: Number(yd.positionX) || 50,
+  //         y: Number(yd.positionY) || 20,
+  //       },
+  //     });
+  //   }
+
+  //   initialYearLoaded.current = true; // ✅ tylko raz
+  // }, [selectedCalendar]);
+
+ 
+
+
+
+// useEffect(() => {
+//     if (!selectedCalendar ) return;
+
+//     setSelectedCalendar((prev) => ({
+//     ...prev,
+//     year_data: {
+//       ...prev.year_data,
+//       positionX: yearPosition.x,
+//       positionY: yearPosition.y,
+//       text: yearText,
+//       color: yearColor,
+//       size: yearFontSize,
+//       weight: yearFontWeight,
+//       font: yearFontFamily,
+//     },
+//   }));
+
     
-      setYearText(yd.text || "2026");
-      setYearColor(yd.color || "#ffffff");
-      setYearFontSize(Number(yd.size)|| 32);
-      setYearFontWeight(yd.weight);
-      setYearFontFamily(yd.font);
-      setYearPosition({
-        coords: {
-          x: Number(yd.positionX) || 50,
-          y: Number(yd.positionY) || 20,
-        },
-      });
-    }
+//   }, [selectedCalendar]);
 
+useEffect(()=>{
+  setPom({
     
-  
-
-    initialYearLoaded.current = true; // ✅ tylko raz
-  }, [selectedCalendar]);
+      text: yearText,
+      color: yearColor,
+      size: yearFontSize,
+      weight: yearFontWeight,
+      font: yearFontFamily,
+      positionX: yearPosition.x,
+      positionY: yearPosition.y,
+    
+  });
+},[yearColor,yearText,yearFontFamily,yearFontSize,yearFontWeight,yearPosition])
 
   const toggleSection = (name) => {
     setOpenSection((prev) => (prev === name ? null : name));
   };
 
-  const handleImageSelect = (url) => {
-    setSelectedImageUrl(url);
+  const handleImageSelect = (img) => {
+    setSelectedImageUrl(img);
     setSelectedCalendar((prev) => ({
       ...prev,
-      top_image_url: url,
+      top_image_url: img.url,
     }));
   };
 
-
-
-
-
+  const handleSaveCalendar = async () => {
+    setSaving(true);
+    const formData = new FormData();
+    const token = localStorage.getItem(ACCESS_TOKEN);
+    // przykładowe pola
+    formData.append("name", calendarName);
+    formData.append("top_image", selectedImageUrl.id);
+    // np. zmiana top_image jeśli wybierzesz nowy plik:
+    // formData.append("top_image", fileInput.files[0]);
+    try {
+      const res = await axios.patch(
+        `${apiUrl}/calendar/${selectedCalendar.id}/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      alert("Kalendarz zaktualizowany ✅");
+      // setCalendar(res.data);
+      console.log("data", res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Błąd podczas zapisu ❌");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="flex-1 bg-[#1f2020] rounded-2xl p-6 border border-gray-700">
@@ -233,7 +295,7 @@ setFontSettings
           openSection={openSection}
           toggleSection={toggleSection}
           images={images}
-          selectedImageUrl={selectedImageUrl}
+          selectedImageUrl={selectedImageUrl.url}
           setSelectedCalendar={setSelectedCalendar}
           selectedCalendar={selectedCalendar}
           setSelectedImageUrl={setSelectedImageUrl}
@@ -402,12 +464,66 @@ setFontSettings
                   setImageScales={setImageScales}
                   setMonthImages={setMonthImages}
                   setFontSettings={setFontSettings}
-                 
                 />
               ))}
             </div>
           )}
         </div>
+
+        <div
+          className={`p-3 rounded-lg cursor-pointer flex justify-between items-center transition ${
+            openSection === "zapisz"
+              ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
+              : "bg-[#2a2b2b] text-gray-300 hover:bg-[#343636]"
+          }`}
+          onClick={() => toggleSection("zapisz")}
+        >
+          <span>🖼️ Sekcja Zapisz</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={`w-5 h-5 transition-transform duration-300 ${
+              openSection === "zapisz" ? "rotate-180" : "rotate-0"
+            }`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 9l6 6 6-6"
+            />
+          </svg>
+        </div>
+        {openSection === "zapisz" && (
+          <div className="bg-[#2a2b2b] rounded-3xl p-5 shadow-lg mt-4">
+            <label className="block text-sm font-medium text-[#d2e4e2] mb-2">
+              Wpisz nazwę kalendarza
+            </label>
+
+            <input
+              type="text"
+              value={calendarName}
+              onChange={(e) => setCalendarName(e.target.value)}
+              placeholder="np. Kalendarz firmowy 2025"
+              className="w-full h-12 rounded-lg px-3 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] focus:border-[#6d8f91] focus:outline-none transition-colors"
+            />
+
+            <button
+              onClick={handleSaveCalendar}
+              disabled={!calendarName.trim()}
+              className={`mt-4 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200
+      ${
+        calendarName.trim()
+          ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
+          : "bg-[#3b3c3c] text-[#8a8a8a] cursor-not-allowed"
+      }`}
+            >
+              Zapisz kalendarz
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

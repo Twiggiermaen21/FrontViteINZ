@@ -73,7 +73,7 @@ const TopImageSection = ({
             {images.map((item) => (
               <div
                 key={item.url} // ✅ unikalny key
-                onClick={() => handleImageSelect(item.url)}
+                onClick={() => handleImageSelect(item)}
                 className={`relative rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
                   selectedImageUrl === item.url
                     ? "ring-4 ring-[#6d8f91] scale-[1.02]"
