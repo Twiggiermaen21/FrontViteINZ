@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
+import { Trash2 } from "lucide-react"; // import ikonki kosza
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 const months = ["Grudzień", "Styczeń", "Luty"];
@@ -16,29 +17,36 @@ const BrowseCalendars = () => {
   const thumbRef = useRef(null);
 
   // Pobieranie kalendarzy
-  const fetchCalendars = useCallback(async () => {
-    if (!hasMore || loading) return;
+const fetchCalendars = useCallback(async () => {
+  if (!hasMore || loading) return;
 
-    setLoading(true);
-    const token = localStorage.getItem(ACCESS_TOKEN);
+  setLoading(true);
+  const token = localStorage.getItem(ACCESS_TOKEN);
 
-    try {
-      const response = await axios.get(`${apiUrl}/calendars/`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { page, page_size: 5 },
-      });
+  try {
+    const response = await axios.get(`${apiUrl}/calendars/`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { page, page_size: 5 },
+    });
 
-      setCalendars((prev) => [...prev, ...response.data.results]);
-      setHasMore(!!response.data.next);
-      setPage((prev) => prev + 1);
-    } catch (err) {
-      console.error("Błąd podczas pobierania danych:", err);
-      if (err.response?.status === 401)
-        setTimeout(() => window.location.reload(), 500);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, hasMore, loading]);
+    setCalendars((prev) => {
+      // unikamy duplikatów po ID
+      const newItems = response.data.results.filter(
+        (item) => !prev.some((c) => c.id === item.id)
+      );
+      return [...prev, ...newItems];
+    });
+
+    setHasMore(!!response.data.next);
+    setPage((prev) => prev + 1);
+  } catch (err) {
+    console.error("Błąd podczas pobierania danych:", err);
+    if (err.response?.status === 401)
+      setTimeout(() => window.location.reload(), 500);
+  } finally {
+    setLoading(false);
+  }
+}, [hasMore, loading, page]);
 
   useEffect(() => {
     fetchCalendars();
@@ -109,7 +117,31 @@ const BrowseCalendars = () => {
             <p className="text-[#989c9e]">Brak dostępnych kalendarzy.</p>
           ) : (
             calendars.map((calendar,index) => (
-              <div key={index} className="flex-shrink-0">
+            
+               <div key={index} className="flex-shrink-0 relative">
+    {/* Ikona kosza */}
+    <button
+      className="absolute top-2 right-2 p-1 rounded-full text-gray-400 hover:text-red-600 transition-colors z-10"
+      onClick={async () => {
+        const confirmed = window.confirm(
+          `Czy na pewno chcesz usunąć kalendarz "${calendar.name}"?`
+        );
+        if (!confirmed) return;
+
+        try {
+          const token = localStorage.getItem(ACCESS_TOKEN);
+          await axios.delete(`${apiUrl}/calendar-destroy/${calendar.id}/`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setCalendars((prev) => prev.filter((c) => c.id !== calendar.id));
+        } catch (err) {
+          console.error("Błąd podczas usuwania kalendarza:", err);
+          alert("Nie udało się usunąć kalendarza.");
+        }
+      }}
+    >
+      <Trash2 size={20} />
+    </button>
                 <h1 className="text-xl  font-bold text-white mb-2">
                   {calendar.name}
                 </h1>
