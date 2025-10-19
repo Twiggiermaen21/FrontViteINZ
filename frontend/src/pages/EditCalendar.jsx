@@ -351,6 +351,7 @@ if(pom!==null){
               {/* ⚙️ Panel edycji (po prawej) */}
               <EditRightPanel
                 setPom={setPom}
+                pom={pom}
                 selectedCalendar={selectedCalendar}
                 setYearActive={setYearActive}
                 yearActive={yearActive}

@@ -40,7 +40,7 @@ const GradientSettings = ({
         </label>
         <input
           type="color"
-          value={bgColor}
+          value={bgColor?? "#ffffff"}
           onChange={(e) => setBgColor(e.target.value)}
           className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
         />
@@ -53,7 +53,7 @@ const GradientSettings = ({
         </label>
         <input
           type="color"
-          value={gradientEndColor}
+          value={gradientEndColor?? "#ffffff"}
           onChange={(e) => setGradientEndColor(e.target.value)}
           className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
         />

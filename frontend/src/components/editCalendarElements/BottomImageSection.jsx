@@ -12,47 +12,27 @@ const BottomImageSection = ({
   style,
   selectedCalendar,
   setSelectedCalendar,
+  bgColor,
+  setBgColor,
+  imagesBackground,
+  setImagesBackground,
+  gradientVariant,
+  setGradientVariant,
+  gradientEndColor,
+  setGradientEndColor,
+  gradientStrength,
+  setGradientStrength,
+  gradientTheme,
+  setGradientTheme,
+  backgroundImage,
+  setBackgroundImage,
+  image,
+  setImage,
+  hasMoreBackground,
+  setHasMoreBackground,
+  fetchImagesBackground,
+  loading
 }) => {
-  const [bgColor, setBgColor] = useState("#ffffff");
-  const [imagesBackground, setImagesBackground] = useState([]);
-  const [gradientVariant, setGradientVariant] = useState("diagonal");
-  const [gradientEndColor, setGradientEndColor] = useState("#ffffff");
-  const [gradientStrength, setGradientStrength] = useState("medium");
-  const [gradientTheme, setGradientTheme] = useState("classic");
-  const [backgroundImage, setBackgroundImage] = useState(null);
-  const [pageBackground, setPageBackground] = useState(1);
-
-  const [hasMoreBackground, setHasMoreBackground] = useState(true);
-  const [loading, setLoading] = useState(false);
-
-  const fetchImagesBackground = async () => {
-    if (!hasMoreBackground || loading) return;
-
-    setLoading(true);
-    const token = localStorage.getItem(ACCESS_TOKEN);
-
-    try {
-      const res = await axios.get(`${apiUrl}/generate/`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { page: pageBackground, page_size: 12 }, // backend musi obsługiwać paginację
-      });
-
-      setImagesBackground((prev) => [...prev, ...res.data.results]);
-      setHasMoreBackground(!!res.data.next);
-      setPageBackground((prev) => prev + 1);
-    } catch (err) {
-      console.error("Błąd podczas pobierania obrazów:", err);
-      if (err.response?.status === 401) {
-        setTimeout(() => {
-          window.location.reload();
-        }, 500); // odświeży po 0.5 sekundy
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const [image, setImage] = useState(null);
   const fetchedOnce = useRef(false);
 
   useEffect(() => {
@@ -66,7 +46,7 @@ const BottomImageSection = ({
 
   useEffect(() => {
     if (!selectedCalendar || style === null) return;
-
+    console.log("work")
     let newBottom = { ...selectedCalendar.bottom };
 
     // ustawiamy content_type_id jeśli style3
