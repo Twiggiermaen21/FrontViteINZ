@@ -145,8 +145,7 @@ const EditCalendar = () => {
 
   };
   
-  console.log(selectedCalendar)
-console.log("pom",pom)
+ 
 
 
 useEffect(()=>{
@@ -156,7 +155,7 @@ if(pom!==null){
    year_data:pom
   })); 
 
-  console.log("done")
+ 
 }
 
  
@@ -169,12 +168,12 @@ if(pom!==null){
   return (
     <div className="flex gap-6 w-full max-w-[1812px] mx-auto mt-4 ">
       {/* 🩶 Lewa kolumna z przewijaną listą */}
-      <div className="w-[26%] bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 border-r border-gray-700  flex flex-col">
-        <h2 className="text-xl font-bold text-white mb-4">Wybierz kalendarz</h2>
+      <div className="w-[26%] max-h-[88vh] bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 border-r border-gray-700  flex flex-col">
+      <h2 className="text-xl font-bold text-white mb-4 text-center">Wybierz kalendarz</h2>
 
         {/* 🔹 Scroll tylko na liście kalendarzy */}
         <div
-          className="overflow-y-auto custom-scroll max-h-[80vh] pr-2"
+          className="overflow-y-auto custom-scroll max-h-[89vh] pr-2"
           ref={scrollRef}
         >
           {loading && calendars.length === 0 ? (
@@ -216,7 +215,7 @@ if(pom!==null){
       </div>
 
       {/* 🩵 Prawa kolumna — bez scrolla */}
-      <div className="flex-1 bg-[#2a2b2b] rounded-4xl mt-4 p-8 flex flex-col">
+      <div className="flex-1 bg-[#2a2b2b] max-h-[88vh] rounded-4xl mt-4 p-4 flex flex-col">
         {!selectedCalendar ? (
           <p className="text-gray-400 text-lg">
             Wybierz kalendarz z listy po lewej, aby rozpocząć edycję.
@@ -224,9 +223,9 @@ if(pom!==null){
         ) : (
           <>
             {/* 🔹 Nagłówek edycji */}
-            <h1 className="text-xl font-bold text-white mb-6">
-              Edycja: {selectedCalendar.name}
-            </h1>
+            <h2 className="text-xl font-bold text-white mb-4 text-center">
+        Ustawienia kalendarza
+      </h2>
 
             {/* 🔹 Główna sekcja: podgląd po lewej, pola edycji po prawej */}
             <div className="flex gap-8 items-start">

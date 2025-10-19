@@ -37,30 +37,9 @@ const TopImageSection = ({
 
   return (
     <div>
-      <div
-        className={`p-3 rounded-lg cursor-pointer flex justify-between items-center transition ${
-          openSection === "topImage"
-            ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
-            : "bg-[#2a2b2b] text-gray-300 hover:bg-[#343636]"
-        }`}
-        onClick={() => toggleSection("topImage")}
-      >
-        <span>🖼️ Grafika górna</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className={`w-5 h-5 transition-transform duration-300 ${
-            openSection === "topImage" ? "rotate-180" : "rotate-0"
-          }`}
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-        </svg>
-      </div>
+      
 
-      {openSection === "topImage" && (
+      
         <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 animate-fadeIn">
           <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
             Galeria grafik
@@ -106,7 +85,7 @@ const TopImageSection = ({
             className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90"
           />
         </div>
-      )}
+    
     </div>
   );
 };
