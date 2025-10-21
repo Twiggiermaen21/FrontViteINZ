@@ -7,11 +7,7 @@ const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 export default function Generate() {
   const [prompt, setPrompt] = useState("");
   const [images, setImages] = useState([
-    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1759260406/generated_images/generated_b163444da3ed493a8878d8d0210ca2fa.jpg",
-    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1753272595/generated_images/generated_image_92.jpg",
-    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1753213490/generated_image_89_znxn81.jpg",
-    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1753213490/generated_image_87_pn8akp.jpg",
-    "https://res.cloudinary.com/dhgml9qt5/image/upload/v1753213490/generated_image_88_ah7yrr.jpg",
+    
   ]);
   const [loading, setLoading] = useState(false);
   const [options, setOptions] = useState({});

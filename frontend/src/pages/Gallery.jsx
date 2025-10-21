@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 
@@ -8,43 +8,77 @@ const Gallery = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(null); 
+  const [hasMore, setHasMore] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
+const isFetchingRef = useRef(false); // ⛔ lokalna blokada
 
-  const fetchImages = async () => {
-    if (loading) return;
+const fetchImages = useCallback(async () => {
+  // 🔒 zabezpieczenie przed wielokrotnym wywołaniem
+  if (isFetchingRef.current || loading || !hasMore) return;
 
-    setLoading(true);
-    const token = localStorage.getItem(ACCESS_TOKEN);
+  isFetchingRef.current = true;
+  setLoading(true);
 
-    try {
-      const res = await axios.get(`${apiUrl}/generate/`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { page, page_size: 20 },
+  const token = localStorage.getItem(ACCESS_TOKEN);
+
+  try {
+    const res = await axios.get(`${apiUrl}/generate/`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { page, page_size: 20 },
+    });
+
+    const results = res.data.results || [];
+
+    console.log("📸 Pobrano:", results.length, "zdjęć (strona:", page, ")");
+
+    // ✅ Zawsze dodaj nowe zdjęcia, jeśli przyszły
+    if (results.length > 0) {
+      setImages((prev) => {
+        // 🔁 Deduplikacja po `id` (jeśli backend zwraca powtarzające się zdjęcia)
+        const merged = [...prev, ...results];
+        const unique = Array.from(new Map(merged.map((img) => [img.id, img])).values());
+        return unique;
       });
 
-      setImages((prev) => [...prev, ...res.data.results]);
       setPage((prev) => prev + 1);
-    } catch (err) {
-      console.error("Błąd podczas pobierania obrazów:", err);
-      if (err.response?.status === 401) {
-        setTimeout(() => window.location.reload(), 500);
-      }
-    } finally {
-      setLoading(false);
     }
-  };
+
+    // ✅ Sprawdzenie, czy to koniec danych
+    if (!res.data.next || res.data.message || results.length < 20) {
+      console.log("🚫 Brak więcej danych:", res.data.message || "ostatnia strona");
+      setHasMore(false);
+    }
+
+  } catch (err) {
+    console.error("❌ Błąd podczas pobierania obrazów:", err);
+
+    if (err.response?.status === 404) {
+      setHasMore(false);
+    }
+
+    if (err.response?.status === 401) {
+      setTimeout(() => window.location.reload(), 500);
+    }
+
+  } finally {
+    setLoading(false);
+    isFetchingRef.current = false; // 🔓 odblokowanie po zakończeniu
+  }
+}, [loading, hasMore, page]);
 
   useEffect(() => {
     fetchImages();
-  }, []);
+  }, [fetchImages]);
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
-    if (scrollTop + clientHeight >= scrollHeight - 10) {
+
+    // tylko jeśli nie ładuje i są jeszcze dane
+    if (scrollTop + clientHeight >= scrollHeight - 10 && !loading && hasMore) {
       fetchImages();
     }
   };
-
+console.log(images)
   return (
     <div className="p-6">
       <h1 className="text-3xl font-semibold mb-4 text-white">Gallery</h1>
@@ -62,7 +96,7 @@ const Gallery = () => {
             ) : (
               images.map((img, index) => (
                 <div
-                  key={index }
+                  key={index}
                   className="relative group rounded-lg overflow-hidden border border-[#374b4b] bg-[#2a2b2b] shadow-sm cursor-pointer"
                   onClick={() => setSelectedImage(img)}
                 >
@@ -86,60 +120,60 @@ const Gallery = () => {
               Ładowanie...
             </p>
           )}
+
+          {!hasMore && !loading && (
+            <p className="col-span-full text-center text-[#9ca3af] mt-4">
+              🏁 To już wszystkie obrazy.
+            </p>
+          )}
         </div>
       </div>
 
       {/* Modal powiększonego obrazu */}
       {selectedImage && (
-  <div
-    className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6"
-    onClick={() => setSelectedImage(null)} // kliknięcie poza obrazem też zamyka
-  >
-    <div
-      className="relative max-w-4xl w-full bg-[#1e1f1f] rounded-2xl shadow-lg overflow-hidden"
-      onClick={(e) => e.stopPropagation()} // blokuje zamknięcie po kliknięciu w obraz
-    >
-      {/* Ikonka powrotu */}
-      <button
-        className="absolute top-3 left-3 text-white text-2xl hover:text-[#a0f0f0] transition"
-        onClick={() => setSelectedImage(null)}
-      >
-        ←
-      </button>
+        <div
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            className="relative max-w-4xl w-full bg-[#1e1f1f] rounded-2xl shadow-lg overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-3 left-3 text-white text-2xl hover:text-[#a0f0f0] transition"
+              onClick={() => setSelectedImage(null)}
+            >
+              ←
+            </button>
+            <button
+              className="absolute top-3 right-3 text-white text-2xl hover:text-[#a0f0f0] transition"
+              onClick={() => setSelectedImage(null)}
+            >
+              ✕
+            </button>
 
-      {/* Zamknięcie (✕) */}
-      <button
-        className="absolute top-3 right-3 text-white text-2xl hover:text-[#a0f0f0] transition"
-        onClick={() => setSelectedImage(null)}
-      >
-        ✕
-      </button>
+            <img
+              src={selectedImage.url}
+              alt="Selected"
+              className="w-full max-h-[70vh] object-contain bg-black"
+            />
 
-      {/* Obraz */}
-      <img
-        src={selectedImage.url}
-        alt="Selected"
-        className="w-full max-h-[70vh] object-contain bg-black"
-      />
-
-      {/* Szczegóły */}
-      <div className="p-4 border-t border-[#2c2e2d] text-[#d1d5db]">
-        <h2 className="text-lg font-semibold mb-2">Details</h2>
-        <p>
-          <span className="font-medium text-[#a0f0f0]">Prompt:</span>{" "}
-          {selectedImage.prompt}
-        </p>
-        {selectedImage.created_at && (
-          <p className="mt-2 text-sm text-[#9ca3af]">
-            Generated at:{" "}
-            {new Date(selectedImage.created_at).toLocaleString()}
-          </p>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-
+            <div className="p-4 border-t border-[#2c2e2d] text-[#d1d5db]">
+              <h2 className="text-lg font-semibold mb-2">Details</h2>
+              <p>
+                <span className="font-medium text-[#a0f0f0]">Prompt:</span>{" "}
+                {selectedImage.prompt}
+              </p>
+              {selectedImage.created_at && (
+                <p className="mt-2 text-sm text-[#9ca3af]">
+                  Generated at:{" "}
+                  {new Date(selectedImage.created_at).toLocaleString()}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
