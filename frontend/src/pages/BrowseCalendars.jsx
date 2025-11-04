@@ -3,7 +3,7 @@ import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { Trash2 } from "lucide-react";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
-
+import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 const months = ["Grudzień", "Styczeń", "Luty"];
 
@@ -114,33 +114,32 @@ const BrowseCalendars = () => {
     }
   };
 
+  const calendarPrint = async (id) => {
+    try {
+      const token = localStorage.getItem(ACCESS_TOKEN);
 
-const calendarPrint = async (id) => {
-  try {
-    const token = localStorage.getItem(ACCESS_TOKEN);
+      const response = await axios.post(
+        `${apiUrl}/calendar-print/`,
+        {
+          // id_kalendarz: id
+          id_kalendarz: selectedCalendar.id,
+        }, // <-- przesyłamy JSON
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    const response = await axios.post(
-      `${apiUrl}/calendar-print/`,
-      { 
-        // id_kalendarz: id
-        id_kalendarz: "generated_images/generated_d70e8e27e05f480f9ae3f6877d573c8b"
-      }, // <-- przesyłamy JSON
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-      }
-    );
+      console.log(response.data); // { id, image_url, local_path }
+    } catch (err) {
+      console.error("Błąd drukowania", err);
+      alert("Nie udało się pobrać/upscalować kalendarza.");
+    }
+  };
 
-    console.log(response.data); // { id, image_url, local_path }
-  } catch (err) {
-    console.error("Błąd drukowania", err);
-    alert("Nie udało się pobrać/upscalować kalendarza.");
-  }
-};
-
-
+  console.log("Selected Calendar in print:", selectedCalendar);
   return (
     <div className="relative mt-8 mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]   max-w-[1600px]">
       <h1 className="text-3xl font-bold text-white mb-4">
@@ -175,6 +174,25 @@ const calendarPrint = async (id) => {
                     ) : (
                       <span className="text-gray-500">
                         Brak grafiki nagłówka
+                      </span>
+                    )}
+
+                    {calendar?.year_data !== null && (
+                      <span
+          
+
+                  
+                        style={{
+                          position: "absolute",
+                          color: calendar?.year_data.color,
+                          fontSize: `${calendar?.year_data.size}px`,
+                          fontWeight: calendar?.year_data.weight,
+                          fontFamily: calendar?.year_data.font,
+
+                          ...getYearPositionStyles(calendar?.year_data.yearPosition),
+                        }}
+                      >
+                        {calendar?.year_data.text}
                       </span>
                     )}
                   </div>
@@ -253,118 +271,122 @@ const calendarPrint = async (id) => {
       )}
 
       {/* Modal */}
-     {selectedCalendar && (
-  <div
-    className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6"
-    onClick={() => setSelectedCalendar(null)}
-  >
-    <div
-      className="relative max-w-6xl w-full bg-[#1e1f1f] rounded-2xl shadow-lg overflow-hidden flex gap-4"
-      onClick={(e) => e.stopPropagation()}
-    >
-      {/* Zamknij modal */}
-      <button
-        className="absolute top-3 right-3 text-white text-2xl hover:text-[#a0f0f0] transition"
-        onClick={() => setSelectedCalendar(null)}
-      >
-        ✕
-      </button>
-
-      {/* Kalendarz */}
-      <div className="flex-shrink-0 w-[400px] h-auto bg-white border rounded overflow-hidden shadow m-4">
-        {/* Header */}
-        <div className="relative h-[180px] bg-gray-200 flex items-center justify-center overflow-hidden">
-          {selectedCalendar.top_image ? (
-            <img
-              src={selectedCalendar.top_image_url}
-              alt="Nagłówek"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-gray-500">Brak grafiki nagłówka</span>
-          )}
-        </div>
-
-        {/* Bottom */}
+      {selectedCalendar && (
         <div
-          className="px-3 py-4 flex flex-col items-center text-center"
-          style={getBottomSectionBackground({
-            style:
-              selectedCalendar.bottom?.content_type_id === 26
-                ? "style1"
-                : selectedCalendar.bottom?.content_type_id === 27
-                ? "style2"
-                : selectedCalendar.bottom?.content_type_id === 28
-                ? "style3"
-                : null,
-            bgColor:
-              selectedCalendar.bottom?.color ??
-              selectedCalendar.bottom?.start_color,
-            gradientEndColor: selectedCalendar.bottom?.end_color,
-            gradientTheme: selectedCalendar.bottom?.theme,
-            gradientStrength: selectedCalendar.bottom?.strength,
-            gradientVariant: selectedCalendar.bottom?.direction,
-            backgroundImage: selectedCalendar.bottom?.url,
-          })}
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6"
+          onClick={() => setSelectedCalendar(null)}
         >
-          {[selectedCalendar.field1, selectedCalendar.field2, selectedCalendar.field3].map(
-            (field, index) => {
-              if (!field) return null;
-              const isText = "text" in field;
-              const isImage = "path" in field;
-              return (
-                <div
-                  key={`${selectedCalendar.id}-${index}`}
-                  className="w-full border rounded bg-white shadow p-2 flex flex-col items-center mb-2"
-                >
-                  <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                    {months[index]}
-                  </h3>
-                  <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
-                    [Siatka dni dla {months[index]}]
-                  </div>
-                  <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
-                    {isText
-                      ? field.text
-                      : isImage
-                      ? selectedCalendar.images_for_fields
-                          .filter((img) => img.field_number === index + 1)
-                          .map((img) => (
-                            <img
-                              key={`${selectedCalendar.id}-${index}-${img.id}`}
-                              src={img.url}
-                              alt="Image"
-                              style={{ height: 60 }}
-                            />
-                          ))
-                      : null}
-                  </div>
-                </div>
-              );
-            }
-          )}
-        </div>
-      </div>
+          <div
+            className="relative max-w-6xl w-full bg-[#1e1f1f] rounded-2xl shadow-lg overflow-hidden flex gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Zamknij modal */}
+            <button
+              className="absolute top-3 right-3 text-white text-2xl hover:text-[#a0f0f0] transition"
+              onClick={() => setSelectedCalendar(null)}
+            >
+              ✕
+            </button>
 
-      {/* Panel boczny z nazwą i przyciskami */}
-      <div className="flex flex-col justify-start p-6 text-white flex-1">
-        <h2 className="text-3xl font-bold mb-6">{selectedCalendar.name}</h2>
-        <button
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 mb-4"
-       onClick={() => calendarPrint(selectedCalendar.id)}
-        >
-          Drukuj
-        </button>
-        <button
-          className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-          onClick={() => deleteCalendar(selectedCalendar.id)}
-        >
-          Usuń
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            {/* Kalendarz */}
+            <div className="flex-shrink-0 w-[400px] h-auto bg-white border rounded overflow-hidden shadow m-4">
+              {/* Header */}
+              <div className="relative h-[180px] bg-gray-200 flex items-center justify-center overflow-hidden">
+                {selectedCalendar.top_image ? (
+                  <img
+                    src={selectedCalendar.top_image_url}
+                    alt="Nagłówek"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-gray-500">Brak grafiki nagłówka</span>
+                )}
+              </div>
+
+              {/* Bottom */}
+              <div
+                className="px-3 py-4 flex flex-col items-center text-center"
+                style={getBottomSectionBackground({
+                  style:
+                    selectedCalendar.bottom?.content_type_id === 26
+                      ? "style1"
+                      : selectedCalendar.bottom?.content_type_id === 27
+                      ? "style2"
+                      : selectedCalendar.bottom?.content_type_id === 28
+                      ? "style3"
+                      : null,
+                  bgColor:
+                    selectedCalendar.bottom?.color ??
+                    selectedCalendar.bottom?.start_color,
+                  gradientEndColor: selectedCalendar.bottom?.end_color,
+                  gradientTheme: selectedCalendar.bottom?.theme,
+                  gradientStrength: selectedCalendar.bottom?.strength,
+                  gradientVariant: selectedCalendar.bottom?.direction,
+                  backgroundImage: selectedCalendar.bottom?.url,
+                })}
+              >
+                {[
+                  selectedCalendar.field1,
+                  selectedCalendar.field2,
+                  selectedCalendar.field3,
+                ].map((field, index) => {
+                  if (!field) return null;
+                  const isText = "text" in field;
+                  const isImage = "path" in field;
+                  return (
+                    <div
+                      key={`${selectedCalendar.id}-${index}`}
+                      className="w-full border rounded bg-white shadow p-2 flex flex-col items-center mb-2"
+                    >
+                      <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                        {months[index]}
+                      </h3>
+                      <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
+                        [Siatka dni dla {months[index]}]
+                      </div>
+                      <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
+                        {isText
+                          ? field.text
+                          : isImage
+                          ? selectedCalendar.images_for_fields
+                              .filter((img) => img.field_number === index + 1)
+                              .map((img) => (
+                                <img
+                                  key={`${selectedCalendar.id}-${index}-${img.id}`}
+                                  src={img.url}
+                                  alt="Image"
+                                  style={{ height: 60 }}
+                                />
+                              ))
+                          : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Panel boczny z nazwą i przyciskami */}
+            <div className="flex flex-col justify-start p-6 text-white flex-1">
+              <h2 className="text-3xl font-bold mb-6">
+                {selectedCalendar.name}
+              </h2>
+              <button
+                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 mb-4"
+                onClick={() => calendarPrint(selectedCalendar.id)}
+              >
+                Drukuj
+              </button>
+              <button
+                className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
+                onClick={() => deleteCalendar(selectedCalendar.id)}
+              >
+                Usuń
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
