@@ -63,7 +63,7 @@ export default function Login() {
               localStorage.setItem(REFRESH_TOKEN, res.data.token.refresh);
               localStorage.setItem("user", JSON.stringify(res.data.user));
               // console.log("Google login successful:", res.data);
-              navigate("/ai");
+              navigate("/ai/dashboard");
             }}
             onError={() => {
               navigate("/login");

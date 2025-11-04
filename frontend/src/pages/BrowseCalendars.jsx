@@ -114,6 +114,33 @@ const BrowseCalendars = () => {
     }
   };
 
+
+const calendarPrint = async (id) => {
+  try {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+
+    const response = await axios.post(
+      `${apiUrl}/calendar-print/`,
+      { 
+        // id_kalendarz: id
+        id_kalendarz: "generated_images/generated_d70e8e27e05f480f9ae3f6877d573c8b"
+      }, // <-- przesyłamy JSON
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+      }
+    );
+
+    console.log(response.data); // { id, image_url, local_path }
+  } catch (err) {
+    console.error("Błąd drukowania", err);
+    alert("Nie udało się pobrać/upscalować kalendarza.");
+  }
+};
+
+
   return (
     <div className="relative mt-8 mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]   max-w-[1600px]">
       <h1 className="text-3xl font-bold text-white mb-4">
@@ -324,7 +351,7 @@ const BrowseCalendars = () => {
         <h2 className="text-3xl font-bold mb-6">{selectedCalendar.name}</h2>
         <button
           className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 mb-4"
-          onClick={() => window.print()}
+       onClick={() => calendarPrint(selectedCalendar.id)}
         >
           Drukuj
         </button>

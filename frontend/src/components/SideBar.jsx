@@ -16,16 +16,16 @@ const navbar = [
   { label: "Dashboard", path: "/ai/dashboard", Icon: House },
   { label: "Generuj", path: "/ai/generate", Icon: SquarePen },
   { label: "Galeria", path: "/ai/gallery", Icon: ImageMinus },
-  { label: "Edytuj zdjęcie", path: "/ai/edit", Icon: Edit3 },
+  { label: "Edytuj zdjęcie", path: "/ai/edit", Icon: Edit3, staffOnly: true },
   { label: "Nowy kalendarz", path: "/ai/create-calendar", Icon: CalendarPlus },
   { label: "Kalendarze", path: "/ai/calendars", Icon: CalendarSearch },
-  { label: "Edytuj kalendarz", path: "/ai/edit-calendar", Icon: Edit3 },
+  { label: "Edytuj kalendarz", path: "/ai/edit-calendar", Icon: Edit3, staffOnly: true },
 ];
 
 const SideBar = ({ sidebar, setSidebar, user }) => {
   const navigate = useNavigate();
   const [clicks, setClicks] = useState(0);
-
+  console.log(user)
   useEffect(() => {
     if (clicks === 5) {
       navigate("/ai/game");
@@ -55,7 +55,9 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
         />
 
         <div className="px-4 mt-6 text-sm font-medium">
-          {navbar.map(({ path, label, Icon }) => (
+          {navbar
+  .filter(item => (item.staffOnly ? user?.is_staff : true))
+  .map(({ path, label, Icon }) => (
             <NavLink
               key={path}
               to={path}
