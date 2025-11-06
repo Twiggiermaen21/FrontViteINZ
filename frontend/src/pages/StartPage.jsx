@@ -1,12 +1,12 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
-import Hero from '../components/Hero'
-import AiTools from '../components/aiTools'
-import ImageGallery from '../components/ImageGallery'
-import Footer from '../components/Footer'
+import Navbar from '../components/startPage/Navbar'
+import Hero from '../components/startPage/Hero'
+import AiTools from '../components/startPage/AiTools'
+import ImageGallery from '../components/startPage/ImageGallery'
+import Footer from '../components/startPage/Footer'
 const StartPage = () => {
   return (
-    <div>
+    <div className='bg-[#1e1f1f]'>
       <Navbar />
       <Hero />
       <ImageGallery />

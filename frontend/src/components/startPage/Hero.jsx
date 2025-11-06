@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom';
-import { assets } from '../assets/assets';
+import { assets } from '../../assets/assets';
 
 const Hero = () => {
 
@@ -8,18 +8,18 @@ const navigate = useNavigate();
 
   return (
     <div className="px-4 sm:px-20 xl:px-32 relative inline-flex flex-col 
-    w-full  justify-center bg-[url(/gradientBackground.png)] bg-cover bg-no-repeat min-h-screen">
+    w-full  justify-center bg-[url(/gradientBackground.png)]  bg-cover bg-no-repeat min-h-screen">
 
 
     <div className='text-center mb-6'>
-        <h1 className='text-3xl sm:text-5xl md:text-6xl 2xl:text-7xl font-semibold mx-auto leading-[1.2]'>Create amazing cal <br/>  with 
-       <span className='text-primary'> AI-powered tools.</span></h1>
+        <h1 className='text-3xl sm:text-5xl md:text-6xl 2xl:text-7xl font-semibold text-white mx-auto leading-[1.2]'>Create amazing cal <br/>  with 
+       <span className='text-[#d2e4e2]'> AI-powered tools.</span></h1>
          <p className='mt-4 max-w-xs sm:max-w-lg 2xl:max-w-xl m-auto max-sm:text-xs text-gray-600'>Build your dream product with our AI-powered tools.</p>
     </div>
 
 
     <div className='flex flex-wrap justify-center gap-4 text-sm max-sm:text-xs'>
-        <button onClick={() => navigate('/ai')} className='bg-primary text-white px-10 py-3 rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer'>Start creating now</button>
+        <button onClick={() => navigate('/ai')} className='bg-[#6d8f91] hover:bg-[#afe5e6] text-[#1e1f1f] font-bold  px-10 py-3 rounded-lg hover:scale-102 active:scale-95 transition cursor-pointer'>Start creating now</button>
         <button onClick={() => navigate('/learn-more')} className='bg-white px-10 py-3 rounded-lg border border-gray-300 hover:scale-102 active:scale-95 transition cursor-pointer'>Learn more</button>   
     </div>
 
