@@ -7,68 +7,74 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-      const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col pt-24 items-center justify-center ">
-      <div className="flex w-full max-w-6xl min-h-[40rem] bg-white rounded-3xl overflow-hidden shadow-xl">
+    <div className="flex flex-col min-h-screen items-center justify-center bg-[#1e1f1f] text-[#d2e4e2]">
+      <div className="flex w-full max-w-6xl min-h-[40rem] bg-[#2a2b2b] rounded-3xl overflow-hidden shadow-2xl border border-[#374b4b]">
+        {/* LEWA STRONA (zachowana oryginalna kolorystyka) */}
         <div className="flex-1 bg-gradient-to-br from-pink-400 via-orange-400 to-purple-500 relative flex items-center justify-center p-10">
-          {/* <div className="text-white text-5xl font-bold absolute top-10 left-10">{NAME_WEB}</div> */}
           <img
             src="https://cdn3d.iconscout.com/3d/premium/thumb/astronaut-helmet-with-balloons-9236788-7520477.png"
             alt="Astronaut"
-            className="max-h-80 drop-shadow-2xl"
+            className="max-h-80 drop-shadow-2xl hover:scale-105 transition-transform duration-300"
           />
-          <div className="text-white text-6xl font-extrabold absolute bottom-10 left-10">
+          <div className="text-white text-6xl font-extrabold absolute bottom-10 left-10 drop-shadow-md">
             {NAME_WEB}
           </div>
         </div>
 
-        <div className="flex-1 p-12 flex flex-col justify-center">
-          <div className="flex items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800">
-              Welcome to {NAME_WEB}!
+        {/* PRAWA STRONA (ciemny motyw jak dashboard) */}
+        <div className="flex-1 p-12 flex flex-col justify-center bg-[#1e1f1f]">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-[#e0e0e0]">
+              Witamy w {NAME_WEB}!
             </h2>
+            <p className="text-sm text-[#989c9e] mt-2">
+              Zaloguj się, aby kontynuować swoją przygodę.
+            </p>
           </div>
 
           <Form route="/api/token/" method="login" />
-          <div className="text-center mt-8 text-gray-500 text-sm">
-            Not registered yet?{" "}
+
+          <div className="text-center mt-8 text-[#989c9e] text-sm">
+            Nie masz jeszcze konta?{" "}
             <a
               href="/register"
-              className="text-pink-500 font-semibold hover:underline"
+              className="text-[#afe5e6] font-semibold hover:underline hover:text-white transition-colors"
             >
-              Create an Account
+              Zarejestruj się
             </a>
           </div>
 
           <div className="flex items-center my-6">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-400 text-sm">
-              or sign with Email
+            <div className="flex-grow border-t border-[#374b4b]"></div>
+            <span className="mx-4 text-[#989c9e] text-sm">
+              lub zaloguj się przez Google
             </span>
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="flex-grow border-t border-[#374b4b]"></div>
           </div>
 
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              
-              const res = await axios.post(
-                "http://localhost:8000/auth/google/",
-                { credential: credentialResponse.credential },
-                { withCredentials: true }
-              );
-              console.log(res)
-              localStorage.setItem(ACCESS_TOKEN, res.data.token.access);
-              localStorage.setItem(REFRESH_TOKEN, res.data.token.refresh);
-              localStorage.setItem("user", JSON.stringify(res.data.user));
-              // console.log("Google login successful:", res.data);
-              navigate("/ai/dashboard");
-            }}
-            onError={() => {
-              navigate("/login");
-            }}
-          />
+          <div className="flex justify-center">
+            <div className="transition-transform duration-300 hover:scale-[1.03]">
+              <GoogleLogin
+                onSuccess={async (credentialResponse) => {
+                  const res = await axios.post(
+                    "http://localhost:8000/auth/google/",
+                    { credential: credentialResponse.credential },
+                    { withCredentials: true }
+                  );
+                  localStorage.setItem(ACCESS_TOKEN, res.data.token.access);
+                  localStorage.setItem(REFRESH_TOKEN, res.data.token.refresh);
+                  localStorage.setItem("user", JSON.stringify(res.data.user));
+                  navigate("/ai/dashboard");
+                }}
+                onError={() => {
+                  navigate("/login");
+                }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
