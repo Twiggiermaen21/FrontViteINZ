@@ -1,49 +1,50 @@
 import React from "react";
-
 import Form from "../components/Form";
+import { NAME_WEB } from "../assets/assets";
+
 export default function Register() {
+  return (
+    <div className="flex flex-col min-h-screen items-center justify-center bg-[#1e1f1f] text-[#d2e4e2]">
+      <div className="flex w-full max-w-6xl min-h-[40rem] bg-[#2a2b2b] rounded-3xl overflow-hidden shadow-2xl border border-[#374b4b]">
 
-
-    return (
- <div className="flex flex-col pt-5.5 items-center justify-center ">
-        <div className="flex w-full max-w-6xl min-h-[40rem] bg-white rounded-3xl overflow-hidden shadow-xl">
-
-        {/* Left - colorful illustration */}
+        {/* Lewa strona - kolorowa ilustracja */}
         <div className="flex-1 bg-gradient-to-br from-pink-400 via-orange-400 to-purple-500 relative flex items-center justify-center p-10">
-          {/* <div className="text-white text-5xl font-bold absolute top-10 left-10">{NAME_WEB}</div> */}
-          <img 
+          <img
             src="https://cdn3d.iconscout.com/3d/premium/thumb/astronaut-helmet-with-balloons-9236788-7520477.png"
             alt="Astronaut"
-            className="max-h-80 drop-shadow-2xl"
+            className="max-h-80 drop-shadow-2xl hover:scale-105 transition-transform duration-300"
           />
-          <div className="text-white text-6xl font-extrabold absolute bottom-10 left-10">neocal</div>
+          <div className="text-white text-6xl font-extrabold absolute bottom-10 left-10 drop-shadow-md">
+            {NAME_WEB}
+          </div>
         </div>
 
-        {/* Right - login panel */}
-        <div className="flex-1 p-12 flex flex-col justify-center">
-          <div className="flex items-center mb-8">
-            {/* <img src={logo} alt="Logo" className="h-10 mr-3" /> */}
-            <h2 className="text-3xl font-bold text-gray-800">Welcome to neocal!</h2>
+        {/* Prawa strona - panel rejestracji */}
+        <div className="flex-1 p-12 flex flex-col justify-center bg-[#1e1f1f]">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-[#e0e0e0]">Witamy w {NAME_WEB}!</h2>
+            <p className="text-sm text-[#989c9e] mt-2">
+              Zarejestruj się, aby rozpocząć przygodę.
+            </p>
           </div>
 
           <Form route="/api/user/register/" method="register" />
 
-          <div className="text-center mt-8 text-gray-500 text-sm">
-           You have an Account?{" "}
-            <a href="/login" className="text-pink-500 font-semibold hover:underline">Login</a>
+          <div className="text-center mt-8 text-[#989c9e] text-sm">
+            Masz już konto?{" "}
+            <a
+              href="/login"
+              className="text-[#afe5e6] font-semibold hover:underline hover:text-white transition-colors"
+            >
+              Zaloguj się
+            </a>
           </div>
 
-          <div className="flex items-center my-6">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-400 text-sm">or sign with Email</span>
-            <div className="flex-grow border-t border-gray-300"></div>
-          </div>
+         
 
-          <button className="flex items-center justify-center space-x-3 border border-gray-300 rounded-full py-3 w-full hover:bg-gray-50 transition">
-            <img src="https://img.icons8.com/color/48/google-logo.png" alt="Google" className="w-6 h-6"/>
-            <span className="text-gray-600 font-semibold">Sign in with Google</span>
-          </button>
+          
         </div>
+
       </div>
     </div>
   );

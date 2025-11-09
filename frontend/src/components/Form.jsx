@@ -15,6 +15,7 @@ export default function Form({ route, method }) {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+const [infoMessage, setInfoMessage] = useState("");
 
   const name = method === "login" ? "Zaloguj się" : "Zarejestruj się";
 
@@ -45,7 +46,12 @@ export default function Form({ route, method }) {
         localStorage.setItem("user", JSON.stringify(res.data.user));
         navigate("/ai/dashboard");
       } else {
-        navigate("/login");
+       // Po rejestracji ustawiamy infoMessage i ukrywamy formularz
+        setInfoMessage("Rejestracja zakończona! Sprawdź e-mail, aby aktywować konto.");
+        // Małe opóźnienie, żeby użytkownik zdążył przeczytać komunikat
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       }
     } catch (error) {
       console.error(error);
@@ -64,6 +70,16 @@ export default function Form({ route, method }) {
       setLoading(false);
     }
   };
+
+
+  // Jeśli infoMessage jest ustawione, wyświetlamy tylko komunikat
+  if (infoMessage) {
+    return (
+      <div className="p-6 bg-[#2a2b2b] rounded-xl text-center text-[#e8f3f2]">
+        <p className="text-lg font-semibold">{infoMessage}</p>
+      </div>
+    );
+  }
 
   return (
     <form
