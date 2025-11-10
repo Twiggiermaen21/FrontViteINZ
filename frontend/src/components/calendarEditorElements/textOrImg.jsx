@@ -72,7 +72,10 @@ const MonthEditor = ({
             </select>
           </div>
 
-          <div>
+          <div className="flex gap-4">
+            <div className="w-1/2"> 
+
+            
             <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
               Grubość czcionki
             </label>
@@ -96,8 +99,7 @@ const MonthEditor = ({
               ))}
             </select>
           </div>
-
-          <div>
+          <div className="w-1/2">
             <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
               Kolor tekstu
             </label>
@@ -115,6 +117,7 @@ const MonthEditor = ({
               }
               className="w-full h-10 rounded-lg cursor-pointer border border-[#374b4b] hover:border-[#6d8f91]"
             />
+            </div>
           </div>
         </>
       ) : (

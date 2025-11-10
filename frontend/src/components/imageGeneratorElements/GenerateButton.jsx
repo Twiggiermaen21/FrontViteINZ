@@ -15,10 +15,9 @@ export default function GenerateButton({ generateImage, loading: externalLoading
       setProgress(i + 1);
 
       if (i < repeatCount - 1) {
-        await new Promise((resolve) => setTimeout(resolve, 50000)); // 50s
+        await new Promise((resolve) => setTimeout(resolve, 60000)); // 60s
       }
     }
-
     setLoading(false);
   };
 

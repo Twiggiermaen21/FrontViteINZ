@@ -299,7 +299,7 @@ export default function CreateCalendar() {
   <button
     onClick={handleSaveCalendar}
     disabled={!calendarName.trim()}
-    className={`mt-4 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200
+    className={`mt-2 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200
       ${
         calendarName.trim()
           ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"

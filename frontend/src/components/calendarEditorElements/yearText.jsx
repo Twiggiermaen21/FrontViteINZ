@@ -157,7 +157,7 @@ const YearText = ({
             type="color"
             value={yearColor}
             onChange={(e) => setYearColor(e.target.value)}
-            className="w-full h-12 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
+            className="w-full h-10 rounded-lg cursor-pointer bg-transparent border border-[#374b4b] hover:border-[#6d8f91] transition-colors"
           />
         </div>
       </div>

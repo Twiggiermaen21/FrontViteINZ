@@ -117,7 +117,7 @@ const StyleSidebar = ({
         </div>
 
 
-        <h2 className="text-base font-semibold text-[#d2e4e2] mb-4">
+        <h2 className="text-base font-semibold text-[#d2e4e2] mb-2">
           Wgraj własną grafikę
         </h2>
         <input
