@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN, fields, fieldToEndpoint } from "../constants";
 import { Trash2 } from "lucide-react";
+import GenerateButton from "../components/imageGeneratorElements/GenerateButton.jsx";
+
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function Generate() {
@@ -325,13 +327,9 @@ const handleDeleteOption = async (field, id) => {
         />
 
         {/* BUTTON */}
-        <button
-          onClick={generateImage}
-          disabled={loading}
-          className="w-full py-4 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300"
-        >
-          {loading ? "Generating..." : "Generate"}
-        </button>
+        <GenerateButton generateImage={generateImage} loading={loading} staffMode={isStaff} />
+
+
         {staff && (
           <>
             {/* STAFF TOGGLE */}
