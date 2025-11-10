@@ -139,7 +139,7 @@ const BrowseCalendars = () => {
     }
   };
 
-  console.log("Selected Calendar in print:", selectedCalendar);
+  console.log("Selected Calendar in print:", calendars);
   return (
     <div className="relative mt-8 mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]   max-w-[1600px]">
       <h1 className="text-3xl font-bold text-white mb-4">
@@ -179,9 +179,6 @@ const BrowseCalendars = () => {
 
                     {calendar?.year_data !== null && (
                       <span
-          
-
-                  
                         style={{
                           position: "absolute",
                           color: calendar?.year_data.color,
@@ -189,7 +186,10 @@ const BrowseCalendars = () => {
                           fontWeight: calendar?.year_data.weight,
                           fontFamily: calendar?.year_data.font,
 
-                          ...getYearPositionStyles(calendar?.year_data.yearPosition),
+                          ...getYearPositionStyles({coords:{
+                            x: calendar?.year_data.positionX,
+                            y: calendar?.year_data.positionY,
+                          }}),
                         }}
                       >
                         {calendar?.year_data.text}

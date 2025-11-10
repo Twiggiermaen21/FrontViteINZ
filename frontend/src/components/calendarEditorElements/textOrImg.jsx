@@ -11,8 +11,6 @@ const MonthEditor = ({
   index,
   isImageMode,
   fontSettings,
-  monthTexts,
-  handleMonthTextChange,
   monthImages,
   imageScales,
   fontFamilies,
@@ -21,7 +19,7 @@ const MonthEditor = ({
   setImageScales,
   setMonthImages,
   setFontSettings,
-  setMonthTexts,
+ 
 }) => {
   return (
     <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4  space-y-4">
@@ -57,11 +55,12 @@ const MonthEditor = ({
               className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91]"
               value={fontSettings.fontFamily}
               onChange={(e) =>
-                handleMonthTextChange(
+                handleFontSettingChange(
                   index,
+                  "fontFamily",
                   e.target.value,
-                  monthTexts,
-                  setMonthTexts
+                  fontSettings,
+                  setFontSettings
                 )
               }
             >

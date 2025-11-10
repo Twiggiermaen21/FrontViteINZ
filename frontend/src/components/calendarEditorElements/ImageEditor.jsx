@@ -11,18 +11,18 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
   const containerRef = useRef(null);
 
   // Wczytywanie obrazka
-  const onFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageSrc(reader.result);
-        setPosition({ x: 0, y: 0 }); // reset pozycji
-        setImageScale(1); // reset skali
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // const onFileChange = (e) => {
+  //   if (e.target.files && e.target.files[0]) {
+  //     const file = e.target.files[0];
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setImageSrc(reader.result);
+  //       setPosition({ x: 0, y: 0 }); // reset pozycji
+  //       setImageScale(1); // reset skali
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   // Drag start
   const onMouseDown = (e) => {
@@ -47,10 +47,10 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
   };
 
   // Zoom
-  const onZoomChange = (e) => {
-    const val = parseFloat(e.target.value);
-    setImageScale(val);
-  };
+  // const onZoomChange = (e) => {
+  //   const val = parseFloat(e.target.value);
+  //   setImageScale(val);
+  // };
 
   return (
     <div
@@ -58,7 +58,7 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
     >
       
 
-      {imageSrc && (
+      {imageSrc ? (
         <>
           <div
             ref={containerRef}
@@ -95,6 +95,10 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
 
         
         </>
+      ):(
+        <div className="my-5 p-6 border-2 border-dashed border-gray-300 rounded-lg text-gray-500">
+          Wybierz grafikę do kalendarza
+        </div>
       )}
     </div>
   );

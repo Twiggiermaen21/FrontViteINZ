@@ -378,11 +378,7 @@ export default function CreateCalendar() {
             month={month}
             index={index}
             isImageMode={isImageMode[index]}
-            // toggleImageMode={toggleImageMode}
             fontSettings={fontSettings}
-            // handleFontSettingChange={handleFontSettingChange}
-            monthTexts={monthTexts[index]}
-            handleMonthTextChange={handleMonthTextChange}
             monthImages={monthImages[index]}
             imageScales={imageScales[index]}
             fontFamilies={fontFamilies}
@@ -391,7 +387,7 @@ export default function CreateCalendar() {
             setImageScales={setImageScales}
             setMonthImages={setMonthImages}
             setFontSettings={setFontSettings}
-            setMonthTexts={setMonthTexts}
+
           />
         ))}
       </div>

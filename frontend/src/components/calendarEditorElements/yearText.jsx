@@ -35,30 +35,39 @@ const YearText = ({
     switch (value) {
       case "top-left":
         newPosition = { position: value, coords: { x: 0, y: 0 } };
+        isCustom && setIsCustom(false);
         break;
       case "top-center":
         newPosition = { position: value, coords: { x: 50, y: 0 } };
+        isCustom && setIsCustom(false);
         break;
       case "top-right":
         newPosition = { position: value, coords: { x: 100, y: 0 } };
+        isCustom && setIsCustom(false);
         break;
       case "center-left":
-        newPosition = { position: value, coords: { x: 0, y: 50 } };
+        newPosition = { position: value, coords: { x: 0, y: 50 } }; 
+        isCustom && setIsCustom(false);
         break;
       case "center":
         newPosition = { position: value, coords: { x: 50, y: 50 } };
+        isCustom && setIsCustom(false);
         break;
       case "center-right":
         newPosition = { position: value, coords: { x: 100, y: 50 } };
+        isCustom && setIsCustom(false);
         break;
       case "bottom-left":
         newPosition = { position: value, coords: { x: 0, y: 100 } };
+        isCustom && setIsCustom(false);
         break;
       case "bottom-center":
         newPosition = { position: value, coords: { x: 50, y: 100 } };
+        isCustom && setIsCustom(false);
         break;
       case "bottom-right":
         newPosition = { position: value, coords: { x: 100, y: 100 } };
+        isCustom && setIsCustom(false);
         break;
       case "custom":
         newPosition = { position: "custom", coords: yearPosition.coords };
