@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { Search, X, Menu } from "lucide-react";
+import { X, Menu } from "lucide-react";
+import SearchBar from "../components/layoutElements/SearchBar";
 import SideBar from "../components/SideBar";
 const Layout = () => {
   const [user, setUser] = useState(null);
@@ -25,14 +26,7 @@ const Layout = () => {
         <nav className="h-14 bg-[#2a2b2b] mt-4 rounded-4xl shadow-lg mx-4 px-4 sm:px-6 flex items-center justify-between">
           {/* Środkowe pole wyszukiwania */}
           <div className="flex-1 flex justify-center px-8">
-            <div className="w-full sm:w-2/4 md:w-3/4 flex items-center bg-[#1e1f1f] rounded-full px-8 border border-[#374b4b] focus-within:border-[#6d8f91] transition-all duration-300">
-              <Search className="w-5 h-5 text-[#d2e4e2] mr-2" />
-              <input
-                type="text"
-                placeholder="Szukaj..."
-                className="bg-transparent text-[#d2e4e2] placeholder-[#989c9e] outline-none text-sm w-full h-10"
-              />
-            </div>
+            <SearchBar />
           </div>
 
           {/* Prawa część - avatar i nazwa */}
