@@ -8,6 +8,8 @@ const Layout = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [sidebar, setSidebar] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null); // <-- wybrany projekt
+
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -26,7 +28,7 @@ const Layout = () => {
         <nav className="h-14 bg-[#2a2b2b] mt-4 rounded-4xl shadow-lg mx-4 px-4 sm:px-6 flex items-center justify-between">
           {/* Środkowe pole wyszukiwania */}
           <div className="flex-1 flex justify-center px-8">
-            <SearchBar />
+            <SearchBar selectedProject={selectedProject} setSelectedProject={setSelectedProject} />
           </div>
 
           {/* Prawa część - avatar i nazwa */}
@@ -64,7 +66,9 @@ const Layout = () => {
 
         {/* CONTENT */}
         <div className="flex-1 mx-6">
-          <Outlet />
+          <Outlet 
+           context={ selectedProject }
+           />
         </div>
       </div>
     </div>

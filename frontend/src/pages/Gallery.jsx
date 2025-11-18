@@ -1,74 +1,64 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
+import { useOutletContext } from "react-router-dom";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const Gallery = () => {
+  const selectedProject = useOutletContext() ?? {};
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
-const isFetchingRef = useRef(false); // ⛔ lokalna blokada
+  const isFetchingRef = useRef(false); // ⛔ lokalna blokada
 
-const fetchImages = useCallback(async () => {
-  // 🔒 zabezpieczenie przed wielokrotnym wywołaniem
+
+
+
+ const fetchImages = useCallback(async () => {
   if (isFetchingRef.current || loading || !hasMore) return;
 
   isFetchingRef.current = true;
   setLoading(true);
-
   const token = localStorage.getItem(ACCESS_TOKEN);
 
   try {
     const res = await axios.get(`${apiUrl}/generate/`, {
       headers: { Authorization: `Bearer ${token}` },
-      params: { page, page_size: 20 },
+      params: { 
+        page,
+        page_size: 20,
+        project_name: selectedProject?.name,
+      },
     });
 
     const results = res.data.results || [];
 
-    console.log("📸 Pobrano:", results.length, "zdjęć (strona:", page, ")");
-
-    // ✅ Zawsze dodaj nowe zdjęcia, jeśli przyszły
-    if (results.length > 0) {
+    if (page === 1) {
+      setImages(results);
+    } else if (results.length > 0) {
       setImages((prev) => {
-        // 🔁 Deduplikacja po `id` (jeśli backend zwraca powtarzające się zdjęcia)
         const merged = [...prev, ...results];
-        const unique = Array.from(new Map(merged.map((img) => [img.id, img])).values());
-        return unique;
+        return Array.from(new Map(merged.map((img) => [img.id, img])).values());
       });
-
-      setPage((prev) => prev + 1);
     }
 
-    // ✅ Sprawdzenie, czy to koniec danych
-    if (!res.data.next || res.data.message || results.length < 20) {
-      console.log("🚫 Brak więcej danych:", res.data.message || "ostatnia strona");
-      setHasMore(false);
-    }
+    if (!res.data.next || results.length < 20) setHasMore(false);
+    else setPage((prev) => prev + 1);
 
   } catch (err) {
-    console.error("❌ Błąd podczas pobierania obrazów:", err);
-
-    if (err.response?.status === 404) {
-      setHasMore(false);
-    }
-
-    if (err.response?.status === 401) {
-      setTimeout(() => window.location.reload(), 500);
-    }
-
+    console.error(err);
   } finally {
     setLoading(false);
-    isFetchingRef.current = false; // 🔓 odblokowanie po zakończeniu
+    isFetchingRef.current = false;
   }
-}, [loading, hasMore, page]);
+}, [selectedProject, page, loading, hasMore]);
 
   useEffect(() => {
     fetchImages();
-  }, [fetchImages]);
+  }, [fetchImages, selectedProject]);
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
@@ -78,7 +68,7 @@ const fetchImages = useCallback(async () => {
       fetchImages();
     }
   };
-console.log(images)
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-semibold mb-4 text-white">Gallery</h1>

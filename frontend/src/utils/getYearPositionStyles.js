@@ -1,5 +1,5 @@
 export function getYearPositionStyles(position) {
-    console.log("Using custom coordinates for year position:", position.coords);
+    // console.log("Using custom coordinates for year position:", position.coords);
 
 
 

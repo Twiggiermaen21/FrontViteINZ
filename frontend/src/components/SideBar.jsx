@@ -25,7 +25,7 @@ const navbar = [
 const SideBar = ({ sidebar, setSidebar, user }) => {
   const navigate = useNavigate();
   const [clicks, setClicks] = useState(0);
-  console.log(user)
+  
   useEffect(() => {
     if (clicks === 5) {
       navigate("/ai/game");

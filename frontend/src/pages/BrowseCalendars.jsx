@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
-import { Trash2 } from "lucide-react";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
+import { useOutletContext } from "react-router-dom";
+
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 const months = ["Grudzień", "Styczeń", "Luty"];
 
 const BrowseCalendars = () => {
+  const selectedProject = useOutletContext() ?? {};
+  console.log("BrowseCalendars - selectedProject:", selectedProject);
   const [calendars, setCalendars] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -131,15 +134,12 @@ const BrowseCalendars = () => {
           },
         }
       );
-
-      console.log(response.data); // { id, image_url, local_path }
     } catch (err) {
       console.error("Błąd drukowania", err);
       alert("Nie udało się pobrać/upscalować kalendarza.");
     }
   };
 
-  console.log("Selected Calendar in print:", calendars);
   return (
     <div className="relative mt-8 mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]   max-w-[1600px]">
       <h1 className="text-3xl font-bold text-white mb-4">
@@ -186,10 +186,12 @@ const BrowseCalendars = () => {
                           fontWeight: calendar?.year_data.weight,
                           fontFamily: calendar?.year_data.font,
 
-                          ...getYearPositionStyles({coords:{
-                            x: calendar?.year_data.positionX,
-                            y: calendar?.year_data.positionY,
-                          }}),
+                          ...getYearPositionStyles({
+                            coords: {
+                              x: calendar?.year_data.positionX,
+                              y: calendar?.year_data.positionY,
+                            },
+                          }),
                         }}
                       >
                         {calendar?.year_data.text}
