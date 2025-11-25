@@ -17,7 +17,6 @@ const BrowseCalendars = () => {
   const [hasMore, setHasMore] = useState(true);
 
   const [selectedCalendar, setSelectedCalendar] = useState(null); // ✅ do modala
-
   const scrollRef = useRef(null);
   const thumbRef = useRef(null);
 
@@ -53,6 +52,45 @@ const BrowseCalendars = () => {
   useEffect(() => {
     fetchCalendars();
   }, []);
+
+
+const fetchSingleCalendar = useCallback(async (projectName) => {
+  const token = localStorage.getItem(ACCESS_TOKEN);
+
+  try {
+    const response = await axios.get(
+      `${apiUrl}/calendar-by-project/${encodeURIComponent(projectName)}/`,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+    console.log("Pobrany kalendarze:", response.data);
+    setCalendars((prev) => {
+  const incoming = response.data.results; // tablica kalendarzy
+
+  const filtered = incoming.filter(
+    item => !prev.some(c => c.id === item.id)
+  );
+
+  return [...prev, ...filtered];
+});
+    console.log("Zaktualizowane kalendarze:", calendars);
+  } catch (err) {
+    console.error("Błąd pobierania pojedynczego kalendarza:", err);
+  }
+}, []);
+
+useEffect(() => {
+  if (!selectedProject?.name) return;
+
+  const exists = calendars.some(
+    (c) => c.name === selectedProject.name
+  );
+
+  if (!exists && !loading) {
+    fetchSingleCalendar(selectedProject.name);
+  }
+}, [selectedProject, calendars, loading, fetchSingleCalendar]);
 
   // Scroll thumb update
   const updateThumb = useCallback(() => {
@@ -151,7 +189,13 @@ const BrowseCalendars = () => {
           {calendars.length === 0 && !loading ? (
             <p className="text-[#989c9e]">Brak dostępnych kalendarzy.</p>
           ) : (
-            calendars.map((calendar, index) => (
+            calendars
+  .filter((calendar) =>
+    selectedProject?.name
+      ? calendar.name === selectedProject.name
+      : true
+  )
+  .map((calendar, index) => (
               <div
                 key={calendar.id}
                 className={`flex-shrink-0 relative my-3 flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105 hover:shadow-xl

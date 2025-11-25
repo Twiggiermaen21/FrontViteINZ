@@ -68,7 +68,7 @@ const Gallery = () => {
       fetchImages();
     }
   };
-
+console.log("images:", images);
   return (
     <div className="p-6">
       <h1 className="text-3xl font-semibold mb-4 text-white">Gallery</h1>
@@ -84,7 +84,13 @@ const Gallery = () => {
                 Brak obrazów do wyświetlenia.
               </p>
             ) : (
-              images.map((img, index) => (
+              images
+      .filter((img) =>
+        selectedProject?.name
+          ? img.name === selectedProject.name
+          : true
+      )
+      .map((img, index) => (
                 <div
                   key={index}
                   className="relative group rounded-lg overflow-hidden border border-[#374b4b] bg-[#2a2b2b] shadow-sm cursor-pointer"
