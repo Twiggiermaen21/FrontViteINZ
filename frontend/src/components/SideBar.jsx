@@ -9,6 +9,7 @@ import {
   CalendarPlus,
   CalendarSearch,
   Settings,
+  Printer
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -20,6 +21,7 @@ const navbar = [
   { label: "Nowy kalendarz", path: "/ai/create-calendar", Icon: CalendarPlus },
   { label: "Kalendarze", path: "/ai/calendars", Icon: CalendarSearch },
   { label: "Edytuj kalendarz", path: "/ai/edit-calendar", Icon: Edit3, staffOnly: true },
+  { label: "Produkcja", path: "/ai/production-list", Icon: Printer },
 ];
 
 const SideBar = ({ sidebar, setSidebar, user }) => {

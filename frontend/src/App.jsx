@@ -18,6 +18,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import Settings from "./pages/Settings";
 import FlappyBird from "./components/menuElements/FlappyBird";
 import ActivateAccount from "./pages/activateAccount";
+import ProductionList from "./pages/ProductionList";
 function Logout() {
   localStorage.clear();
   return <Navigate to="/" />;
@@ -41,6 +42,7 @@ function App() {
           <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/activate-account/:uidb64/:token" element={<ActivateAccount />} />
+          
 
           {/* Protected routes */}
           <Route
@@ -52,6 +54,7 @@ function App() {
             }
           >
             <Route path="generate" element={<Generate />} />
+            <Route path="production-list" element={<ProductionList />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="gallery" element={<Gallery />} />
             <Route path="calendars" element={<BrowseCalendars />} />

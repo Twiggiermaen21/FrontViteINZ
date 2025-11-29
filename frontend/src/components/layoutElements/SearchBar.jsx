@@ -115,7 +115,7 @@ const SearchBar = ({ placeholder = "Szukaj...", selectedProject, setSelectedProj
   return (
     <div ref={wrapperRef} className="w-full flex flex-col gap-2 relative">
       <div
-        className="w-full z-100 sm:w-2/4 md:w-3/4 flex items-center bg-[#1e1f1f] rounded-full px-8 border border-[#374b4b] cursor-pointer focus-within:border-[#6d8f91] transition-all duration-300"
+        className="w-full z-10 sm:w-2/4 md:w-3/4 flex items-center bg-[#1e1f1f] rounded-full px-8 border border-[#374b4b] cursor-pointer focus-within:border-[#6d8f91] transition-all duration-300"
         onClick={() => setOpen(true)}
       >
         <Search className="w-5 h-5 text-[#d2e4e2] mr-2" />
@@ -144,7 +144,7 @@ const SearchBar = ({ placeholder = "Szukaj...", selectedProject, setSelectedProj
       </div>
 
       {open && (
-        <div className="absolute -mt-5 top-full left-0 w-full sm:w-2/4 md:w-3/4 bg-[#1e1f1f] border border-[#374b4b] border-t-0 rounded-b-xl shadow-xl z-50">
+        <div className="absolute -mt-5 top-full left-0 w-full sm:w-2/4 md:w-3/4 bg-[#1e1f1f] border border-[#374b4b] border-t-0 rounded-b-xl shadow-xl z-9">
           <div className="max-h-72 overflow-y-auto custom-scroll px-4 py-6">
             {isProjectMode ? (
               <div>

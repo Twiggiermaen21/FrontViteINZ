@@ -15,6 +15,9 @@ const BrowseCalendars = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+const [quantity, setQuantity] = useState(1);
+const [deadline, setDeadline] = useState("");
+const [note, setNote] = useState("");
 
   const [selectedCalendar, setSelectedCalendar] = useState(null); // ✅ do modala
   const scrollRef = useRef(null);
@@ -177,6 +180,49 @@ useEffect(() => {
       alert("Nie udało się pobrać/upscalować kalendarza.");
     }
   };
+
+const addToProduction = async () => {
+  try {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+
+    const response = await axios.post(
+      `${apiUrl}/production/`,
+      {
+        calendar: selectedCalendar.id,
+        quantity: Number(quantity),
+        deadline: deadline || null,
+        production_note: note,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    alert("✅ Dodano do produkcji!");
+
+    // reset formularza
+    setQuantity(1);
+    setDeadline("");
+    setNote("");
+
+    // jeśli masz odświeżanie listy:
+    // fetchProductions();
+
+  } catch (err) {
+    console.error("Błąd dodawania do produkcji", err);
+
+    if (err.response?.data) {
+      alert(JSON.stringify(err.response.data));
+    } else {
+      alert("Nie udało się dodać do produkcji.");
+    }
+  }
+};
+
+
 
   return (
     <div className="relative mt-8 mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]   max-w-[1600px]">
@@ -413,23 +459,86 @@ useEffect(() => {
             </div>
 
             {/* Panel boczny z nazwą i przyciskami */}
-            <div className="flex flex-col justify-start p-6 text-white flex-1">
-              <h2 className="text-3xl font-bold mb-6">
-                {selectedCalendar.name}
-              </h2>
-              <button
-                className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 mb-4"
-                onClick={() => calendarPrint(selectedCalendar.id)}
-              >
-                Drukuj
-              </button>
-              <button
-                className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-                onClick={() => deleteCalendar(selectedCalendar.id)}
-              >
-                Usuń
-              </button>
-            </div>
+           <div className="flex flex-col justify-start p-6 text-white flex-1">
+  <h2 className="text-3xl font-bold mb-6">
+    {selectedCalendar.name}
+  </h2>
+
+  {/* === PANEL PRODUKCJI – STYL JAK TEN GÓRNY === */}
+  <div className="bg-[#2a2b2b] rounded-4xl p-8 shadow-lg mb-6">
+    <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
+      Dodaj do produkcji
+    </h3>
+
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        addToProduction(selectedCalendar.id);
+      }}
+      className="flex flex-col gap-5"
+    >
+      {/* ILOŚĆ */}
+      <div>
+        <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
+          Ilość
+        </label>
+        <input
+          type="number"
+          min="1"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          placeholder="Podaj ilość"
+          className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+          required
+        />
+      </div>
+
+      {/* DEADLINE */}
+      <div>
+        <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
+          Termin realizacji
+        </label>
+        <input
+          type="date"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+          className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+        />
+      </div>
+
+      {/* NOTATKA */}
+      <div>
+        <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
+          Notatka dla produkcji
+        </label>
+        <textarea
+          rows={3}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Np. rodzaj papieru, format, wykończenie..."
+          className="w-full p-4 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+        />
+      </div>
+
+      {/* SUBMIT */}
+      <button
+        type="submit"
+        className="w-full py-4 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300 disabled:opacity-50"
+      >
+        Dodaj do produkcji
+      </button>
+    </form>
+  </div>
+
+  {/* === USUWANIE === */}
+  <button
+    className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
+    onClick={() => deleteCalendar(selectedCalendar.id)}
+  >
+    Usuń
+  </button>
+</div>
+
           </div>
         </div>
       )}
