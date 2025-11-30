@@ -393,118 +393,130 @@ export default function CreateCalendar() {
       </div>
 
       {/* Preview area */}
-      <div className="lg:col-span-4  mt-4">
-        <div className=" bg-[#2a2b2b]  rounded-4xl shadow-lg  p-6">
+      <div className="lg:col-span-4 justify-center  flex mt-4">
+        <div className=" w-[350px]  rounded-4xl shadow-lg ">
           <div className=" rounded overflow-hidden shadow   ">
             {/* Header */}
             <div
-              ref={headerRef}
-              className="relative h-[162px] bg-gray-200 flex items-center justify-center"
-            >
-              {image ? (
-                <>
-                  <img
-                    src={imageFromDisk ? URL.createObjectURL(image) : image.url}
-                    alt="Nagłówek"
-                    className="w-full h-full object-cover"
-                  />
-                  {/* Tekst z rokiem */}
-                  {yearActive && (
-                    <span
-                      ref={spanRef}
-                      onMouseDown={(e) =>
-                        handleMouseDown(e, {
-                          yearPosition,
-                          setYearPosition,
-                          spanRef,
-                          xLimits,
-                          yLimits,
-                          setDragging,
-                          dragStartPos,
-                        })
-                      }
-                      style={{
-                        position: "absolute",
-                        color: yearColor,
-                        fontSize: `${yearFontSize}px`,
-                        fontWeight: yearFontWeight,
-                        fontFamily: yearFontFamily,
-                        cursor: "move",
-                        userSelect: "none",
-                        whiteSpace: "nowrap",
-                        pointerEvents: "auto",
-                        ...getYearPositionStyles(yearPosition),
-                      }}
-                    >
-                      {yearText}
-                    </span>
-                  )}
-                </>
-              ) : (
-                <span className="text-gray-500">Brak grafiki nagłówka</span>
-              )}
-            </div>
+  ref={headerRef}
+  className="relative w-full max-w-[350px] mx-auto bg-gray-200 flex items-center justify-center"
+  
+>
+  {image ? (
+    <>
+      <img
+        src={imageFromDisk ? URL.createObjectURL(image) : image.url}
+        alt="Nagłówek"
+        className="w-full h-full object-cover"
+      />
+      {/* Tekst z rokiem */}
+      {yearActive && (
+        <span
+          ref={spanRef}
+          onMouseDown={(e) =>
+            handleMouseDown(e, {
+              yearPosition,
+              setYearPosition,
+              spanRef,
+              xLimits,
+              yLimits,
+              setDragging,
+              dragStartPos,
+            })
+          }
+          style={{
+            position: "absolute",
+            color: yearColor,
+            fontSize: `${yearFontSize}px`,
+            fontWeight: yearFontWeight,
+            fontFamily: yearFontFamily,
+            cursor: "move",
+            userSelect: "none",
+            whiteSpace: "nowrap",
+            pointerEvents: "auto",
+            ...getYearPositionStyles(yearPosition),
+          }}
+        >
+          {yearText}
+        </span>
+      )}
+    </>
+  ) : (
+    <span className="text-gray-500">Brak grafiki nagłówka</span>
+  )}
+</div>
+
 
             {/* Bottom */}
-            <div
-              ref={bottomRef}
-              className="h-[620px] p-2 flex flex-col  items-center text-center"
-              style={getBottomSectionBackground({
-                style,
-                bgColor,
-                gradientEndColor,
-                gradientTheme,
-                gradientStrength,
-                gradientVariant,
-                backgroundImage,
-              })}
-            >
-              {months.map((month, index) => (
-                <Fragment key={month}>
-                  <div className="w-full border rounded bg-white shadow p-2 flex flex-col items-center">
-                    <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                      {month}
-                    </h3>
-                    <div className="w-full h-[60px] text-sm text-gray-600 flex items-center justify-center">
-                      [Siatka dni dla {month}]
-                    </div>
-                  </div>
-                  {isImageMode[index] ? (
-                    <ImageEditor
-                      imageSrc={monthImages[index]}
-                      setImageSrc={(newValue) =>
-                        setMonthImages((prev) =>
-                          prev.map((img, i) => (i === index ? newValue : img))
-                        )
-                      }
-                      imageScale={imageScales[index]}
-                      setImageScale={(newValue) =>
-                        setImageScales((prev) =>
-                          prev.map((s, i) => (i === index ? newValue : s))
-                        )
-                      }
-                      position={positions[index]}
-                      setPosition={(newValue) =>
-                        setPositions((prev) =>
-                          prev.map((p, i) => (i === index ? newValue : p))
-                        )
-                      }
-                    />
-                  ) : (
-                    <LimitedTextarea
-                      value={monthTexts[index]}
-                      index={index}
-                      onChange={handleMonthTextChange}
-                      placeholder="Wpisz tekst pod miesiącem..."
-                      fontFamily={fontSettings[index].fontFamily}
-                      fontWeight={fontSettings[index].fontWeight}
-                      fontColor={fontSettings[index].fontColor}
-                      maxChars={1000}
-                    />
-                  )}
-                </Fragment>
-              ))}
-            </div>
+           <div
+  ref={bottomRef}
+  className="w-full  mx-auto p-2 flex flex-col items-center text-center"
+  style={{
+    aspectRatio: '13/24.2',
+    ...getBottomSectionBackground({
+      style,
+      bgColor,
+      gradientEndColor,
+      gradientTheme,
+      gradientStrength,
+      gradientVariant,
+      backgroundImage,
+    }),
+  }}
+>
+  {months.map((month, index) => (
+    <Fragment key={month}>
+      <div className="w-full border  rounded bg-white shadow p-2 flex flex-col items-center" style={{
+    aspectRatio: '  11.8/5.5',
+    
+  }}>
+        
+        <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+          {month}
+        </h3>
+        <div className="w-full h-[60px] text-sm text-gray-600 flex items-center justify-center">
+          [Siatka dni dla {month}]
+        </div>
+      </div>
+      {isImageMode[index] ? (
+        <ImageEditor
+         
+          imageSrc={monthImages[index]}
+          setImageSrc={(newValue) =>
+            setMonthImages((prev) =>
+              prev.map((img, i) => (i === index ? newValue : img))
+            )
+          }
+          imageScale={imageScales[index]}
+          setImageScale={(newValue) =>
+            setImageScales((prev) =>
+              prev.map((s, i) => (i === index ? newValue : s))
+            )
+          }
+          position={positions[index]}
+          setPosition={(newValue) =>
+            setPositions((prev) =>
+              prev.map((p, i) => (i === index ? newValue : p))
+            )
+          }
+        />
+      ) : (
+        <LimitedTextarea
+          value={monthTexts[index]}
+          index={index}
+          onChange={handleMonthTextChange}
+          placeholder="Wpisz tekst pod miesiącem..."
+          fontFamily={fontSettings[index].fontFamily}
+          fontWeight={fontSettings[index].fontWeight}
+          fontColor={fontSettings[index].fontColor}
+          maxChars={1000}
+          
+        />
+      )}
+    </Fragment>
+  ))}
+</div>
+
           </div>
         </div>
       </div>

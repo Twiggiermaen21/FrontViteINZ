@@ -261,7 +261,7 @@ case "waiting":
 
 
   return (
-    <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl max-w-[1200px] mx-auto text-white">
+    <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl  mx-auto text-white">
     <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">Lista Produkcji</h1>
 
       <div className="space-y-4">

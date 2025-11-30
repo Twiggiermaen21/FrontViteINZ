@@ -71,7 +71,7 @@ const Gallery = () => {
 console.log("images:", images);
   return (
     <div className="p-6">
-       <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">Gallery</h1>
+       <h1 className="text-4xl font-extrabold mb-4 text-[#afe5e6]">Gallery</h1>
 
       <div className="h-[80vh] rounded-4xl border pt-8 pb-8 border-[#2c2e2d] p-4 bg-[#2c2e2d]">
         <div

@@ -55,6 +55,8 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
   return (
     <div
       className={`text-center ${dragging ? "select-none" : "select-auto"}  w-full`}
+          style={{ aspectRatio: ' 11.8 / 1.2 ' }}
+
     >
       
 

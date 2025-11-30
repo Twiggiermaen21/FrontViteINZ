@@ -90,7 +90,7 @@ const StyleSidebar = ({
         {/* ✅ Scrollowalny kontener */}
         <div
           ref={scrollRef}
-          className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto custom-scroll"
+          className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto custom-scroll"
         >
           {images.map((item, index) => (
             <img

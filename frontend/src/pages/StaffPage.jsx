@@ -253,12 +253,34 @@ const StaffProductionList = () => {
     []
   );
 
-  const handleAccept = (item) =>
-    updateProductionStatus(
-      item.id,
-      "in_production",
-      "zaakceptowana i włączona do produkcji"
+  const handleAccept = async (item) => {
+  // 1️⃣ Aktualizacja statusu produkcji
+  updateProductionStatus(
+    item.id,
+    "in_production",
+    "zaakceptowana i włączona do produkcji"
+  );
+console.log( "Initiating calendar print request for calendar ID:", item.calendar);
+ 
+  try {
+    const token = localStorage.getItem(ACCESS_TOKEN);
+     const res = await axios.post(
+      `${apiUrl}/calendar-print/`,
+      { id_kalendarz: item.calendar}, // dane POST
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
     );
+
+      console.log("CalendarPrint response:", res.data);
+  } catch (error) {
+    console.error("Błąd CalendarPrint:", error.response || error.message);
+  }
+};
+
   // ZMIANA: 'archived' używane jako status "Gotowe do druku"
   const handleReadyForPrint = (item) =>
     updateProductionStatus(
@@ -275,7 +297,7 @@ const StaffProductionList = () => {
   };
 
   return (
-    <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl max-w-[1400px] mx-auto text-white shadow-2xl">
+    <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl  mx-auto text-white shadow-2xl">
       <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
         Panel Zarządzania Produkcją
       </h1>

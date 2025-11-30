@@ -64,7 +64,7 @@ const LimitedTextarea = ({
   };
   
   return (
-    <div className="relative w-full">
+    <div className="relative w-full " style={{ aspectRatio: ' 11.8 / 1.2' }}>
       <textarea
         ref={ref}
         value={value}
