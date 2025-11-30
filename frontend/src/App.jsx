@@ -19,6 +19,8 @@ import Settings from "./pages/Settings";
 import FlappyBird from "./components/menuElements/FlappyBird";
 import ActivateAccount from "./pages/activateAccount";
 import ProductionList from "./pages/ProductionList";
+import StaffPage from "./pages/StaffPage";
+
 function Logout() {
   localStorage.clear();
   return <Navigate to="/" />;
@@ -54,6 +56,7 @@ function App() {
             }
           >
             <Route path="generate" element={<Generate />} />
+            <Route path="staffpage" element={<StaffPage />} />
             <Route path="production-list" element={<ProductionList />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="gallery" element={<Gallery />} />
