@@ -15,7 +15,8 @@ const STATUS_MAP = {
     "in_production": "W TRAKCIE",
     "done": "GOTOWY",
     "archived": "ARCHIWUM",
-    "Nieokreślony": "BRAK STATUSU"
+    "Nieokreślony": "BRAK STATUSU",
+    "waiting":"OCZEKIWANIE NA AKCEPTACJĘ"
 };
 
 /* ================= PREVIEW KALENDARZA (BEZ ZMIAN) ================= */
@@ -243,6 +244,8 @@ const ProductionList = () => {
         case "draft":
         case "to_produce":
             return "bg-yellow-600/50 text-yellow-300";
+case "waiting":
+            return "bg-yellow-600/50 text-yellow-300";
         case "in_production":
             return "bg-blue-600/50 text-blue-300";
         case "done":
@@ -259,7 +262,7 @@ const ProductionList = () => {
 
   return (
     <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl max-w-[1200px] mx-auto text-white">
-      <h1 className="text-3xl font-bold mb-6">Lista Produkcji</h1>
+    <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">Lista Produkcji</h1>
 
       <div className="space-y-4">
           {/* WARUNEK DLA PUSTEJ LISTY PRODUKCJI */}
@@ -352,7 +355,9 @@ const ProductionList = () => {
                       </div>
 
                       {/* PRZYCISK ANULOWANIA */}
-                      <div className="pt-4 border-t border-[#3c3d3d]">
+{item.status !== "done" && (
+
+ <div className="pt-4 border-t border-[#3c3d3d]">
                           <button
                             onClick={() => cancelProduction(item.id)}
                             className="bg-red-700 text-white px-6 py-2 rounded font-semibold hover:bg-red-600 transition disabled:bg-red-900 disabled:cursor-not-allowed flex items-center"
@@ -367,6 +372,9 @@ const ProductionList = () => {
                             Spowoduje to usunięcie pozycji tylko z listy produkcji, projekt kalendarza pozostanie w bazie.
                           </p>
                       </div>
+
+) }
+                     
                       
                   </div>
                 </div>

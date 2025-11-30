@@ -226,7 +226,7 @@ const addToProduction = async () => {
 
   return (
     <div className="relative mt-8 mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]   max-w-[1600px]">
-      <h1 className="text-3xl font-bold text-white mb-4">
+      <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
         Przeglądaj kalendarze
       </h1>
 
