@@ -90,10 +90,10 @@ export default function CreateCalendar() {
     if (image !== null) {
       if (imageFromDisk) {
         formData.append("imageFromDisk", "true");
-        formData.append("top_image", image); // raw plik
+        formData.append("top_image", image); 
       } else {
         formData.append("imageFromDisk", "false");
-        formData.append("top_image", image.id); // tylko ID obrazka
+        formData.append("top_image", image.id); 
       }
     }
 
@@ -144,7 +144,7 @@ export default function CreateCalendar() {
     }
     // ----- MIESIĄCE -----
     for (let i = 0; i < months.length; i++) {
-      const fieldName = `field${i + 1}`; // field1, field2...
+      const fieldName = `field${i + 1}`;
 
       if (isImageMode[i]) {
         formData.append(
@@ -195,7 +195,7 @@ export default function CreateCalendar() {
     try {
       const res = await axios.get(`${apiUrl}/generate/`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { page:page, page_size: 12 }, // backend musi obsługiwać paginację
+        params: { page:page, page_size: 12 }, 
       });
 
       setImages((prev) => [...prev, ...res.data.results]);
@@ -223,7 +223,7 @@ export default function CreateCalendar() {
     try {
       const res = await axios.get(`${apiUrl}/generate/`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { page: pageBackground, page_size: 12 }, // backend musi obsługiwać paginację
+        params: { page: pageBackground, page_size: 12 }, 
       });
 
       setImagesBackground((prev) => [...prev, ...res.data.results]);

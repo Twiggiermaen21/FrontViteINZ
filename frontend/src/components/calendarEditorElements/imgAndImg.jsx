@@ -10,7 +10,6 @@ const BackgroundImg = ({
 }) => {
   const scrollRef = useRef(null);
 
-  // Infinite scroll — automatyczne ładowanie przy przewinięciu do końca
   const handleScroll = useCallback(() => {
     const container = scrollRef.current;
     if (!container || loading || !hasMore) return;
@@ -31,7 +30,6 @@ const BackgroundImg = ({
     return () => container.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  // Upload własnej grafiki
   const handleUpload = (e) => {
     const file = e.target.files[0];
     if (file) {

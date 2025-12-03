@@ -34,7 +34,7 @@ const StyleSidebar = ({
     }
   };
 
-  // ✅ Infinite scroll — automatyczne ładowanie przy przewinięciu do końca
+  //  Infinite scroll — automatyczne ładowanie przy przewinięciu do końca
   const handleScroll = useCallback(() => {
     const container = scrollRef.current;
     if (!container || loading || !hasMore) return;
@@ -87,7 +87,7 @@ const StyleSidebar = ({
           Galeria grafik
         </h2>
 
-        {/* ✅ Scrollowalny kontener */}
+        {/*  Scrollowalny kontener */}
         <div
           ref={scrollRef}
           className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto custom-scroll"
@@ -106,7 +106,7 @@ const StyleSidebar = ({
           ))}
         </div>
 
-        {/* ✅ Komunikaty na dole */}
+        {/*  Komunikaty na dole */}
         <div className="text-center mt-3">
           {loading && (
             <p className="text-[#989c9e] text-sm">Ładowanie grafik...</p>
