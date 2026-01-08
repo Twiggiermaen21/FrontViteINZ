@@ -68,7 +68,7 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
             onMouseLeave={onMouseUp}
-            className={`my-5 mx-auto border border-gray-300 overflow-hidden relative cursor-${dragging ? "grabbing" : "grab"}`}
+            className={`my-2 mx-auto border border-gray-300 overflow-hidden relative cursor-${dragging ? "grabbing" : "grab"}`}
             style={{ height: 60 }}
           >
             <img
@@ -98,7 +98,7 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
         
         </>
       ):(
-        <div className="my-5 p-6 border-2 border-dashed border-gray-300 rounded-lg text-gray-500">
+        <div className="my-2 p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500">
           Wybierz grafikę do kalendarza
         </div>
       )}

@@ -13,9 +13,9 @@ export default function Login() {
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#1e1f1f] text-[#d2e4e2]">
       <div className="flex w-full max-w-6xl min-h-[40rem] bg-[#2a2b2b] rounded-3xl overflow-hidden shadow-2xl border border-[#374b4b]">
         {/* LEWA STRONA (zachowana oryginalna kolorystyka) */}
-        <div className="flex-1 bg-gradient-to-br from-pink-400 via-orange-400 to-purple-500 relative flex items-center justify-center p-10">
+        <div className="flex-1 bg-gradient-to-br from-[#6d8f91] via-[#8ebabb] to-[#afe5e6] relative flex items-center justify-center p-10">
           <img
-            src="https://cdn3d.iconscout.com/3d/premium/thumb/astronaut-helmet-with-balloons-9236788-7520477.png"
+            src="/astronaut.png"
             alt="Astronaut"
             className="max-h-80 drop-shadow-2xl hover:scale-105 transition-transform duration-300"
           />
