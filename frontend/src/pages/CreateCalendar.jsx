@@ -29,7 +29,7 @@ export default function CreateCalendar() {
   const [gradientStrength, setGradientStrength] = useState("medium");
   const [gradientTheme, setGradientTheme] = useState("classic");
   const [backgroundImage, setBackgroundImage] = useState(null);
-  
+
   const headerRef = useRef();
   const bottomRef = useRef();
 
@@ -40,8 +40,8 @@ export default function CreateCalendar() {
   const [yearPosition, setYearPosition] = useState({
     coords: { x: 50, y: 20 },
   });
-  const [xLimits, setXLimits] = useState({ min: 50, max: 325 });
-  const [yLimits, setYLimits] = useState({ min: 20, max: 235 });
+  const [xLimits, setXLimits] = useState({ min: 40, max: 252 });
+  const [yLimits, setYLimits] = useState({ min: 20, max: 178 });
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);
   const months = ["Grudzień", "Styczeń", "Luty"];
   const [fontSettings, setFontSettings] = useState(
@@ -77,9 +77,6 @@ export default function CreateCalendar() {
     setMonthTexts(newTexts);
   };
 
-
-
-
   const handleSaveCalendar = async () => {
     const token = localStorage.getItem(ACCESS_TOKEN);
 
@@ -90,10 +87,10 @@ export default function CreateCalendar() {
     if (image !== null) {
       if (imageFromDisk) {
         formData.append("imageFromDisk", "true");
-        formData.append("top_image", image); 
+        formData.append("top_image", image);
       } else {
         formData.append("imageFromDisk", "false");
-        formData.append("top_image", image.id); 
+        formData.append("top_image", image.id);
       }
     }
 
@@ -195,7 +192,7 @@ export default function CreateCalendar() {
     try {
       const res = await axios.get(`${apiUrl}/generate/`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { page:page, page_size: 12 }, 
+        params: { page: page, page_size: 12 },
       });
 
       setImages((prev) => [...prev, ...res.data.results]);
@@ -213,8 +210,7 @@ export default function CreateCalendar() {
     }
   };
 
-
-    const fetchImagesBackground = async () => {
+  const fetchImagesBackground = async () => {
     if (!hasMore || loading) return;
 
     setLoading(true);
@@ -223,7 +219,7 @@ export default function CreateCalendar() {
     try {
       const res = await axios.get(`${apiUrl}/generate/`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { page: pageBackground, page_size: 12 }, 
+        params: { page: pageBackground, page_size: 12 },
       });
 
       setImagesBackground((prev) => [...prev, ...res.data.results]);
@@ -240,7 +236,6 @@ export default function CreateCalendar() {
       setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchImages();
@@ -268,7 +263,6 @@ export default function CreateCalendar() {
     };
   }, [dragging, xLimits, yLimits]);
 
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-6 px-4">
       <div className="lg:col-span-3 space-y-2 ">
@@ -284,31 +278,31 @@ export default function CreateCalendar() {
           setImageFromDisk={setImageFromDisk}
         />
         <div className="bg-[#2a2b2b] rounded-3xl p-5 shadow-lg mt-4">
-  <label className="block text-sm font-medium text-[#d2e4e2] mb-2">
-    Wpisz nazwę kalendarza
-  </label>
+          <label className="block text-sm font-medium text-[#d2e4e2] mb-2">
+            Wpisz nazwę kalendarza
+          </label>
 
-  <input
-    type="text"
-    value={calendarName}
-    onChange={(e) => setCalendarName(e.target.value)}
-    placeholder="np. Kalendarz firmowy 2025"
-    className="w-full h-12 rounded-lg px-3 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] focus:border-[#6d8f91] focus:outline-none transition-colors"
-  />
+          <input
+            type="text"
+            value={calendarName}
+            onChange={(e) => setCalendarName(e.target.value)}
+            placeholder="np. Kalendarz firmowy 2025"
+            className="w-full h-12 rounded-lg px-3 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] focus:border-[#6d8f91] focus:outline-none transition-colors"
+          />
 
-  <button
-    onClick={handleSaveCalendar}
-    disabled={!calendarName.trim()}
-    className={`mt-2 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200
+          <button
+            onClick={handleSaveCalendar}
+            disabled={!calendarName.trim()}
+            className={`mt-2 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200
       ${
         calendarName.trim()
           ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
           : "bg-[#3b3c3c] text-[#8a8a8a] cursor-not-allowed"
       }`}
-  >
-    Zapisz kalendarz
-  </button>
-</div>
+          >
+            Zapisz kalendarz
+          </button>
+        </div>
       </div>
 
       <div className="lg:col-span-3 space-y-2 ">
@@ -357,6 +351,7 @@ export default function CreateCalendar() {
           yearFontSize={yearFontSize}
           setYearFontSize={setYearFontSize}
           yearFontFamily={yearFontFamily}
+          fontFamilies={fontFamilies}
           setYearFontFamily={setYearFontFamily}
           yearFontWeight={yearFontWeight}
           setYearFontWeight={setYearFontWeight}
@@ -387,136 +382,148 @@ export default function CreateCalendar() {
             setImageScales={setImageScales}
             setMonthImages={setMonthImages}
             setFontSettings={setFontSettings}
-
           />
         ))}
       </div>
 
       {/* Preview area */}
       <div className="lg:col-span-4 justify-center  flex mt-4">
-        <div className=" w-[350px]  rounded-4xl shadow-lg ">
+        <div className=" w-[292px] mx-auto  rounded-4xl shadow-lg ">
           <div className=" rounded overflow-hidden shadow   ">
             {/* Header */}
             <div
-  ref={headerRef}
-  className="relative w-full max-w-[350px] mx-auto bg-gray-200 flex items-center justify-center"
-  
->
-  {image ? (
-    <>
-      <img
-        src={imageFromDisk ? URL.createObjectURL(image) : image.url}
-        alt="Nagłówek"
-        className="w-full h-full object-cover"
-      />
-      {/* Tekst z rokiem */}
-      {yearActive && (
-        <span
-          ref={spanRef}
-          onMouseDown={(e) =>
-            handleMouseDown(e, {
-              yearPosition,
-              setYearPosition,
-              spanRef,
-              xLimits,
-              yLimits,
-              setDragging,
-              dragStartPos,
-            })
-          }
-          style={{
-            position: "absolute",
-            color: yearColor,
-            fontSize: `${yearFontSize}px`,
-            fontWeight: yearFontWeight,
-            fontFamily: yearFontFamily,
-            cursor: "move",
-            userSelect: "none",
-            whiteSpace: "nowrap",
-            pointerEvents: "auto",
-            ...getYearPositionStyles(yearPosition),
-          }}
-        >
-          {yearText}
-        </span>
-      )}
-    </>
-  ) : (
-    <span className="text-gray-500">Brak grafiki nagłówka</span>
-  )}
-</div>
-
+              ref={headerRef}
+              className="relative w-full bg-gray-200 flex items-center justify-center"
+              style={{
+                height: "198px", // 21 cm w skali do 800px całości
+                width: "100%", // 292px
+              }}
+            >
+              {image ? (
+                <>
+                  <img
+                    src={imageFromDisk ? URL.createObjectURL(image) : image.url}
+                    alt="Nagłówek"
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Tekst z rokiem */}
+                  {yearActive && (
+                    <span
+                      ref={spanRef}
+                      onMouseDown={(e) =>
+                        handleMouseDown(e, {
+                          yearPosition,
+                          setYearPosition,
+                          spanRef,
+                          xLimits,
+                          yLimits,
+                          setDragging,
+                          dragStartPos,
+                        })
+                      }
+                      style={{
+                        position: "absolute",
+                        color: yearColor,
+                        fontSize: `${yearFontSize}px`,
+                        fontWeight: yearFontWeight,
+                        fontFamily: yearFontFamily,
+                        cursor: "move",
+                        userSelect: "none",
+                        whiteSpace: "nowrap",
+                        pointerEvents: "auto",
+                        ...getYearPositionStyles(yearPosition),
+                      }}
+                    >
+                      {yearText}
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-gray-500">Brak grafiki nagłówka</span>
+              )}
+            </div>
 
             {/* Bottom */}
-           <div
-  ref={bottomRef}
-  className="w-full  mx-auto p-2 flex flex-col items-center text-center"
-  style={{
-    aspectRatio: '13/24.2',
-    ...getBottomSectionBackground({
-      style,
-      bgColor,
-      gradientEndColor,
-      gradientTheme,
-      gradientStrength,
-      gradientVariant,
-      backgroundImage,
-    }),
-  }}
->
-  {months.map((month, index) => (
-    <Fragment key={month}>
-      <div className="w-full border  rounded bg-white shadow p-2 flex flex-col items-center" style={{
-    aspectRatio: '  11.8/5.5',
-    
-  }}>
-        
-        <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-          {month}
-        </h3>
-        <div className="w-full h-[60px] text-sm text-gray-600 flex items-center justify-center">
-          [Siatka dni dla {month}]
-        </div>
-      </div>
-      {isImageMode[index] ? (
-        <ImageEditor
-         
-          imageSrc={monthImages[index]}
-          setImageSrc={(newValue) =>
-            setMonthImages((prev) =>
-              prev.map((img, i) => (i === index ? newValue : img))
-            )
-          }
-          imageScale={imageScales[index]}
-          setImageScale={(newValue) =>
-            setImageScales((prev) =>
-              prev.map((s, i) => (i === index ? newValue : s))
-            )
-          }
-          position={positions[index]}
-          setPosition={(newValue) =>
-            setPositions((prev) =>
-              prev.map((p, i) => (i === index ? newValue : p))
-            )
-          }
-        />
-      ) : (
-        <LimitedTextarea
-          value={monthTexts[index]}
-          index={index}
-          onChange={handleMonthTextChange}
-          placeholder="Wpisz tekst pod miesiącem..."
-          fontFamily={fontSettings[index].fontFamily}
-          fontWeight={fontSettings[index].fontWeight}
-          fontColor={fontSettings[index].fontColor}
-          maxChars={1000}
-          
-        />
-      )}
-    </Fragment>
-  ))}
-</div>
 
+            <div
+              ref={bottomRef}
+              className="w-full flex flex-col items-center overflow-hidden"
+              style={{
+                height: "602px",
+                width: "292px",
+                ...getBottomSectionBackground({
+                  style,
+                  bgColor,
+                  gradientEndColor,
+                  gradientTheme,
+                  gradientStrength,
+                  gradientVariant,
+                  backgroundImage,
+                }),
+              }}
+            >
+              {months.map((month, index) => (
+                <Fragment key={month}>
+                  {/* 1. POLE KALENDARIUM (Góra) - Wysokość: 132px */}
+                  <div
+                    className="bg-white shadow-sm flex flex-col items-center border border-gray-200"
+                    style={{
+                      height: "132px",
+                      width: "273px", // Proporcja 29cm
+                      marginTop: "4px", // Mały odstęp od góry/paska
+                    }}
+                  >
+                    <h3 className="text-[12px] font-bold text-blue-700 uppercase mt-1">
+                      {month}
+                    </h3>
+                    <div className="w-full flex-grow text-[10px] text-gray-400 flex items-center justify-center">
+                      [Siatka dni]
+                    </div>
+                  </div>
+
+                  {/* 2. POLE REKLAMOWE (Dół) - Wysokość: 65px */}
+                  {/* To pole odpowiada Twoim paskom 31x5cm oraz stopce na samym dole */}
+                  <div
+                    className="w-full flex items-center justify-center overflow-hidden"
+                    style={{ height: "65px" }}
+                  >
+                    {isImageMode[index] ? (
+                      <ImageEditor
+                        imageSrc={monthImages[index]}
+                        setImageSrc={(newValue) =>
+                          setMonthImages((prev) =>
+                            prev.map((img, i) => (i === index ? newValue : img))
+                          )
+                        }
+                        imageScale={imageScales[index]}
+                        setImageScale={(newValue) =>
+                          setImageScales((prev) =>
+                            prev.map((s, i) => (i === index ? newValue : s))
+                          )
+                        }
+                        position={positions[index]}
+                        setPosition={(newValue) =>
+                          setPositions((prev) =>
+                            prev.map((p, i) => (i === index ? newValue : p))
+                          )
+                        }
+                      />
+                    ) : (
+                      <LimitedTextarea
+                        value={monthTexts[index]}
+                        index={index}
+                        onChange={handleMonthTextChange}
+                        placeholder="Wpisz tekst reklamowy..."
+                        fontFamily={fontSettings[index].fontFamily}
+                        fontWeight={fontSettings[index].fontWeight}
+                        fontColor={fontSettings[index].fontColor}
+                        maxChars={1000}
+                      />
+                    )}
+                  </div>
+                </Fragment>
+              ))}
+            </div>
           </div>
         </div>
       </div>

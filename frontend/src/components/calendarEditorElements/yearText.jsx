@@ -9,6 +9,7 @@ const YearText = ({
   setYearFontSize,
   yearFontFamily,
   setYearFontFamily,
+    fontFamilies,
   yearFontWeight,
   setYearFontWeight,
   yearPosition,
@@ -79,19 +80,47 @@ const YearText = ({
     setYearPosition(newPosition);
   };
 
-  const updateLimitsByFontSize = (fontSize) => {
-    if (fontSize <= 24) {
-      setXLimits({ min: 50, max: 325 });
-      setYLimits({ min: 20, max: 235 });
-    } else if (fontSize <= 48) {
-      setXLimits({ min: 60, max: 300 });
-      setYLimits({ min: 30, max: 220 });
-    } else {
-      setXLimits({ min: 90, max: 280 });
-      setYLimits({ min: 40, max: 200 });
-    }
+const updateLimitsByFontSize = (fontSize) => {
+  // BAZA: Wartości dla rozmiaru 32px
+  const baseSize = 32;
+  const baseLimits = {
+    x: { min: 40, max: 252 },
+    y: { min: 20, max: 178 } // Zakładam, że Y to górna krawędź tekstu
   };
 
+  // RÓŻNICA: O ile zmieniła się czcionka względem 32px
+  const diff = fontSize - baseSize;
+
+  // WSPÓŁCZYNNIKI (Mnożniki)
+  // Szerokość: 4 znaki * ~0.6 szerokości znaku = 2.4
+  // To znaczy: Jak czcionka rośnie o 10px, napis jest szerszy o 24px.
+  const widthFactor = 2.4; 
+  
+  // Wysokość: rośnie 1:1 z rozmiarem czcionki
+  const heightFactor = 1.0;
+
+  // OBLICZENIA
+  // Min (lewa krawędź): Zostawiamy stałą (40), bo tekst rośnie "w prawo".
+  // Jeśli zwiększysz czcionkę, początek tekstu nadal może być na 40px.
+  
+  // Max (prawa granica dla lewej krawędzi tekstu):
+  // Musimy ją zmniejszyć o tyle, o ile urósł tekst, żeby prawa strona nie wyleciała.
+  const newMaxX = baseLimits.x.max - (diff * widthFactor);
+  
+  // Max (dolna granica dla górnej krawędzi tekstu):
+  // Musimy ją zmniejszyć o tyle, o ile urósł tekst w pionie.
+  const newMaxY = baseLimits.y.max - (diff * heightFactor);
+
+  setXLimits({
+    min: baseLimits.x.min, 
+    max: newMaxX
+  });
+
+  setYLimits({
+    min: baseLimits.y.min,
+    max: newMaxY
+  });
+};
   const handleFontSizeChange = (e) => {
     const newSize = Number(e.target.value);
     setYearFontSize(newSize);
@@ -190,13 +219,11 @@ const YearText = ({
           onChange={(e) => setYearFontFamily(e.target.value)}
           className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91]"
         >
-          <option value="Arial">Arial</option>
-          <option value="'Roboto', sans-serif">Roboto</option>
-          <option value="'Montserrat', sans-serif">Montserrat</option>
-          <option value="Georgia">Georgia</option>
-          <option value="'Courier New', monospace">Courier New</option>
-          <option value="'Times New Roman', serif">Times New Roman</option>
-          <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+           {fontFamilies.map((font) => (
+                <option key={font} value={font}>
+                  {font}
+                </option>
+              ))}
         </select>
       </div>
 
@@ -212,8 +239,6 @@ const YearText = ({
         >
           <option value="normal">Normal</option>
           <option value="bold">Pogrubiona</option>
-          <option value="bolder">Bardziej pogrubiona</option>
-          <option value="lighter">Lżejsza</option>
         </select>
       </div>
 
