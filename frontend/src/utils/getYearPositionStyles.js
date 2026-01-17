@@ -1,15 +1,13 @@
 export function getYearPositionStyles(position) {
-    // console.log("Using custom coordinates for year position:", position.coords);
-
-
+     console.log("Using custom coordinates for year position:", position.coords);
 
   if (position.coords) {
-    return {
-      left: position.coords.x,
-      top: position.coords.y,
-      transform: "translate(-50%, -50%)",
-    };
-  }
+  return {
+    left: `${position.coords.x}px`,
+    top: `${position.coords.y}px`,
+    transform: "translate(-50%, -50%)",
+  };
+}
 
   switch (position.preset) {
     case "top-left":

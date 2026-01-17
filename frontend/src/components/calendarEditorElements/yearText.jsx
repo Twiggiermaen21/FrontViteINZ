@@ -9,7 +9,7 @@ const YearText = ({
   setYearFontSize,
   yearFontFamily,
   setYearFontFamily,
-    fontFamilies,
+  fontFamilies,
   yearFontWeight,
   setYearFontWeight,
   yearPosition,
@@ -81,46 +81,23 @@ const YearText = ({
   };
 
 const updateLimitsByFontSize = (fontSize) => {
-  // BAZA: Wartości dla rozmiaru 32px
-  const baseSize = 32;
-  const baseLimits = {
-    x: { min: 40, max: 252 },
-    y: { min: 20, max: 178 } // Zakładam, że Y to górna krawędź tekstu
-  };
-
-  // RÓŻNICA: O ile zmieniła się czcionka względem 32px
-  const diff = fontSize - baseSize;
-
-  // WSPÓŁCZYNNIKI (Mnożniki)
-  // Szerokość: 4 znaki * ~0.6 szerokości znaku = 2.4
-  // To znaczy: Jak czcionka rośnie o 10px, napis jest szerszy o 24px.
-  const widthFactor = 2.4; 
   
-  // Wysokość: rośnie 1:1 z rozmiarem czcionki
-  const heightFactor = 1.0;
+  let newMinX =  fontSize / 0.8;
+  let newMaxX = 292 - fontSize / 0.8;
+  let newMinY = fontSize / 1.6;
+  let newMaxY = 198 - fontSize / 1.6;
 
-  // OBLICZENIA
-  // Min (lewa krawędź): Zostawiamy stałą (40), bo tekst rośnie "w prawo".
-  // Jeśli zwiększysz czcionkę, początek tekstu nadal może być na 40px.
-  
-  // Max (prawa granica dla lewej krawędzi tekstu):
-  // Musimy ją zmniejszyć o tyle, o ile urósł tekst, żeby prawa strona nie wyleciała.
-  const newMaxX = baseLimits.x.max - (diff * widthFactor);
-  
-  // Max (dolna granica dla górnej krawędzi tekstu):
-  // Musimy ją zmniejszyć o tyle, o ile urósł tekst w pionie.
-  const newMaxY = baseLimits.y.max - (diff * heightFactor);
-
-  setXLimits({
-    min: baseLimits.x.min, 
+  setXLimits({ 
+    min: newMinX, 
     max: newMaxX
   });
 
-  setYLimits({
-    min: baseLimits.y.min,
-    max: newMaxY
+  setYLimits({ 
+    min: newMinY, 
+    max: newMaxY 
   });
 };
+
   const handleFontSizeChange = (e) => {
     const newSize = Number(e.target.value);
     setYearFontSize(newSize);

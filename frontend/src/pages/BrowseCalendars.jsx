@@ -15,9 +15,9 @@ const BrowseCalendars = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-const [quantity, setQuantity] = useState(1);
-const [deadline, setDeadline] = useState("");
-const [note, setNote] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [deadline, setDeadline] = useState("");
+  const [note, setNote] = useState("");
 
   const [selectedCalendar, setSelectedCalendar] = useState(null); // ✅ do modala
   const scrollRef = useRef(null);
@@ -56,44 +56,41 @@ const [note, setNote] = useState("");
     fetchCalendars();
   }, []);
 
+  const fetchSingleCalendar = useCallback(async (projectName) => {
+    const token = localStorage.getItem(ACCESS_TOKEN);
 
-const fetchSingleCalendar = useCallback(async (projectName) => {
-  const token = localStorage.getItem(ACCESS_TOKEN);
+    try {
+      const response = await axios.get(
+        `${apiUrl}/calendar-by-project/${encodeURIComponent(projectName)}/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("Pobrany kalendarze:", response.data);
+      setCalendars((prev) => {
+        const incoming = response.data.results; // tablica kalendarzy
 
-  try {
-    const response = await axios.get(
-      `${apiUrl}/calendar-by-project/${encodeURIComponent(projectName)}/`,
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-    console.log("Pobrany kalendarze:", response.data);
-    setCalendars((prev) => {
-  const incoming = response.data.results; // tablica kalendarzy
+        const filtered = incoming.filter(
+          (item) => !prev.some((c) => c.id === item.id)
+        );
 
-  const filtered = incoming.filter(
-    item => !prev.some(c => c.id === item.id)
-  );
+        return [...prev, ...filtered];
+      });
+      console.log("Zaktualizowane kalendarze:", calendars);
+    } catch (err) {
+      console.error("Błąd pobierania pojedynczego kalendarza:", err);
+    }
+  }, []);
 
-  return [...prev, ...filtered];
-});
-    console.log("Zaktualizowane kalendarze:", calendars);
-  } catch (err) {
-    console.error("Błąd pobierania pojedynczego kalendarza:", err);
-  }
-}, []);
+  useEffect(() => {
+    if (!selectedProject?.name) return;
 
-useEffect(() => {
-  if (!selectedProject?.name) return;
+    const exists = calendars.some((c) => c.name === selectedProject.name);
 
-  const exists = calendars.some(
-    (c) => c.name === selectedProject.name
-  );
-
-  if (!exists && !loading) {
-    fetchSingleCalendar(selectedProject.name);
-  }
-}, [selectedProject, calendars, loading, fetchSingleCalendar]);
+    if (!exists && !loading) {
+      fetchSingleCalendar(selectedProject.name);
+    }
+  }, [selectedProject, calendars, loading, fetchSingleCalendar]);
 
   // Scroll thumb update
   const updateThumb = useCallback(() => {
@@ -181,49 +178,46 @@ useEffect(() => {
     }
   };
 
-const addToProduction = async () => {
-  try {
-    const token = localStorage.getItem(ACCESS_TOKEN);
+  const addToProduction = async () => {
+    try {
+      const token = localStorage.getItem(ACCESS_TOKEN);
 
-    const response = await axios.post(
-      `${apiUrl}/production/`,
-      {
-        calendar: selectedCalendar.id,
-        quantity: Number(quantity),
-        deadline: deadline || null,
-        production_note: note,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const response = await axios.post(
+        `${apiUrl}/production/`,
+        {
+          calendar: selectedCalendar.id,
+          quantity: Number(quantity),
+          deadline: deadline || null,
+          production_note: note,
         },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert("✅ Dodano do produkcji!");
+
+      // reset formularza
+      setQuantity(1);
+      setDeadline("");
+      setNote("");
+
+      // jeśli masz odświeżanie listy:
+      // fetchProductions();
+    } catch (err) {
+      console.error("Błąd dodawania do produkcji", err);
+
+      if (err.response?.data) {
+        alert(JSON.stringify(err.response.data));
+      } else {
+        alert("Nie udało się dodać do produkcji.");
       }
-    );
-
-    alert("✅ Dodano do produkcji!");
-
-    // reset formularza
-    setQuantity(1);
-    setDeadline("");
-    setNote("");
-
-    // jeśli masz odświeżanie listy:
-    // fetchProductions();
-
-  } catch (err) {
-    console.error("Błąd dodawania do produkcji", err);
-
-    if (err.response?.data) {
-      alert(JSON.stringify(err.response.data));
-    } else {
-      alert("Nie udało się dodać do produkcji.");
     }
-  }
-};
-
-
-
+  };
+  console.log(calendars[0]);
   return (
     <div className="relative mt-8 mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]   max-w-[1600px]">
       <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
@@ -236,122 +230,123 @@ const addToProduction = async () => {
             <p className="text-[#989c9e]">Brak dostępnych kalendarzy.</p>
           ) : (
             calendars
-  .filter((calendar) =>
-    selectedProject?.name
-      ? calendar.name === selectedProject.name
-      : true
-  )
-  .map((calendar, index) => (
-              <div
-                key={calendar.id}
-                className={`flex-shrink-0 relative my-3 flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105 hover:shadow-xl
+              .filter((calendar) =>
+                selectedProject?.name
+                  ? calendar.name === selectedProject.name
+                  : true
+              )
+              .map((calendar, index) => (
+                <div
+                  key={calendar.id}
+                  className={`flex-shrink-0 relative my-3 flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105 hover:shadow-xl
       ${index === 0 ? "ml-6" : ""}
       ${index === calendars.length - 1 ? "mr-6" : ""}`}
-                onClick={() => setSelectedCalendar(calendar)} // otwieranie modala
-              >
-                <h1 className="text-xl font-bold text-white mb-2">
-                  {calendar.name}
-                </h1>
-                <div className="relative w-[221px] h-[539px] bg-white border rounded overflow-hidden shadow">
-                  {/* Header */}
-                  <div className="relative h-[152px] bg-gray-200 flex items-center justify-center overflow-hidden">
-                    {calendar.top_image ? (
-                      <img
-                        src={calendar.top_image_url}
-                        alt="Nagłówek"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-gray-500">
-                        Brak grafiki nagłówka
-                      </span>
-                    )}
+                  onClick={() => setSelectedCalendar(calendar)} // otwieranie modala
+                >
+                  <h1 className="text-xl font-bold text-white mb-2">
+                    {calendar.name}
+                  </h1>
+                  <div className="w-[292px] rounded overflow-hidden shadow">
+                    {/* Header */}
+                    <div className="relative h-[198px] w-full bg-gray-200 flex items-center justify-center ">
+                      {calendar.top_image ? (
+                        <img
+                          src={calendar.top_image_url}
+                          alt="Nagłówek"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-gray-500">
+                          Brak grafiki nagłówka
+                        </span>
+                      )}
 
-                    {calendar?.year_data !== null && (
-                      <span
-                        style={{
-                          position: "absolute",
-                          color: calendar?.year_data.color,
-                          fontSize: `${calendar?.year_data.size}px`,
-                          fontWeight: calendar?.year_data.weight,
-                          fontFamily: calendar?.year_data.font,
+                      {calendar.year_data !== null && (
+                        <span
+                          style={{
+                            position: "absolute",
+                            color: calendar?.year_data.color,
+                            fontSize: `${calendar?.year_data.size}px`,
+                            fontWeight: calendar?.year_data.weight,
+                            fontFamily: calendar?.year_data.font,
 
-                          ...getYearPositionStyles({
-                            coords: {
-                              x: calendar?.year_data.positionX,
-                              y: calendar?.year_data.positionY,
-                            },
-                          }),
-                        }}
-                      >
-                        {calendar?.year_data.text}
-                      </span>
-                    )}
-                  </div>
+                            ...getYearPositionStyles({
+                              coords: {
+                                x: calendar.year_data.positionX,
+                                y: calendar.year_data.positionY,
+                              },
+                            }),
+                          }}
+                        >
+                          {calendar?.year_data.text}
+                        </span>
+                      )}
+                    </div>
 
-                  {/* Bottom */}
-                  <div
-                    className="h-[720px] px-3 py-4 flex flex-col items-center text-center"
-                    style={getBottomSectionBackground({
-                      style:
-                        calendar.bottom?.content_type_id === 26
-                          ? "style1"
-                          : calendar.bottom?.content_type_id === 27
-                          ? "style2"
-                          : calendar.bottom?.content_type_id === 28
-                          ? "style3"
-                          : null,
-                      bgColor:
-                        calendar.bottom?.color ?? calendar.bottom?.start_color,
-                      gradientEndColor: calendar.bottom?.end_color,
-                      gradientTheme: calendar.bottom?.theme,
-                      gradientStrength: calendar.bottom?.strength,
-                      gradientVariant: calendar.bottom?.direction,
-                      backgroundImage: calendar.bottom?.url,
-                    })}
-                  >
-                    {[calendar.field1, calendar.field2, calendar.field3].map(
-                      (field, index) => {
-                        if (!field) return null;
-                        const isText = "text" in field;
-                        const isImage = "path" in field;
-                        return (
-                          <div
-                            key={`${calendar.id}-${index}`}
-                            className="w-full border rounded bg-white shadow p-2 flex flex-col items-center mb-2"
-                          >
-                            <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                              {months[index]}
-                            </h3>
-                            <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
-                              [Siatka dni dla {months[index]}]
+                    {/* Bottom */}
+                    <div
+                      className="h-[720px] px-3 py-4 flex flex-col items-center text-center"
+                      style={getBottomSectionBackground({
+                        style:
+                          calendar.bottom?.content_type_id === 26
+                            ? "style1"
+                            : calendar.bottom?.content_type_id === 27
+                            ? "style2"
+                            : calendar.bottom?.content_type_id === 28
+                            ? "style3"
+                            : null,
+                        bgColor:
+                          calendar.bottom?.color ??
+                          calendar.bottom?.start_color,
+                        gradientEndColor: calendar.bottom?.end_color,
+                        gradientTheme: calendar.bottom?.theme,
+                        gradientStrength: calendar.bottom?.strength,
+                        gradientVariant: calendar.bottom?.direction,
+                        backgroundImage: calendar.bottom?.url,
+                      })}
+                    >
+                      {[calendar.field1, calendar.field2, calendar.field3].map(
+                        (field, index) => {
+                          if (!field) return null;
+                          const isText = "text" in field;
+                          const isImage = "path" in field;
+                          return (
+                            <div
+                              key={`${calendar.id}-${index}`}
+                              className="w-full border rounded bg-white shadow p-2 flex flex-col items-center mb-2"
+                            >
+                              <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                                {months[index]}
+                              </h3>
+                              <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
+                                [Siatka dni dla {months[index]}]
+                              </div>
+                              <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
+                                {isText
+                                  ? field.text
+                                  : isImage
+                                  ? calendar.images_for_fields
+                                      .filter(
+                                        (img) => img.field_number === index + 1
+                                      )
+                                      .map((img) => (
+                                        <img
+                                          key={`${calendar.id}-${index}-${img.id}`}
+                                          src={img.url}
+                                          alt="Image"
+                                          style={{ height: 60 }}
+                                        />
+                                      ))
+                                  : null}
+                              </div>
                             </div>
-                            <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
-                              {isText
-                                ? field.text
-                                : isImage
-                                ? calendar.images_for_fields
-                                    .filter(
-                                      (img) => img.field_number === index + 1
-                                    )
-                                    .map((img) => (
-                                      <img
-                                        key={`${calendar.id}-${index}-${img.id}`}
-                                        src={img.url}
-                                        alt="Image"
-                                        style={{ height: 60 }}
-                                      />
-                                    ))
-                                : null}
-                            </div>
-                          </div>
-                        );
-                      }
-                    )}
+                          );
+                        }
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
           )}
         </div>
       </div>
@@ -459,86 +454,85 @@ const addToProduction = async () => {
             </div>
 
             {/* Panel boczny z nazwą i przyciskami */}
-           <div className="flex flex-col justify-start p-6 text-white flex-1">
-  <h2 className="text-3xl font-bold mb-6">
-    {selectedCalendar.name}
-  </h2>
+            <div className="flex flex-col justify-start p-6 text-white flex-1">
+              <h2 className="text-3xl font-bold mb-6">
+                {selectedCalendar.name}
+              </h2>
 
-  {/* === PANEL PRODUKCJI – STYL JAK TEN GÓRNY === */}
-  <div className="bg-[#2a2b2b] rounded-4xl p-8 shadow-lg mb-6">
-    <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-      Dodaj do produkcji
-    </h3>
+              {/* === PANEL PRODUKCJI – STYL JAK TEN GÓRNY === */}
+              <div className="bg-[#2a2b2b] rounded-4xl p-8 shadow-lg mb-6">
+                <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
+                  Dodaj do produkcji
+                </h3>
 
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        addToProduction(selectedCalendar.id);
-      }}
-      className="flex flex-col gap-5"
-    >
-      {/* ILOŚĆ */}
-      <div>
-        <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
-          Ilość
-        </label>
-        <input
-          type="number"
-          min="1"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          placeholder="Podaj ilość"
-          className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-          required
-        />
-      </div>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    addToProduction(selectedCalendar.id);
+                  }}
+                  className="flex flex-col gap-5"
+                >
+                  {/* ILOŚĆ */}
+                  <div>
+                    <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
+                      Ilość
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                      placeholder="Podaj ilość"
+                      className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+                      required
+                    />
+                  </div>
 
-      {/* DEADLINE */}
-      <div>
-        <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
-          Termin realizacji
-        </label>
-        <input
-          type="date"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-          className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-        />
-      </div>
+                  {/* DEADLINE */}
+                  <div>
+                    <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
+                      Termin realizacji
+                    </label>
+                    <input
+                      type="date"
+                      value={deadline}
+                      onChange={(e) => setDeadline(e.target.value)}
+                      className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+                    />
+                  </div>
 
-      {/* NOTATKA */}
-      <div>
-        <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
-          Notatka dla produkcji
-        </label>
-        <textarea
-          rows={3}
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Np. rodzaj papieru, format, wykończenie..."
-          className="w-full p-4 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-        />
-      </div>
+                  {/* NOTATKA */}
+                  <div>
+                    <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
+                      Notatka dla produkcji
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      placeholder="Np. rodzaj papieru, format, wykończenie..."
+                      className="w-full p-4 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+                    />
+                  </div>
 
-      {/* SUBMIT */}
-      <button
-        type="submit"
-        className="w-full py-4 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300 disabled:opacity-50"
-      >
-        Dodaj do produkcji
-      </button>
-    </form>
-  </div>
+                  {/* SUBMIT */}
+                  <button
+                    type="submit"
+                    className="w-full py-4 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300 disabled:opacity-50"
+                  >
+                    Dodaj do produkcji
+                  </button>
+                </form>
+              </div>
 
-  {/* === USUWANIE === */}
-  <button
-    className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-    onClick={() => deleteCalendar(selectedCalendar.id)}
-  >
-    Usuń
-  </button>
-</div>
-
+              {/* === USUWANIE === */}
+              <button
+                className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
+                onClick={() => deleteCalendar(selectedCalendar.id)}
+              >
+                Usuń
+              </button>
+            </div>
           </div>
         </div>
       )}
