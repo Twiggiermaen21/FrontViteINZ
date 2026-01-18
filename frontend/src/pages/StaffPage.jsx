@@ -1,45 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
-// Zakładam, że te funkcje są dostępne i poprawnie zaimportowane
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
-
+// Importujemy helpery (upewnij się, że plik productionHelpers.js istnieje w utils)
+import { MONTHS, STATUS_MAP} from "../constants";
+import {getStatusStyle} from "../utils/getStatusStyle";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
-const months = ["Grudzień", "Styczeń", "Luty"];
-// DODANA POLSKA NAZWA DLA STATUSU 'waiting'
-const STATUS_MAP = {
-  draft: "PROJEKT",
-  rejected: "ODRZUCONY",
-  to_produce: "DO PRODUKCJI",
-  in_production: "W TRAKCIE",
-  done: "GOTOWY",
-  archived: "ARCHIWUM",
-  Nieokreślony: "BRAK STATUSU",
-  waiting: "OCZEKIWANIE NA AKCEPTACJĘ",
-};
-
-/* ================= POMOCNICY ================= */
-
-// Aktualizacja: Status 'waiting' traktowany tak samo jak 'draft'/'to_produce' - kolor żółty.
-const getStatusStyle = (status) => {
-  switch (status) {
-    case "draft":
-    case "to_produce":
-    case "waiting": // DODANY 'waiting'
-      return "bg-yellow-600/50 text-yellow-300";
-    case "in_production":
-      return "bg-blue-600/50 text-blue-300";
-    case "done":
-      return "bg-green-600/50 text-green-300";
-    case "archived":
-      return "bg-cyan-600/50 text-cyan-300";
-    case "rejected":
-      return "bg-red-600/50 text-red-300";
-    default:
-      return "bg-gray-600/50 text-gray-400";
-  }
-};
 
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center w-full h-32">
@@ -47,7 +14,7 @@ const LoadingSpinner = () => (
   </div>
 );
 
-/* ================= CALENDAR PREVIEW (BEZ ZMIAN) ================= */
+/* ================= CALENDAR PREVIEW ================= */
 const CalendarPreview = ({ calendar }) => {
   if (!calendar) return null;
 
@@ -98,41 +65,34 @@ const CalendarPreview = ({ calendar }) => {
           gradientEndColor: calendar.bottom?.end_color,
         })}
       >
-        {[calendar.field1, calendar.field2, calendar.field3].map(
-          (field, index) => {
-            if (!field) return null;
-            const isText = "text" in field;
-            const isImage = "path" in field;
+        {[calendar.field1, calendar.field2, calendar.field3].map((field, index) => {
+          if (!field) return null;
+          const isText = "text" in field;
+          const isImage = "path" in field;
 
-            return (
-              <div
-                key={index}
-                className="bg-white rounded p-1 mb-2 text-center"
-              >
-                <h3 className="text-xs font-bold uppercase mb-1">
-                  {months[index]}
-                </h3>
-                <div className="text-xs text-gray-700">
-                  {isText ? (
-                    field.text
-                  ) : isImage ? (
-                    <img
-                      src={field.path}
-                      alt="Pole graficzne"
-                      className="h-8 w-full object-contain mx-auto"
-                    />
-                  ) : null}
-                </div>
+          return (
+            <div key={index} className="bg-white rounded p-1 mb-2 text-center">
+              <h3 className="text-xs font-bold uppercase mb-1">{months[index]}</h3>
+              <div className="text-xs text-gray-700">
+                {isText ? (
+                  field.text
+                ) : isImage ? (
+                  <img
+                    src={field.path}
+                    alt="Pole graficzne"
+                    className="h-8 w-full object-contain mx-auto"
+                  />
+                ) : null}
               </div>
-            );
-          }
-        )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 };
 
-/* ================= STAFF PRODUCTION LIST (ZMODYFIKOWANA) ================= */
+/* ================= STAFF PRODUCTION LIST ================= */
 const StaffProductionList = () => {
   const [productions, setProductions] = useState([]);
   const [page, setPage] = useState(1);
@@ -143,18 +103,12 @@ const StaffProductionList = () => {
   const [loadingCalendarId, setLoadingCalendarId] = useState(null);
   const [isUpdatingId, setIsUpdatingId] = useState(null);
 
-  // USUNIĘTO BŁĄD SKŁADNIOWY: englishStatusKey i polishStatusText były błędnie zdefiniowane tutaj.
-
   const fetchCalendarById = useCallback(async (calendarId) => {
     try {
       const token = localStorage.getItem(ACCESS_TOKEN);
-      // Używamy endpointa dla staffu, tak jak w oryginale
-      const res = await axios.get(
-        `${apiUrl}/calendarByIdStaff/${calendarId}/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await axios.get(`${apiUrl}/calendarByIdStaff/${calendarId}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return res.data;
     } catch (err) {
       console.error("Błąd pobierania kalendarza:", err);
@@ -188,7 +142,6 @@ const StaffProductionList = () => {
   }, [hasMore, loading, page]);
 
   useEffect(() => {
-    // Warunek initial load
     if (page === 1 && productions.length === 0 && !loading && hasMore) {
       fetchProductions();
     }
@@ -205,8 +158,7 @@ const StaffProductionList = () => {
     if (fullCalendarData[item.id]) return;
 
     setLoadingCalendarId(item.id);
-    const calendarIdToFetch = item.calendar;
-    const fullCalendar = await fetchCalendarById(calendarIdToFetch);
+    const fullCalendar = await fetchCalendarById(item.calendar);
 
     if (fullCalendar) {
       setFullCalendarData((prev) => ({
@@ -234,18 +186,12 @@ const StaffProductionList = () => {
           prev.map((p) => (p.id === productionId ? res.data : p))
         );
 
-        alert(
-          `Sukces: Pozycja ID ${productionId} została ${actionDescription}.`
-        );
+        alert(`Sukces: Pozycja ID ${productionId} została ${actionDescription}.`);
         setExpandedId(null);
       } catch (err) {
         console.error(`Błąd podczas ${actionDescription}:`, err);
-        // Poprawione wyświetlanie błędu
-        const errorMessage =
-          err.response?.data?.detail || "Wystąpił nieznany błąd.";
-        alert(
-          `Nie udało się wykonać akcji (${actionDescription}). Błąd: ${errorMessage}`
-        );
+        const errorMessage = err.response?.data?.detail || "Wystąpił nieznany błąd.";
+        alert(`Nie udało się wykonać akcji (${actionDescription}). Błąd: ${errorMessage}`);
       } finally {
         setIsUpdatingId(null);
       }
@@ -254,50 +200,45 @@ const StaffProductionList = () => {
   );
 
   const handleAccept = async (item) => {
-  // 1️⃣ Aktualizacja statusu produkcji
-  updateProductionStatus(
-    item.id,
-    "in_production",
-    "zaakceptowana i włączona do produkcji"
-  );
-console.log( "Initiating calendar print request for calendar ID:", item.calendar);
- 
-  try {
-    const token = localStorage.getItem(ACCESS_TOKEN);
-     const res = await axios.post(
-      `${apiUrl}/calendar-print/`,
-      { id_kalendarz: item.calendar}, // dane POST
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
+    // 1. Aktualizacja statusu
+    updateProductionStatus(item.id, "in_production", "zaakceptowana i włączona do produkcji");
+    
+    // 2. Wysłanie requestu o wydruk (generowanie)
+    console.log("Initiating calendar print request for calendar ID:", item.calendar);
+    try {
+      const token = localStorage.getItem(ACCESS_TOKEN);
+      const res = await axios.post(
+        `${apiUrl}/calendar-print/`,
+        { id_kalendarz: item.calendar },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       console.log("CalendarPrint response:", res.data);
-  } catch (error) {
-    console.error("Błąd CalendarPrint:", error.response || error.message);
-  }
-};
+    } catch (error) {
+      console.error("Błąd CalendarPrint:", error.response || error.message);
+    }
+  };
 
-  // ZMIANA: 'archived' używane jako status "Gotowe do druku"
   const handleReadyForPrint = (item) =>
-    updateProductionStatus(
-      item.id,
-      "archived",
-      "przygotowana do druku (archived)"
-    );
-  // ZMIANA: 'done' używane jako status "Wysłana do druku / Zakończona"
+    updateProductionStatus(item.id, "archived", "przygotowana do druku (archived)");
+
   const handlePrint = (item) =>
     updateProductionStatus(item.id, "done", "wysłana do druku");
+
   const handleReject = (item) => {
     if (!window.confirm("Czy na pewno chcesz ODRZUCIĆ tę pozycję?")) return;
     updateProductionStatus(item.id, "rejected", "odrzucona");
   };
 
   return (
-    <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl  mx-auto text-white shadow-2xl">
+    <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl mx-auto text-white shadow-2xl">
+      {/* Style dla scrollbara */}
+     
+
       <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
         Panel Zarządzania Produkcją
       </h1>
@@ -305,166 +246,150 @@ console.log( "Initiating calendar print request for calendar ID:", item.calendar
         Zarządzaj statusami, upscalingiem i wysyłką do druku kalendarzy.
       </p>
 
-      <div className="space-y-4">
-        {productions.length === 0 && !loading && (
-          <p className="text-lg text-center text-gray-400 py-10">
-            Brak pozycji do zarządzania.
-          </p>
-        )}
+      {/* Kontener scrollowania - max 800px wysokości */}
+      <div className="max-h-[600px] overflow-y-auto custom-scroll pr-4">
+        <div className="space-y-4">
+          {productions.length === 0 && !loading && (
+            <p className="text-lg text-center text-gray-400 py-10">
+              Brak pozycji do zarządzania.
+            </p>
+          )}
 
-        {productions.map((item) => {
-          const isExpanded = expandedId === item.id;
-          const calendarData = fullCalendarData[item.id];
-          const isLoading = loadingCalendarId === item.id;
-          const isUpdating = isUpdatingId === item.id;
+          {productions.map((item) => {
+            const isExpanded = expandedId === item.id;
+            const calendarData = fullCalendarData[item.id];
+            const isLoading = loadingCalendarId === item.id;
+            const isUpdating = isUpdatingId === item.id;
 
-          // POBRANIE KLUCZA I WARTOSCI STATUSU DO WYSWIETLENIA
-          const englishStatusKey = item.status || "Nieokreślony";
-          const polishStatusText =
-            STATUS_MAP[englishStatusKey] || STATUS_MAP["Nieokreślony"];
+            const englishStatusKey = item.status || "Nieokreślony";
+            const polishStatusText = STATUS_MAP[englishStatusKey] || STATUS_MAP["Nieokreślony"];
 
-          return (
-            <div
-              key={item.id}
-              className="bg-[#1e1f1f] rounded-xl border border-[#3c3d3d] overflow-hidden transition-all duration-300"
-            >
-              {/* HEADER (Nazwa + Status) */}
+            return (
               <div
-                onClick={() => toggleExpand(item)}
-                className="p-4 flex justify-between items-center cursor-pointer hover:bg-[#3c3d3d]/50 transition duration-150"
+                key={item.id}
+                className="bg-[#1e1f1f] rounded-xl border border-[#3c3d3d] overflow-hidden transition-all duration-300"
               >
-                <div className="flex-1 min-w-0">
-                  <div className="text-xl font-bold truncate">
-                    {item.calendar_name || "Brak nazwy kalendarza"}
-                  </div>
-                  <div className="text-sm text-gray-400 mt-1">
-                    Utworzono: {new Date(item.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-
-                {/* WYŚWIETLANIE POLSKIEJ NAZWY I STYLU Z KLUCZA ANG. */}
+                {/* HEADER */}
                 <div
-                  className={`py-1 px-3 rounded-full text-sm font-semibold ml-4 ${getStatusStyle(
-                    englishStatusKey
-                  )}`}
+                  onClick={() => toggleExpand(item)}
+                  className="p-4 flex justify-between items-center cursor-pointer hover:bg-[#3c3d3d]/50 transition duration-150"
                 >
-                  {polishStatusText}
-                </div>
-
-                <span className="text-2xl text-[#afe5e6] ml-4">
-                  {isExpanded ? "▲" : "▼"}
-                </span>
-              </div>
-
-              {/* SZCZEGÓŁY (Rozwijane) */}
-              {isExpanded && (
-                <div className="p-6 flex flex-col md:flex-row gap-6 bg-[#2a2b2b] border-t border-[#3c3d3d]">
-                  {/* Lewa kolumna: Podgląd */}
-                  <div className="md:w-1/3 flex justify-center items-center p-2">
-                    {isLoading ? (
-                      <LoadingSpinner />
-                    ) : calendarData ? (
-                      <CalendarPreview calendar={calendarData} />
-                    ) : (
-                      <div className="text-red-400">Brak podglądu</div>
-                    )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xl font-bold truncate">
+                      {item.calendar_name || "Brak nazwy kalendarza"}
+                    </div>
+                    <div className="text-sm text-gray-400 mt-1">
+                      Utworzono: {new Date(item.created_at).toLocaleDateString()}
+                    </div>
                   </div>
 
-                  {/* Prawa kolumna: Szczegóły produkcji i przyciski akcji */}
-                  <div className="md:w-2/3 space-y-4">
-                    <h3 className="text-2xl font-bold text-[#afe5e6] mb-2">
-                      Informacje i Akcje
-                    </h3>
+                  <div className={`py-1 px-3 rounded-full text-sm font-semibold ml-4 ${getStatusStyle(englishStatusKey)}`}>
+                    {polishStatusText}
+                  </div>
 
-                    {/* Ilość, Termin, Ostatnia zmiana */}
-                    <div className="flex flex-wrap gap-6 p-4 bg-[#1e1f1f] rounded-lg shadow-inner">
-                      <div>
-                        <div className="text-sm text-gray-400">Ilość:</div>
-                        <div className="text-xl font-bold">
-                          {item.quantity} szt.
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-400">
-                          Termin Realizacji:
-                        </div>
-                        <div className="text-xl font-bold">
-                          {item.deadline || "Nieokreślony"}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-400">
-                          Ostatnia zmiana:
-                        </div>
-                        <div className="text-xl font-bold text-yellow-300">
-                          {new Date(item.updated_at).toLocaleDateString()}
-                        </div>
-                      </div>
-                    </div>
+                  <span className="text-2xl text-[#afe5e6] ml-4">
+                    {isExpanded ? "▲" : "▼"}
+                  </span>
+                </div>
 
-                    {/* Notatka */}
-                    <div className="pt-2">
-                      <div className="text-sm text-gray-400 mb-1">Notatka:</div>
-                      <div className="bg-[#1e1f1f] p-4 rounded-lg whitespace-pre-wrap italic text-sm">
-                        {item.production_note || "Brak notatki."}
-                      </div>
-                    </div>
-
-                    {/* PRZYCISKI AKCJI */}
-                    <div className="flex flex-wrap gap-3 pt-4 border-t border-[#3c3d3d]">
-                      {isUpdating ? (
-                        <div className="text-lg text-yellow-500 font-semibold flex items-center">
-                          <LoadingSpinner /> Trwa aktualizacja statusu...
-                        </div>
+                {/* SZCZEGÓŁY */}
+                {isExpanded && (
+                  <div className="p-6 flex flex-col md:flex-row gap-6 bg-[#2a2b2b] border-t border-[#3c3d3d]">
+                    {/* Lewa kolumna: Podgląd */}
+                    <div className="md:w-1/3 flex justify-center items-center p-2">
+                      {isLoading ? (
+                        <LoadingSpinner />
+                      ) : calendarData ? (
+                        <CalendarPreview calendar={calendarData} />
                       ) : (
-                        <>
-                          {/* Akceptacja (Przenieś na W TRAKCIE) */}
-                          {(englishStatusKey === "draft" ||
-                            englishStatusKey === "to_produce" ||
-                            englishStatusKey === "waiting") && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleAccept(item);
-                              }}
-                              className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition font-semibold disabled:opacity-50"
-                              disabled={isUpdating}
-                            >
-                              ✅ Akceptuj do produkcji
-                            </button>
-                          )}
+                        <div className="text-red-400">Brak podglądu</div>
+                      )}
+                    </div>
 
-                          {/* Gotowe do druku (Przenieś na ARCHIWUM) */}
-                          {englishStatusKey === "in_production" && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleReadyForPrint(item);
-                              }}
-                              className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50"
-                              disabled={isUpdating}
-                            >
-                              📦 Oznacz jako GOTOWE DO DRUKU (Archiwum)
-                            </button>
-                          )}
+                    {/* Prawa kolumna: Akcje */}
+                    <div className="md:w-2/3 space-y-4">
+                      <h3 className="text-2xl font-bold text-[#afe5e6] mb-2">
+                        Informacje i Akcje
+                      </h3>
 
-                          {/* Wysyłka do druku (Przenieś na GOTOWY) */}
-                          {englishStatusKey === "archived" && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePrint(item);
-                              }}
-                              className="bg-cyan-600 text-white py-2 px-4 rounded-lg hover:bg-cyan-700 transition font-semibold disabled:opacity-50"
-                              disabled={isUpdating}
-                            >
-                              🚀 WYSŁANO DO DRUKU (Gotowy)
-                            </button>
-                          )}
+                      <div className="flex flex-wrap gap-6 p-4 bg-[#1e1f1f] rounded-lg shadow-inner">
+                        <div>
+                          <div className="text-sm text-gray-400">Ilość:</div>
+                          <div className="text-xl font-bold">{item.quantity} szt.</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-400">Termin Realizacji:</div>
+                          <div className="text-xl font-bold">{item.deadline || "Nieokreślony"}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-400">Ostatnia zmiana:</div>
+                          <div className="text-xl font-bold text-yellow-300">
+                            {new Date(item.updated_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
 
-                          {/* Odrzucenie (Dla wszystkich statusów oprócz GOTOWY/ODRZUCONY) */}
-                          {englishStatusKey !== "done" &&
-                            englishStatusKey !== "rejected" && (
+                      <div className="pt-2">
+                        <div className="text-sm text-gray-400 mb-1">Notatka:</div>
+                        <div className="bg-[#1e1f1f] p-4 rounded-lg whitespace-pre-wrap italic text-sm">
+                          {item.production_note || "Brak notatki."}
+                        </div>
+                      </div>
+
+                      {/* BUTTONY AKCJI */}
+                      <div className="flex flex-wrap gap-3 pt-4 border-t border-[#3c3d3d]">
+                        {isUpdating ? (
+                          <div className="text-lg text-yellow-500 font-semibold flex items-center">
+                            <LoadingSpinner /> Trwa aktualizacja statusu...
+                          </div>
+                        ) : (
+                          <>
+                            {/* Akceptacja */}
+                            {(englishStatusKey === "draft" ||
+                              englishStatusKey === "to_produce" ||
+                              englishStatusKey === "waiting") && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAccept(item);
+                                }}
+                                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition font-semibold disabled:opacity-50"
+                                disabled={isUpdating}
+                              >
+                                ✅ Akceptuj do produkcji
+                              </button>
+                            )}
+
+                            {/* Gotowe do druku (Archiwum) */}
+                            {englishStatusKey === "in_production" && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleReadyForPrint(item);
+                                }}
+                                className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50"
+                                disabled={isUpdating}
+                              >
+                                📦 Oznacz jako GOTOWE DO DRUKU (Archiwum)
+                              </button>
+                            )}
+
+                            {/* Wysłano do druku (Gotowy) */}
+                            {englishStatusKey === "archived" && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePrint(item);
+                                }}
+                                className="bg-cyan-600 text-white py-2 px-4 rounded-lg hover:bg-cyan-700 transition font-semibold disabled:opacity-50"
+                                disabled={isUpdating}
+                              >
+                                🚀 WYSŁANO DO DRUKU (Gotowy)
+                              </button>
+                            )}
+
+                            {/* Odrzucenie */}
+                            {englishStatusKey !== "done" && englishStatusKey !== "rejected" && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -477,50 +402,46 @@ console.log( "Initiating calendar print request for calendar ID:", item.calendar
                               </button>
                             )}
 
-                          {englishStatusKey === "done" && (
-                            <p className="text-green-500 font-bold">
-                              Pozycja zakończona i wydrukowana.
-                            </p>
-                          )}
-                          {englishStatusKey === "rejected" && (
-                            <p className="text-red-500 font-bold">
-                              Pozycja została odrzucona.
-                            </p>
-                          )}
-                        </>
-                      )}
+                            {englishStatusKey === "done" && (
+                              <p className="text-green-500 font-bold">
+                                Pozycja zakończona i wydrukowana.
+                              </p>
+                            )}
+                            {englishStatusKey === "rejected" && (
+                              <p className="text-red-500 font-bold">
+                                Pozycja została odrzucona.
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Stopka ładowania / braku danych */}
-      {loading && (
-        <p className="text-center text-gray-400 mt-6">
-          Ładowanie kolejnych pozycji...
-        </p>
-      )}
-
-      {!hasMore && productions.length > 0 && (
-        <p className="text-center text-gray-400 mt-6">
-          Wszystkie pozycje zostały załadowane.
-        </p>
-      )}
-
-      {hasMore && !loading && (
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => fetchProductions()}
-            className="bg-[#afe5e6] text-black px-6 py-3 rounded font-semibold hover:bg-[#92c5c6] transition"
-          >
-            Załaduj więcej
-          </button>
+                )}
+              </div>
+            );
+          })}
         </div>
-      )}
+
+        {loading && (
+          <p className="text-center text-gray-400 mt-6">Ładowanie kolejnych pozycji...</p>
+        )}
+
+        {!hasMore && productions.length > 0 && (
+          <p className="text-center text-gray-400 mt-6">Wszystkie pozycje zostały załadowane.</p>
+        )}
+
+        {hasMore && !loading && (
+          <div className="flex justify-center mt-6 pb-2">
+            <button
+              onClick={() => fetchProductions()}
+              className="bg-[#afe5e6] text-black px-6 py-3 rounded font-semibold hover:bg-[#92c5c6] transition"
+            >
+              Załaduj więcej
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
