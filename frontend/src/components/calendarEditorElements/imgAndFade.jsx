@@ -14,7 +14,7 @@ const GradientSettings = ({
   setGradientStrength,
 }) => {
   return (
-    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 space-y-4">
+    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 space-y-2">
       <h2 className="text-base font-semibold text-[#d2e4e2]">
         Ustawienia gradientu
       </h2>
@@ -25,7 +25,7 @@ const GradientSettings = ({
           onClick={() =>
             extractColorsFromImage(image.url, setBgColor, setGradientEndColor)
           }
-          className="w-full mt-2 px-4 py-2 rounded-lg text-sm font-medium
+          className="w-full px-4 py-2 rounded-lg text-sm font-medium
             bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]
             hover:opacity-90 transition-colors"
         >

@@ -113,9 +113,8 @@ const updateLimitsByFontSize = (fontSize) => {
   };
 
   return (
-    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 space-y-4">
+    <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 space-y-2">
       <h3 className="flex items-center gap-3 text-base font-semibold text-[#d2e4e2]">
-        Napis z rokiem
         <div
           onClick={() => setYearActive(!yearActive)}
           className={`relative w-12 h-6 flex items-center rounded-full cursor-pointer transition-all duration-300 ${
@@ -132,6 +131,8 @@ const updateLimitsByFontSize = (fontSize) => {
             {yearActive ? "ON" : "OFF"}
           </div>
         </div>
+        Napis z rokiem
+        
       </h3>
 
       {/* Rok */}
@@ -169,7 +170,7 @@ const updateLimitsByFontSize = (fontSize) => {
       </div>
 
       {/* Rozmiar */}
-      <div className="mb-0">
+      <div className="mb-0 ">
         <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Rozmiar czcionki (px)
         </label>
@@ -179,7 +180,7 @@ const updateLimitsByFontSize = (fontSize) => {
           max="72"
           value={yearFontSize}
           onChange={handleFontSizeChange}
-          className="w-full accent-[#6d8f91]"
+          className="w-full  accent-[#6d8f91]"
         />
         <div className="text-xs text-[#989c9e] text-right">
           {yearFontSize}px
@@ -187,7 +188,7 @@ const updateLimitsByFontSize = (fontSize) => {
       </div>
 
       {/* Czcionka */}
-      <div>
+      <div className="transform -mt-3">
         <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Rodzaj czcionki
         </label>
@@ -245,52 +246,51 @@ const updateLimitsByFontSize = (fontSize) => {
           )}
         </select>
 
-        {isCustom && (
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-xs text-[#d2e4e2] mb-1">
-                X ({xLimits.min} - {xLimits.max})
-              </label>
-              <input
-                type="number"
-                min={xLimits.min}
-                max={xLimits.max}
-                value={yearPosition.coords.x}
-                onChange={(e) => {
-                  let val = Number(e.target.value);
-                  if (val < xLimits.min) val = xLimits.min;
-                  if (val > xLimits.max) val = xLimits.max;
-                  setYearPosition((prev) => ({
-                    ...prev,
-                    coords: { ...prev.coords, x: val },
-                  }));
-                }}
-                className="w-full rounded-lg px-2 py-1 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-[#d2e4e2] mb-1">
-                Y ({yLimits.min} - {yLimits.max})
-              </label>
-              <input
-                type="number"
-                min={yLimits.min}
-                max={yLimits.max}
-                value={yearPosition.coords.y}
-                onChange={(e) => {
-                  let val = Number(e.target.value);
-                  if (val < yLimits.min) val = yLimits.min;
-                  if (val > yLimits.max) val = yLimits.max;
-                  setYearPosition((prev) => ({
-                    ...prev,
-                    coords: { ...prev.coords, y: val },
-                  }));
-                }}
-                className="w-full rounded-lg px-2 py-1 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b]"
-              />
-            </div>
-          </div>
-        )}
+       {isCustom && (
+  <div className="mt-2 grid grid-cols-2 gap-2">
+    {/* Pole X */}
+    <div className="flex items-center space-x-2">
+      <label className="text-xs font-bold text-[#d2e4e2]">X</label>
+      <input
+        type="number"
+        min={xLimits.min}
+        max={xLimits.max}
+        value={yearPosition.coords.x}
+        onChange={(e) => {
+          let val = Number(e.target.value);
+          if (val < xLimits.min) val = xLimits.min;
+          if (val > xLimits.max) val = xLimits.max;
+          setYearPosition((prev) => ({
+            ...prev,
+            coords: { ...prev.coords, x: val },
+          }));
+        }}
+        className="w-full rounded-md px-1 py-0.5 text-xs bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none"
+      />
+    </div>
+
+    {/* Pole Y */}
+    <div className="flex items-center space-x-2">
+      <label className="text-xs font-bold text-[#d2e4e2]">Y</label>
+      <input
+        type="number"
+        min={yLimits.min}
+        max={yLimits.max}
+        value={yearPosition.coords.y}
+        onChange={(e) => {
+          let val = Number(e.target.value);
+          if (val < yLimits.min) val = yLimits.min;
+          if (val > yLimits.max) val = yLimits.max;
+          setYearPosition((prev) => ({
+            ...prev,
+            coords: { ...prev.coords, y: val },
+          }));
+        }}
+        className="w-full rounded-md px-1 py-0.5 text-xs bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none"
+      />
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

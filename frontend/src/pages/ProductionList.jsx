@@ -67,7 +67,7 @@ const CalendarPreview = ({ calendar }) => {
 
           return (
             <div key={index} className="bg-white rounded p-1 mb-2 text-center">
-              <h3 className="text-xs font-bold uppercase mb-1">{months[index]}</h3>
+              <h3 className="text-xs font-bold uppercase mb-1">{MONTHS[index]}</h3>
               <div className="text-xs text-gray-700">
                 {isText ? (
                   field.text
@@ -104,6 +104,7 @@ const ProductionList = () => {
       const res = await axios.get(`${apiUrl}/calendar/${calendarId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("Pobrano kalendarz:", res.data);
       return res.data;
     } catch (err) {
       console.error("Błąd pobierania kalendarza:", err);
@@ -111,26 +112,35 @@ const ProductionList = () => {
     }
   }, []);
 
-  const fetchProductions = useCallback(async (reset = false) => {
+ const fetchProductions = useCallback(async (reset = false) => {
     if ((!hasMore && !reset) || loadingMore) return;
 
-    const targetPage = reset ? 1 : page;
-    setLoadingMore(true);
+    setLoadingMore(true);  
     const token = localStorage.getItem(ACCESS_TOKEN);
+
+    // Ustalmy stronę do pobrania na sztywno przed zapytaniem
+    const pageToFetch = reset ? 1 : page;
 
     try {
       const res = await axios.get(`${apiUrl}/production/`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { page: targetPage },
+        params: { page: pageToFetch }, // Używamy lokalnej zmiennej pageToFetch
       });
-      
+
+      console.log(`Pobrano stronę: ${pageToFetch}`, res.data);
+
       setProductions((prev) =>
         reset
           ? res.data.results
           : [...prev, ...res.data.results.filter((n) => !prev.some((p) => p.id === n.id))]
       );
+      
       setHasMore(!!res.data.next);
-      setPage((prev) => prev + 1);
+      
+      // === KLUCZOWA POPRAWKA ===
+      // Zamiast (prev) => prev + 1, ustawiamy na podstawie strony, którą właśnie pobraliśmy
+      setPage(pageToFetch + 1); 
+      
     } catch (err) {
       console.error("Błąd listy produkcji:", err);
     } finally {

@@ -10,19 +10,6 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
 
   const containerRef = useRef(null);
 
-  // Wczytywanie obrazka
-  // const onFileChange = (e) => {
-  //   if (e.target.files && e.target.files[0]) {
-  //     const file = e.target.files[0];
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setImageSrc(reader.result);
-  //       setPosition({ x: 0, y: 0 }); // reset pozycji
-  //       setImageScale(1); // reset skali
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
 
   // Drag start
   const onMouseDown = (e) => {
@@ -46,20 +33,13 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
     setDragging(false);
   };
 
-  // Zoom
-  // const onZoomChange = (e) => {
-  //   const val = parseFloat(e.target.value);
-  //   setImageScale(val);
-  // };
+  
 
   return (
     <div
       className={`text-center ${dragging ? "select-none" : "select-auto"}  w-full`}
-          style={{ aspectRatio: ' 11.8 / 1.2 ' }}
-
-    >
-      
-
+          
+          >
       {imageSrc ? (
         <>
           <div
@@ -75,12 +55,10 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
               src={displaySrc} 
               alt="Uploaded"
               draggable={false}
-           
               style={{
                 position: "absolute",
                 left: position.x,
                 top: position.y,
-                
                 height: 60,
                 transform: `scale(${imageScale})`,
                 transformOrigin: "top left",
@@ -94,8 +72,6 @@ const displaySrc = imageSrc instanceof File ? URL.createObjectURL(imageSrc) : im
               }}
             />
           </div>
-
-        
         </>
       ):(
         <div className="my-2 p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500">
