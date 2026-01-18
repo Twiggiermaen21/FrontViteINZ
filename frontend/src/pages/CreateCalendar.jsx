@@ -49,8 +49,11 @@ export default function CreateCalendar() {
       fontFamily: "Arial",
       fontWeight: "400",
       fontColor: "#333333",
+      fontSize: 14,
     }))
   );
+
+  console.log("Font Settings:", fontSettings);
   const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
   const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
   const [imageScales, setImageScales] = useState(() => months.map(() => 1));
@@ -484,7 +487,7 @@ export default function CreateCalendar() {
                   {/* 2. POLE REKLAMOWE (Dół) - Wysokość: 65px */}
                   {/* To pole odpowiada Twoim paskom 31x5cm oraz stopce na samym dole */}
                   <div
-                    className="w-full flex items-center justify-center overflow-hidden"
+                    className="w-full flex items-center px-2 justify-center overflow-hidden"
                     style={{ height: "65px" }}
                   >
                     {isImageMode[index] ? (
@@ -511,13 +514,13 @@ export default function CreateCalendar() {
                     ) : (
                       <LimitedTextarea
                         value={monthTexts[index]}
+                        setFontSettings={setFontSettings}
+                        fontSettings={fontSettings}
                         index={index}
                         onChange={handleMonthTextChange}
                         placeholder="Wpisz tekst reklamowy..."
-                        fontFamily={fontSettings[index].fontFamily}
-                        fontWeight={fontSettings[index].fontWeight}
-                        fontColor={fontSettings[index].fontColor}
-                        maxChars={1000}
+                        
+                        maxChars={100}
                       />
                     )}
                   </div>

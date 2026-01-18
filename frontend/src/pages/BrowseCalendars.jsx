@@ -4,6 +4,8 @@ import { ACCESS_TOKEN } from "../constants";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 import { useOutletContext } from "react-router-dom";
+import { getPaddingTopFromText } from "../utils/textPadding";
+import CalendarDetailsModal from "../components/browseCalendarElements/ModalSelectedCalendar.jsx";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 const months = ["Grudzień", "Styczeń", "Luty"];
@@ -178,7 +180,7 @@ const BrowseCalendars = () => {
     }
   };
 
-  const addToProduction = async () => {
+  const handleAddToProduction = async () => {
     try {
       const token = localStorage.getItem(ACCESS_TOKEN);
 
@@ -235,11 +237,12 @@ const BrowseCalendars = () => {
     // Sprzątamy po sobie (cleanup), żeby nie zapchać pamięci
     return () => window.removeEventListener("resize", handleResize);
   }, []);
- 
+  
+
  
 
   
-  console.log(calendars[2]);
+  console.log(calendars[0]);
   return (
     <div style={{ width: width }} className=" mt-4  bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]  max-w-[1600px]">
       <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
@@ -332,6 +335,7 @@ const BrowseCalendars = () => {
                           if (!field) return null;
                           const isText = "text" in field;
                           const isImage = "path" in field;
+                          
                           return (
                             <>     
                             <div
@@ -357,7 +361,20 @@ const BrowseCalendars = () => {
                   >
                                 {isText
                                   ? 
-                                  <a > {field.text}</a>
+                                   <textarea className="w-full h-[60px] resize-none px-2 text-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                 rows={2}
+                                  readOnly
+                                   style={{
+                                   fontSize: `${field.size}px`,
+                                   fontFamily: field.font,
+                                   fontWeight: field.weight,
+                                   color: field.color,
+                                   lineHeight: "1.2",
+                                   padding: 0,
+                                  paddingTop: getPaddingTopFromText(field.text),
+                                   display: "block",
+                         
+                                 }}>{field.text}</textarea>
                                   
                                   : isImage
                                   ? calendar.images_for_fields
@@ -394,182 +411,12 @@ const BrowseCalendars = () => {
 
       {/* Modal */}
       {selectedCalendar && (
-        <div
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-6"
-          onClick={() => setSelectedCalendar(null)}
-        >
-          <div
-            className="relative max-w-6xl w-full bg-[#1e1f1f] rounded-2xl shadow-lg overflow-hidden flex gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Zamknij modal */}
-            <button
-              className="absolute top-3 right-3 text-white text-2xl hover:text-[#a0f0f0] transition"
-              onClick={() => setSelectedCalendar(null)}
-            >
-              ✕
-            </button>
-
-            {/* Kalendarz */}
-            <div className="flex-shrink-0 w-[400px] h-auto bg-white border rounded overflow-hidden shadow m-4">
-              {/* Header */}
-              <div className="relative h-[180px] bg-gray-200 flex items-center justify-center overflow-hidden">
-                {selectedCalendar.top_image ? (
-                  <img
-                    src={selectedCalendar.top_image_url}
-                    alt="Nagłówek"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-gray-500">Brak grafiki nagłówka</span>
-                )}
-              </div>
-
-              {/* Bottom */}
-              <div
-                className="px-3 py-4 flex flex-col items-center text-center"
-                style={getBottomSectionBackground({
-                  style:
-                    selectedCalendar.bottom?.content_type_id === 26
-                      ? "style1"
-                      : selectedCalendar.bottom?.content_type_id === 27
-                      ? "style2"
-                      : selectedCalendar.bottom?.content_type_id === 28
-                      ? "style3"
-                      : null,
-                  bgColor:
-                    selectedCalendar.bottom?.color ??
-                    selectedCalendar.bottom?.start_color,
-                  gradientEndColor: selectedCalendar.bottom?.end_color,
-                  gradientTheme: selectedCalendar.bottom?.theme,
-                  gradientStrength: selectedCalendar.bottom?.strength,
-                  gradientVariant: selectedCalendar.bottom?.direction,
-                  backgroundImage: selectedCalendar.bottom?.url,
-                })}
-              >
-                {[
-                  selectedCalendar.field1,
-                  selectedCalendar.field2,
-                  selectedCalendar.field3,
-                ].map((field, index) => {
-                  if (!field) return null;
-                  const isText = "text" in field;
-                  const isImage = "path" in field;
-                  return (
-                    <div
-                      key={`${selectedCalendar.id}-${index}`}
-                      className="w-full border rounded bg-white shadow p-2 flex flex-col items-center mb-2"
-                    >
-                      <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                        {months[index]}
-                      </h3>
-                      <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
-                        [Siatka dni dla {months[index]}]
-                      </div>
-                      <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
-                        {isText
-                          ? field.text
-                          : isImage
-                          ? selectedCalendar.images_for_fields
-                              .filter((img) => img.field_number === index + 1)
-                              .map((img) => (
-                                <img
-                                  key={`${selectedCalendar.id}-${index}-${img.id}`}
-                                  src={img.url}
-                                  alt="Image"
-                                  style={{ height: 60 }}
-                                />
-                              ))
-                          : null}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Panel boczny z nazwą i przyciskami */}
-            <div className="flex flex-col justify-start p-6 text-white flex-1">
-              <h2 className="text-3xl font-bold mb-6">
-                {selectedCalendar.name}
-              </h2>
-
-              {/* === PANEL PRODUKCJI – STYL JAK TEN GÓRNY === */}
-              <div className="bg-[#2a2b2b] rounded-4xl p-8 shadow-lg mb-6">
-                <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">
-                  Dodaj do produkcji
-                </h3>
-
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    addToProduction(selectedCalendar.id);
-                  }}
-                  className="flex flex-col gap-5"
-                >
-                  {/* ILOŚĆ */}
-                  <div>
-                    <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
-                      Ilość
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
-                      placeholder="Podaj ilość"
-                      className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-                      required
-                    />
-                  </div>
-
-                  {/* DEADLINE */}
-                  <div>
-                    <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
-                      Termin realizacji
-                    </label>
-                    <input
-                      type="date"
-                      value={deadline}
-                      onChange={(e) => setDeadline(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-                    />
-                  </div>
-
-                  {/* NOTATKA */}
-                  <div>
-                    <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
-                      Notatka dla produkcji
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      placeholder="Np. rodzaj papieru, format, wykończenie..."
-                      className="w-full p-4 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-                    />
-                  </div>
-
-                  {/* SUBMIT */}
-                  <button
-                    type="submit"
-                    className="w-full py-4 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300 disabled:opacity-50"
-                  >
-                    Dodaj do produkcji
-                  </button>
-                </form>
-              </div>
-
-              {/* === USUWANIE === */}
-              <button
-                className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700"
-                onClick={() => deleteCalendar(selectedCalendar.id)}
-              >
-                Usuń
-              </button>
-            </div>
-          </div>
-        </div>
+        <CalendarDetailsModal
+          selectedCalendar={selectedCalendar}
+          onClose={() => setSelectedCalendar(null)}
+          onDelete={deleteCalendar} // Zakładam, że masz tę funkcję w rodzicu
+          onAddToProduction={handleAddToProduction}
+        />
       )}
     </div>
   );

@@ -1,17 +1,24 @@
-
 import useAutoFontSize from "../../utils/autoFontSize";
 import { getPaddingTopFromText } from "../../utils/textPadding";
+
 const LimitedTextarea = ({
   value,
+  setFontSettings,
+  fontSettings,
   onChange,
   placeholder = "",
   index = 0,
   maxChars = 1000,
-  fontFamily = "inherit",    // np. 'Arial', 'Courier New', 'Roboto'
-  fontWeight = "normal",     // np. 'bold', '300', '500'
-  fontColor = "#333333",     // dowolny kolor CSS (hex, rgb, nazwany)
 }) => {
-  const [ref, fontSize] = useAutoFontSize(value);
+  // Bezpieczne pobieranie ustawień dla danego indeksu
+  const currentSettings = fontSettings[index] || {};
+
+  const [ref, fontSize] = useAutoFontSize(
+    value, 
+    index, 
+    setFontSettings, 
+    currentSettings // Przekazujemy cały obiekt ustawień dla tego pola
+  );
 
   const handleTextChange = (e) => {
     let val = e.target.value;
@@ -39,19 +46,14 @@ const LimitedTextarea = ({
     }
 
     const isControlKey = [
-      "Backspace",
-      "Delete",
-      "ArrowLeft",
-      "ArrowRight",
-      "ArrowUp",
-      "ArrowDown",
+      "Backspace", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
     ].includes(e.key);
 
     if (!isControlKey && val.length >= maxChars) {
       e.preventDefault();
     }
   };
-
+  
   const handlePaste = (e) => {
     const pasted = e.clipboardData.getData("text");
     const combined = (value + pasted).slice(0, maxChars).split("\n");
@@ -64,7 +66,7 @@ const LimitedTextarea = ({
   };
   
   return (
-    <div className="relative w-full my-2" style={{ aspectRatio: ' 11.8 / 1.2' }}>
+    <div className="relative w-full my-2">
       <textarea
         ref={ref}
         value={value}
@@ -73,22 +75,20 @@ const LimitedTextarea = ({
         onPaste={handlePaste}
         rows={2}
         maxLength={maxChars}
-        className="w-full h-[60px] resize-none italic text-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+        // overflow-hidden ukrywa pasek przewijania, bo skrypt i tak dopasuje tekst
+        className="w-full h-[60px] resize-none text-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 overflow-hidden"
         style={{
           fontSize: `${fontSize}px`,
-          fontFamily: fontFamily,
-          fontWeight: fontWeight,
-          color: fontColor,
+          fontFamily: currentSettings.fontFamily,
+          fontWeight: currentSettings.fontWeight,
+          color: currentSettings.fontColor,
           lineHeight: "1.2",
           padding: 0,
-         paddingTop: getPaddingTopFromText(value),
+          paddingTop: getPaddingTopFromText(value),
           display: "block",
-
         }}
         placeholder={placeholder}
       />
-
-
     </div>
   );
 };
