@@ -217,15 +217,37 @@ const BrowseCalendars = () => {
       }
     }
   };
-  console.log(calendars[0]);
+
+
+  // Sprawdzamy, czy window istnieje (zabezpieczenie dla Next.js/SSR)
+  const isWindow = typeof window !== "undefined";
+  
+  const [width, setWidth] = useState(isWindow ? window.innerWidth : 0);
+
+  useEffect(() => {
+    if (!isWindow) return;
+
+    const handleResize = () => setWidth(Math.max(window.innerWidth-320, 300));
+
+    // Dodajemy nasłuchiwanie na zmianę rozmiaru
+    window.addEventListener("resize", handleResize);
+    console.log("Initial width set to:", width);
+    // Sprzątamy po sobie (cleanup), żeby nie zapchać pamięci
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+ 
+ 
+
+  
+  console.log(calendars[2]);
   return (
-    <div className="relative mt-8 mx-auto bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]   max-w-[1600px]">
+    <div style={{ width: width }} className=" mt-4  bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]  max-w-[1600px]">
       <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
         Przeglądaj kalendarze
       </h1>
 
-      <div className="overflow-x-auto w-full custom-scroll" ref={scrollRef}>
-        <div className="flex gap-6 pb-4">
+      <div  className="overflow-x-auto custom-scroll  [zoom:0.725] pb-8" ref={scrollRef}>
+        <div className="flex gap-4 md:gap-8 px-4">
           {calendars.length === 0 && !loading ? (
             <p className="text-[#989c9e]">Brak dostępnych kalendarzy.</p>
           ) : (
@@ -285,7 +307,7 @@ const BrowseCalendars = () => {
 
                     {/* Bottom */}
                     <div
-                      className="h-[720px] px-3 py-4 flex flex-col items-center text-center"
+                      className="h-[602px] flex flex-col items-center overflow-hidden"
                       style={getBottomSectionBackground({
                         style:
                           calendar.bottom?.content_type_id === 26
@@ -311,9 +333,15 @@ const BrowseCalendars = () => {
                           const isText = "text" in field;
                           const isImage = "path" in field;
                           return (
+                            <>     
                             <div
                               key={`${calendar.id}-${index}`}
-                              className="w-full border rounded bg-white shadow p-2 flex flex-col items-center mb-2"
+                             className="bg-white shadow-sm flex flex-col items-center border border-gray-200"
+                    style={{
+                      height: "132px",
+                      width: "273px", // Proporcja 29cm
+                      marginTop: "4px", // Mały odstęp od góry/paska
+                    }}
                             >
                               <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
                                 {months[index]}
@@ -321,9 +349,16 @@ const BrowseCalendars = () => {
                               <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
                                 [Siatka dni dla {months[index]}]
                               </div>
-                              <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
+                              
+                            </div>
+                     <div
+                    className="w-full flex items-center justify-center overflow-hidden"
+                    style={{ height: "65px" }}
+                  >
                                 {isText
-                                  ? field.text
+                                  ? 
+                                  <a > {field.text}</a>
+                                  
                                   : isImage
                                   ? calendar.images_for_fields
                                       .filter(
@@ -339,7 +374,7 @@ const BrowseCalendars = () => {
                                       ))
                                   : null}
                               </div>
-                            </div>
+                          </>
                           );
                         }
                       )}

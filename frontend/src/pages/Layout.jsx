@@ -19,6 +19,8 @@ const Layout = () => {
 
   return (
     <div className="flex min-h-screen bg-[#1e1f1f] text-white">
+          {/* // <div className="flex h-fit min-h-full w-fit min-w-full bg-[#1e1f1f] text-white"> */}
+
       {/* SIDEBAR */}
       <SideBar sidebar={sidebar} setSidebar={setSidebar} user={user} />
 
