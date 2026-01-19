@@ -5,87 +5,12 @@ import { getBottomSectionBackground } from "../utils/getBottomSectionBackground"
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 import {MONTHS, STATUS_MAP } from "../constants";
 import { getStatusStyle } from "../utils/getStatusStyle";
+import CalendarPreview from "../components/browseCalendarElements/CalendarPreview.jsx";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 
-/* ================= PREVIEW KALENDARZA ================= */
-const CalendarPreview = ({ calendar }) => {
-  if (!calendar) return null;
 
-  return (
-    <div className="w-[221px] bg-white border rounded shadow-lg">
-      <div className="relative h-[152px] bg-gray-200 flex items-center justify-center overflow-hidden">
-        {calendar.top_image ? (
-          <img
-            src={calendar.top_image_url}
-            alt="Nagłówek"
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <span className="text-gray-500">Brak nagłówka</span>
-        )}
-
-        {calendar?.year_data && (
-          <span
-            style={{
-              position: "absolute",
-              color: calendar.year_data.color,
-              fontSize: `${calendar.year_data.size}px`,
-              fontWeight: calendar.year_data.weight,
-              fontFamily: calendar.year_data.font,
-              ...getYearPositionStyles({
-                coords: {
-                  x: calendar.year_data.positionX,
-                  y: calendar.year_data.positionY,
-                },
-              }),
-            }}
-          >
-            {calendar.year_data.text}
-          </span>
-        )}
-      </div>
-
-      <div
-        className="px-2 py-2"
-        style={getBottomSectionBackground({
-          style:
-            calendar.bottom?.content_type_id === 26
-              ? "style1"
-              : calendar.bottom?.content_type_id === 27
-              ? "style2"
-              : "style3",
-          bgColor: calendar.bottom?.color,
-          gradientEndColor: calendar.bottom?.end_color,
-        })}
-      >
-        {[calendar.field1, calendar.field2, calendar.field3].map((field, index) => {
-          if (!field) return null;
-          const isText = "text" in field;
-          const isImage = "path" in field;
-
-          return (
-            <div key={index} className="bg-white rounded p-1 mb-2 text-center">
-              <h3 className="text-xs font-bold uppercase mb-1">{MONTHS[index]}</h3>
-              <div className="text-xs text-gray-700">
-                {isText ? (
-                  field.text
-                ) : isImage ? (
-                  <img
-                    src={field.path}
-                    alt="Pole graficzne"
-                    className="h-8 w-full object-contain mx-auto"
-                  />
-                ) : null}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 
 /* ================= LISTA PRODUKCJI ================= */
 const ProductionList = () => {
@@ -248,13 +173,13 @@ const ProductionList = () => {
 
                 {isExpanded && (
                   <div className="p-6 flex flex-col md:flex-row gap-6 bg-[#2a2b2b] border-t border-[#3c3d3d]">
-                    <div className="md:w-1/3 flex justify-center items-center">
+                    <div className="md:w-1/3 [zoom:0.70] flex justify-center items-center">
                       {isLoadingCalendar ? (
                         <div className="flex items-center justify-center w-full h-32">
                           <div className="w-16 h-16 border-4 border-t-[#afe5e6] border-b-[#6d8f91] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
                         </div>
                       ) : calendarData ? (
-                        <CalendarPreview calendar={calendarData} />
+                        <CalendarPreview  calendar={calendarData} />
                       ) : (
                         <p className="text-red-400">Brak podglądu</p>
                       )}

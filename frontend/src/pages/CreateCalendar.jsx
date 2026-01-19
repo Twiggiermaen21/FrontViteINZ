@@ -238,6 +238,9 @@ setIsSaving(true);
     };
   }, [dragging, xLimits, yLimits]);
 
+
+console.log("Settings fontowe:", fontSettings);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-6 px-4">
       <div className="lg:col-span-3 space-y-2 ">

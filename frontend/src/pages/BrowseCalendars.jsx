@@ -1,14 +1,11 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
-import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
-import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 import { useOutletContext } from "react-router-dom";
-import { getPaddingTopFromText } from "../utils/textPadding";
 import CalendarDetailsModal from "../components/browseCalendarElements/ModalSelectedCalendar.jsx";
-
+import CalendarPreview from "../components/browseCalendarElements/CalendarPreview.jsx";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
-const months = ["Grudzień", "Styczeń", "Luty"];
+
 
 const BrowseCalendars = () => {
   const selectedProject = useOutletContext() ?? {};
@@ -225,7 +222,7 @@ const BrowseCalendars = () => {
       </h1>
 
       <div
-        className="overflow-x-auto custom-scroll  [zoom:0.72] pb-4"
+        className="overflow-x-auto custom-scroll [zoom:0.72] pb-4"
         ref={scrollRef}
       >
         <div className="flex gap-4 md:gap-8 px-4">
@@ -249,163 +246,7 @@ const BrowseCalendars = () => {
                   <h1 className="text-xl font-bold text-white mb-2">
                     {calendar.name}
                   </h1>
-                  <div className="w-[292px] rounded overflow-hidden shadow">
-                    {/* Header */}
-                    <div className="relative h-[198px] w-full bg-gray-200 flex items-center justify-center ">
-                      {calendar.top_image ? (
-                        <img
-                          src={calendar.top_image_url}
-                          alt="Nagłówek"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-gray-500">
-                          Brak grafiki nagłówka
-                        </span>
-                      )}
-
-                      {calendar.year_data !== null && (
-                        <span
-                          style={{
-                            position: "absolute",
-                            color: calendar?.year_data.color,
-                            fontSize: `${calendar?.year_data.size}px`,
-                            fontWeight: calendar?.year_data.weight,
-                            fontFamily: calendar?.year_data.font,
-
-                            ...getYearPositionStyles({
-                              coords: {
-                                x: calendar.year_data.positionX,
-                                y: calendar.year_data.positionY,
-                              },
-                            }),
-                          }}
-                        >
-                          {calendar?.year_data.text}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Bottom */}
-                    <div
-                      className="h-[602px] flex flex-col items-center overflow-hidden"
-                      style={getBottomSectionBackground({
-                        style:
-                          calendar.bottom?.content_type_id === 26
-                            ? "style1"
-                            : calendar.bottom?.content_type_id === 27
-                              ? "style2"
-                              : calendar.bottom?.content_type_id === 28
-                                ? "style3"
-                                : null,
-                        bgColor:
-                          calendar.bottom?.color ??
-                          calendar.bottom?.start_color,
-                        gradientEndColor: calendar.bottom?.end_color,
-                        gradientTheme: calendar.bottom?.theme,
-                        gradientStrength: calendar.bottom?.strength,
-                        gradientVariant: calendar.bottom?.direction,
-                        backgroundImage: calendar.bottom?.url,
-                      })}
-                    >
-                      {[calendar.field1, calendar.field2, calendar.field3].map(
-                        (field, index) => {
-                          let isText;
-                          let isImage;
-                          if (field !== null) {
-                            isText = "text" in field;
-                            isImage = "path" in field;
-                          }
-                          return (
-                            <React.Fragment
-                              key={`group-${calendar.id}-${index}`}
-                            >
-                              <div
-                                className="bg-white shadow-sm flex flex-col items-center border border-gray-200"
-                                style={{
-                                  height: "132px",
-                                  width: "273px",
-                                  marginTop: "4px",
-                                }}
-                              >
-                                <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                                  {months[index]}
-                                </h3>
-                                <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center mb-2">
-                                  [Siatka dni dla {months[index]}]
-                                </div>
-                              </div>
-
-                              <div
-  className="w-full flex items-center justify-center px-2 overflow-hidden " // Dodano relative
-  style={{ height: "65px" }}
->
-  {(() => {
-    const fieldData = calendar[`field${index + 1}`];
-    
-    if (!fieldData) return null;
-
-    const isTextField = fieldData.text !== undefined;
-    const isImageField = fieldData.path !== undefined;
-
-    if (isTextField) {
-      return (
-        <textarea
-          className="w-full h-[60px] resize-none px-2 text-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
-          rows={2}
-          readOnly
-          defaultValue={fieldData.text}
-          style={{
-            fontSize: `${fieldData.size}px`,
-            fontFamily: fieldData.font,
-            fontWeight: fieldData.weight,
-            color: fieldData.color,
-            lineHeight: "1.2",
-            padding: 0,
-            paddingTop: getPaddingTopFromText(fieldData.text),
-            display: "block",
-          }}
-        />
-      );
-    }
-
-    if (isImageField) {
-      return calendar.images_for_fields
-        ?.filter((img) => img.field_number === index + 1)
-        .map((img) => (
-           <div
-            className={`my-2 mx-auto w-full overflow-hidden relative`}
-            style={{ height: 60 }}
-          >
-          <img
-            key={`img-${calendar.id}-${index}-${img.id}`}
-            src={img.url}
-            alt="Field content"
-            style={{
-              position: "absolute", // Pozycjonowanie względem rodzica (div)
-              left: `${Number(fieldData.positionX || 0)}px`, // X względem tego diva
-              top: `${Number(fieldData.positionY || 0)}px`,  // Y względem tego diva
-              height: "60px", // Bazowa wysokość
-              
-              // Skalowanie względem lewego górnego rogu (tak jak w edytorze)
-              transform: `scale(${Number(fieldData.size)})`,
-              transformOrigin: "top left",
-              
-            }}
-          />
-          </div>
-        ));
-    }
-
-    return null;
-  })()}
-</div>
-                            </React.Fragment>
-                          );
-                        },
-                      )}
-                    </div>
-                  </div>
+                  <CalendarPreview calendar={calendar} />
                 </div>
               ))
           )}

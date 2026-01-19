@@ -12,7 +12,8 @@ const LimitedTextarea = ({
 }) => {
   // Bezpieczne pobieranie ustawień dla danego indeksu
   const currentSettings = fontSettings[index] || {};
-
+  
+  
   const [ref, fontSize] = useAutoFontSize(
     value, 
     index, 
