@@ -3,14 +3,11 @@ import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 import { getYearPositionStyles } from "../utils/getYearPositionStyles";
-import {MONTHS, STATUS_MAP } from "../constants";
+import { MONTHS, STATUS_MAP } from "../constants";
 import { getStatusStyle } from "../utils/getStatusStyle";
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview.jsx";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
-
-
-
 
 /* ================= LISTA PRODUKCJI ================= */
 const ProductionList = () => {
@@ -37,41 +34,48 @@ const ProductionList = () => {
     }
   }, []);
 
- const fetchProductions = useCallback(async (reset = false) => {
-    if ((!hasMore && !reset) || loadingMore) return;
+  const fetchProductions = useCallback(
+    async (reset = false) => {
+      if ((!hasMore && !reset) || loadingMore) return;
 
-    setLoadingMore(true);  
-    const token = localStorage.getItem(ACCESS_TOKEN);
+      setLoadingMore(true);
+      const token = localStorage.getItem(ACCESS_TOKEN);
 
-    // Ustalmy stronę do pobrania na sztywno przed zapytaniem
-    const pageToFetch = reset ? 1 : page;
+      // Ustalmy stronę do pobrania na sztywno przed zapytaniem
+      const pageToFetch = reset ? 1 : page;
 
-    try {
-      const res = await axios.get(`${apiUrl}/production/`, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: { page: pageToFetch }, // Używamy lokalnej zmiennej pageToFetch
-      });
+      try {
+        const res = await axios.get(`${apiUrl}/production/`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { page: pageToFetch }, // Używamy lokalnej zmiennej pageToFetch
+        });
 
-      console.log(`Pobrano stronę: ${pageToFetch}`, res.data);
+        console.log(`Pobrano stronę: ${pageToFetch}`, res.data);
 
-      setProductions((prev) =>
-        reset
-          ? res.data.results
-          : [...prev, ...res.data.results.filter((n) => !prev.some((p) => p.id === n.id))]
-      );
-      
-      setHasMore(!!res.data.next);
-      
-      // === KLUCZOWA POPRAWKA ===
-      // Zamiast (prev) => prev + 1, ustawiamy na podstawie strony, którą właśnie pobraliśmy
-      setPage(pageToFetch + 1); 
-      
-    } catch (err) {
-      console.error("Błąd listy produkcji:", err);
-    } finally {
-      setLoadingMore(false);
-    }
-  }, [hasMore, loadingMore, page, productions]);
+        setProductions((prev) =>
+          reset
+            ? res.data.results
+            : [
+                ...prev,
+                ...res.data.results.filter(
+                  (n) => !prev.some((p) => p.id === n.id),
+                ),
+              ],
+        );
+
+        setHasMore(!!res.data.next);
+
+        // === KLUCZOWA POPRAWKA ===
+        // Zamiast (prev) => prev + 1, ustawiamy na podstawie strony, którą właśnie pobraliśmy
+        setPage(pageToFetch + 1);
+      } catch (err) {
+        console.error("Błąd listy produkcji:", err);
+      } finally {
+        setLoadingMore(false);
+      }
+    },
+    [hasMore, loadingMore, page, productions],
+  );
 
   useEffect(() => {
     if (page === 1 && productions.length === 0 && !loadingMore && hasMore) {
@@ -80,7 +84,11 @@ const ProductionList = () => {
   }, [fetchProductions, page, productions.length, loadingMore, hasMore]);
 
   const cancelProduction = useCallback(async (productionId) => {
-    if (!window.confirm("Czy na pewno chcesz anulować tę pozycję z produkcji? Kalendarz pozostanie nienaruszony.")) {
+    if (
+      !window.confirm(
+        "Czy na pewno chcesz anulować tę pozycję z produkcji? Kalendarz pozostanie nienaruszony.",
+      )
+    ) {
       return;
     }
 
@@ -96,7 +104,9 @@ const ProductionList = () => {
       alert("Produkcja została pomyślnie anulowana.");
     } catch (err) {
       console.error("Błąd anulowania produkcji:", err);
-      const errorMessage = err.response?.data?.detail || "Wystąpił nieznany błąd podczas anulowania.";
+      const errorMessage =
+        err.response?.data?.detail ||
+        "Wystąpił nieznany błąd podczas anulowania.";
       alert(`Błąd: ${errorMessage}`);
     } finally {
       setIsCancelling(null);
@@ -124,16 +134,16 @@ const ProductionList = () => {
     setLoadingCalendarId(null);
   };
 
- return (
+  return (
     <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl mx-auto text-white">
       {/* Style dla customowego scrollbara */}
-      
 
-      <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">Lista Produkcji</h1>
+      <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
+        Lista Produkcji
+      </h1>
 
       {/* Kontener scrollowania - max 800px wysokości */}
       <div className="max-h-[660px] overflow-y-auto custom-scroll pr-4">
-        
         <div className="space-y-4">
           {!loadingMore && productions.length === 0 && (
             <p className="text-lg text-center text-gray-400 py-10">
@@ -147,10 +157,14 @@ const ProductionList = () => {
             const isLoadingCalendar = loadingCalendarId === item.id;
             const isCurrentlyCancelling = isCancelling === item.id;
             const englishStatusKey = item.status || "Nieokreślony";
-            const polishStatusText = STATUS_MAP[englishStatusKey] || STATUS_MAP["Nieokreślony"];
+            const polishStatusText =
+              STATUS_MAP[englishStatusKey] || STATUS_MAP["Nieokreślony"];
 
             return (
-              <div key={item.id} className="bg-[#1e1f1f] rounded-xl border border-[#3c3d3d] overflow-hidden">
+              <div
+                key={item.id}
+                className="bg-[#1e1f1f] rounded-xl border border-[#3c3d3d] overflow-hidden"
+              >
                 <div
                   onClick={() => toggleExpand(item)}
                   className="p-4 flex justify-between items-center cursor-pointer hover:bg-[#3c3d3d]/50 transition duration-150"
@@ -160,15 +174,20 @@ const ProductionList = () => {
                       {item.calendar_name || "Brak nazwy kalendarza"}
                     </p>
                     <p className="text-sm text-gray-400 mt-1">
-                      Utworzono: {new Date(item.created_at).toLocaleDateString()}
+                      Utworzono:{" "}
+                      {new Date(item.created_at).toLocaleDateString()}
                     </p>
                   </div>
 
-                  <div className={`py-1 px-3 rounded-full text-sm font-semibold ml-4 ${getStatusStyle(englishStatusKey)}`}>
+                  <div
+                    className={`py-1 px-3 rounded-full text-sm font-semibold ml-4 ${getStatusStyle(englishStatusKey)}`}
+                  >
                     {polishStatusText}
                   </div>
 
-                  <span className="text-2xl text-[#afe5e6] ml-4">{isExpanded ? "▲" : "▼"}</span>
+                  <span className="text-2xl text-[#afe5e6] ml-4">
+                    {isExpanded ? "▲" : "▼"}
+                  </span>
                 </div>
 
                 {isExpanded && (
@@ -179,30 +198,44 @@ const ProductionList = () => {
                           <div className="w-16 h-16 border-4 border-t-[#afe5e6] border-b-[#6d8f91] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
                         </div>
                       ) : calendarData ? (
-                        <CalendarPreview  calendar={calendarData} />
+                        <CalendarPreview calendar={calendarData} />
                       ) : (
                         <p className="text-red-400">Brak podglądu</p>
                       )}
                     </div>
 
                     <div className="md:w-2/3 space-y-4">
-                      <h3 className="text-2xl font-bold mb-2">Szczegóły Zamówienia</h3>
-                      
+                      <h3 className="text-2xl font-bold mb-2">
+                        Szczegóły Zamówienia
+                      </h3>
+
                       <div className="flex gap-6 p-3 bg-[#1e1f1f] rounded-lg">
                         <div>
                           <p className="text-sm text-gray-400">Ilość:</p>
-                          <p className="text-lg font-bold text-[#afe5e6]">{item.quantity} szt.</p>
+                          <p className="text-lg font-bold text-[#afe5e6]">
+                            {item.quantity} szt.
+                          </p>
                         </div>
                         <div>
-                          <p className="text-sm text-gray-400">Termin Realizacji:</p>
-                          <p className="text-lg font-bold">{item.deadline || "Nieokreślony"}</p>
+                          <p className="text-sm text-gray-400">
+                            Termin Realizacji:
+                          </p>
+                          <p className="text-lg font-bold">
+                           
+  {item.deadline 
+    ? new Date(item.deadline).toLocaleDateString('pl-PL') 
+    : "Nieokreślony"}
+                          </p>
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-sm text-gray-400 mb-1">Notatka dla produkcji:</p>
+                        <p className="text-sm text-gray-400 mb-1">
+                          Notatka dla produkcji:
+                        </p>
                         <p className="bg-[#1e1f1f] p-4 rounded-lg whitespace-pre-wrap italic">
-                          {item.production_note || "Brak notatki od klienta/projektanta."}
+                          {item.production_note ||
+                            "Brak notatki od klienta/projektanta."}
                         </p>
                       </div>
 
@@ -219,7 +252,8 @@ const ProductionList = () => {
                             Anuluj Produkcję
                           </button>
                           <p className="text-xs text-gray-400 mt-2">
-                            Spowoduje to usunięcie pozycji tylko z listy produkcji, projekt kalendarza pozostanie w bazie.
+                            Spowoduje to usunięcie pozycji tylko z listy
+                            produkcji, projekt kalendarza pozostanie w bazie.
                           </p>
                         </div>
                       )}
@@ -232,11 +266,15 @@ const ProductionList = () => {
         </div>
 
         {loadingMore && (
-          <p className="text-center text-gray-400 mt-6">Ładowanie kolejnych pozycji...</p>
+          <p className="text-center text-gray-400 mt-6">
+            Ładowanie kolejnych pozycji...
+          </p>
         )}
 
         {!hasMore && productions.length > 0 && (
-          <p className="text-center text-gray-400 mt-6">Wszystkie pozycje zostały załadowane.</p>
+          <p className="text-center text-gray-400 mt-6">
+            Wszystkie pozycje zostały załadowane.
+          </p>
         )}
 
         {hasMore && !loadingMore && (

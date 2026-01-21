@@ -6,7 +6,6 @@ import CalendarDetailsModal from "../components/browseCalendarElements/ModalSele
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview.jsx";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
-
 const BrowseCalendars = () => {
   const selectedProject = useOutletContext() ?? {};
   const [calendars, setCalendars] = useState([]);
@@ -156,7 +155,7 @@ const BrowseCalendars = () => {
   const handleAddToProduction = async () => {
     try {
       const token = localStorage.getItem(ACCESS_TOKEN);
-
+      console.log("Selected Project in BrowseCalendars:", deadline);
       const response = await axios.post(
         `${apiUrl}/production/`,
         {
@@ -266,6 +265,12 @@ const BrowseCalendars = () => {
           onClose={() => setSelectedCalendar(null)}
           onDelete={deleteCalendar} // Zakładam, że masz tę funkcję w rodzicu
           onAddToProduction={handleAddToProduction}
+          deadline={deadline}
+          quantity={quantity}
+          note={note}
+          setDeadline={setDeadline}
+          setQuantity={setQuantity}
+          setNote={setNote}
         />
       )}
     </div>

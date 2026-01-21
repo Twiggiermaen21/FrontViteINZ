@@ -179,7 +179,7 @@ export default function Settings() {
     }
   };
   return (
-    <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl mx-auto pt-8 px-4">
+    <div className="flex flex-col lg:flex-row gap-10 w-full max-w-6xl mx-auto pt-6 px-4">
       {/* LEWA STRONA — zdjęcie profilowe */}
       <div className="flex flex-col items-center bg-[#2a2b2b] p-8 rounded-4xl shadow-lg w-full lg:w-1/3">
         <h2 className="text-xl text-white font-semibold mb-6">
