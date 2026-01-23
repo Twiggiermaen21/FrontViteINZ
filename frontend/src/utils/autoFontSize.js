@@ -1,44 +1,49 @@
 import { useEffect, useRef } from "react";
 
-function useAutoFontSize(text, index, setFontSettings, currentFontSettings, minFont = 10, maxFont = 30) {
+// ZMIANA: Domyślne wartości zwiększone ~12-krotnie pod wymiar 3661px
+function useAutoFontSize(text, index, setFontSettings, currentFontSettings, minFont = 100, maxFont = 450) {
   const ref = useRef(null);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    // Pobieramy aktualny stan z obiektu (bezpiecznie)
-    const currentSize = currentFontSettings?.size || maxFont;
+    // POPRAWKA: Ujednolicenie nazwy - w stanie masz 'fontSize', a nie 'size'
+    const currentSize = currentFontSettings?.fontSize || maxFont;
 
+    // Zawsze zaczynamy próbkowanie od maksymalnej czcionki
     let newFontSize = maxFont;
 
-    // Funkcja sprawdzająca czy tekst się mieści
     const checkFits = (size) => {
       el.style.fontSize = `${size}px`;
       
-      // Sprawdzamy, czy pojawia się scroll pionowy (scrollHeight > clientHeight)
-      // lub poziomy (scrollWidth > clientWidth)
-      // Dodajemy 1px marginesu błędu dla przeglądarek
-      const fitsVertical = el.scrollHeight <= el.clientHeight + 1;
-      const fitsHorizontal = el.scrollWidth <= el.clientWidth + 1;
+      // Sprawdzamy, czy tekst mieści się w kontenerze
+      // +2px marginesu błędu przy tak dużych rozdzielczościach jest bezpieczniejsze
+      const fitsVertical = el.scrollHeight <= el.clientHeight + 2;
+      const fitsHorizontal = el.scrollWidth <= el.clientWidth + 2;
 
       return fitsVertical && fitsHorizontal;
     };
 
-    // Pętla: zmniejszaj czcionkę, dopóki tekst się nie mieści (czyli dopóki jest scroll)
-    // LUB dopóki nie osiągniemy minFont
+    // Pętla zmniejszająca
     while (newFontSize > minFont && !checkFits(newFontSize)) {
-      newFontSize--;
+      // Przy dużych czcionkach (300px) zmniejszanie o 1px trwa wieki. 
+      // Przyspieszamy, skacząc o 5px, a gdy jesteśmy blisko, można by precyzyjniej, 
+      // ale 5px przy druku to niewiele.
+      newFontSize -= 5; 
     }
 
-    // Przywracamy styl na taki, jaki ma być wyrenderowany (żeby uniknąć migania przed update'm stanu)
+    // Aplikujemy końcowy styl
     el.style.fontSize = `${newFontSize}px`;
 
-    // Aktualizacja stanu tylko jeśli rozmiar się zmienił
+    // Aktualizacja stanu globalnego
     if (currentFontSettings && currentSize !== newFontSize) {
         setFontSettings(prevSettings => {
             const newSettings = [...prevSettings];
             if (!newSettings[index]) return prevSettings;
+
+            // Zapobiegamy pętli nieskończonej - aktualizujemy tylko jeśli zmiana jest istotna
+            if (newSettings[index].fontSize === newFontSize) return prevSettings;
 
             newSettings[index] = {
                 ...newSettings[index],
@@ -48,10 +53,9 @@ function useAutoFontSize(text, index, setFontSettings, currentFontSettings, minF
         });
     }
 
-  }, [text, minFont, maxFont, index, setFontSettings, currentFontSettings?.size, currentFontSettings?.fontFamily, currentFontSettings?.fontWeight]); 
-  // Dodałem zależności do font family/weight, bo zmiana czcionki (np. na grubszą) też może wywołać scroll
+  }, [text, minFont, maxFont, index, setFontSettings, currentFontSettings?.fontSize, currentFontSettings?.fontFamily, currentFontSettings?.fontWeight]); 
 
-  return [ref, currentFontSettings?.size || maxFont];
+  return [ref, currentFontSettings?.fontSize || maxFont];
 }
 
 export default useAutoFontSize;

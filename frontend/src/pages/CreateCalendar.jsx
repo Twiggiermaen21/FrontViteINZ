@@ -30,35 +30,40 @@ export default function CreateCalendar() {
   const [gradientStrength, setGradientStrength] = useState("medium");
   const [gradientTheme, setGradientTheme] = useState("classic");
   const [backgroundImage, setBackgroundImage] = useState(null);
-const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const headerRef = useRef();
   const bottomRef = useRef();
 
   const [yearActive, setYearActive] = useState(false);
-  const [yearText, setYearText] = useState("2025");
+  const [yearText, setYearText] = useState("2026");
   const [yearColor, setYearColor] = useState("#ffffff");
-  const [yearFontSize, setYearFontSize] = useState(32);
+  const [yearFontSize, setYearFontSize] = useState(400);
   const [yearPosition, setYearPosition] = useState({
-    coords: { x: 50, y: 20 },
+    coords: { x: 600, y: 300 },
   });
-  const [xLimits, setXLimits] = useState({ min: 40, max: 252 });
-  const [yLimits, setYLimits] = useState({ min: 20, max: 178 });
+  const [xLimits, setXLimits] = useState({ min: 0, max: 3661 });
+  const [yLimits, setYLimits] = useState({ min: 0, max: 2480 });
+
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);
   const months = ["Grudzień", "Styczeń", "Luty"];
+
+  // 4. Ustawienia czcionek dla Pasków Reklamowych
+  // Pasek ma teraz 768px wysokości, więc czcionka 14px byłaby niewidoczna.
+  // Ustawiamy ok. 180-200px na start.
   const [fontSettings, setFontSettings] = useState(
     months.map(() => ({
       fontFamily: "Arial",
       fontWeight: "400",
       fontColor: "#333333",
-      fontSize: 14,
-    }))
+      fontSize: 200, // Startowa wielkość tekstu reklamowego
+    })),
   );
 
   const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
   const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
   const [imageScales, setImageScales] = useState(() => months.map(() => 1));
   const [positions, setPositions] = useState(() =>
-    months.map(() => ({ x: 0, y: 0 }))
+    months.map(() => ({ x: 0, y: 0 })),
   );
   const [imageFromDisk, setImageFromDisk] = useState(false);
   const [yearFontWeight, setYearFontWeight] = useState("bold");
@@ -71,11 +76,11 @@ const [isSaving, setIsSaving] = useState(false);
   const [pageBackground, setPageBackground] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [hasMoreBackground, setHasMoreBackground] = useState(true);
-  
+
   // ROZDZIELONE STANY ŁADOWANIA
   const [loading, setLoading] = useState(false);
   const [loadingBg, setLoadingBg] = useState(false);
-  
+
   const [calendarName, setCalendarName] = useState("");
 
   const handleMonthTextChange = (index, value) => {
@@ -88,7 +93,7 @@ const [isSaving, setIsSaving] = useState(false);
     const token = localStorage.getItem(ACCESS_TOKEN);
     const formData = new FormData();
     formData.append("name", calendarName);
-setIsSaving(true);
+    setIsSaving(true);
     if (image !== null) {
       if (imageFromDisk) {
         formData.append("imageFromDisk", "true");
@@ -106,12 +111,13 @@ setIsSaving(true);
 
     if (style === "style2") {
       if (gradientTheme === "classic") {
-        const direction = {
-          diagonal: "to bottom right",
-          vertical: "to bottom",
-          horizontal: "to right",
-          radial: "radial",
-        }[gradientVariant] || "to bottom";
+        const direction =
+          {
+            diagonal: "to bottom right",
+            vertical: "to bottom",
+            horizontal: "to right",
+            radial: "radial",
+          }[gradientVariant] || "to bottom";
 
         formData.append("bottom_type", "gradient");
         formData.append("gradient_start_color", bgColor);
@@ -145,18 +151,24 @@ setIsSaving(true);
     for (let i = 0; i < months.length; i++) {
       const fieldName = `field${i + 1}`;
       if (isImageMode[i]) {
-        formData.append(fieldName, JSON.stringify({
-          image: "true",
-          scale: imageScales[i],
-          positionX: positions[i].x,
-          positionY: positions[i].y,
-        }));
+        formData.append(
+          fieldName,
+          JSON.stringify({
+            image: "true",
+            scale: imageScales[i],
+            positionX: positions[i].x,
+            positionY: positions[i].y,
+          }),
+        );
         formData.append(`${fieldName}_image`, monthImages[i]);
       } else {
-        formData.append(fieldName, JSON.stringify({
-          text: monthTexts[i],
-          font: fontSettings[i],
-        }));
+        formData.append(
+          fieldName,
+          JSON.stringify({
+            text: monthTexts[i],
+            font: fontSettings[i],
+          }),
+        );
       }
     }
 
@@ -172,8 +184,8 @@ setIsSaving(true);
     } catch (error) {
       console.error("❌ Błąd zapisu:", error.response?.data || error.message);
       alert("❌ Nie udało się zapisać kalendarza.");
-    }finally {
-        setIsSaving(false); // Odblokowujemy przycisk niezależnie od wyniku (success/error)
+    } finally {
+      setIsSaving(false); // Odblokowujemy przycisk niezależnie od wyniku (success/error)
     }
   };
 
@@ -221,25 +233,31 @@ setIsSaving(true);
   }, []);
 
   useEffect(() => {
-    const onMove = (e) =>
+    const onMouseMove = (e) => {
       handleMouseMove(e, {
         dragging,
         dragStartPos,
-        xLimits,
-        yLimits,
         setYearPosition,
+        zoom: 0.08, // <--- PRZEKAZUJEMY ZOOM
+        containerRef: headerRef, // <--- PRZEKAZUJEMY REF KONTENERA (ten co ma 3661px szerokości)
+        spanRef: spanRef, // <--- PRZEKAZUJEMY REF NAPISU
       });
-    const onUp = () => handleMouseUp(setDragging);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
     };
-  }, [dragging, xLimits, yLimits]);
 
+    const onMouseUp = () => {
+      handleMouseUp(setDragging);
+    };
 
-console.log("Settings fontowe:", fontSettings);
+    if (dragging) {
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
+  }, [dragging, setYearPosition]); // Zależności useEffecta
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-6 px-4">
@@ -266,25 +284,26 @@ console.log("Settings fontowe:", fontSettings);
             placeholder="np. Kalendarz firmowy 2025"
             className="w-full h-12 rounded-lg px-3 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] focus:border-[#6d8f91] focus:outline-none transition-colors"
           />
-         <button
-    onClick={handleSaveCalendar}
-    // Przyciski blokuje się, jeśli nazwa jest pusta LUB trwa zapis
-    disabled={!calendarName.trim() || isSaving}
-    className={`mt-2 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200 flex items-center justify-center
-        ${!calendarName.trim() || isSaving
+          <button
+            onClick={handleSaveCalendar}
+            // Przyciski blokuje się, jeśli nazwa jest pusta LUB trwa zapis
+            disabled={!calendarName.trim() || isSaving}
+            className={`mt-2 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200 flex items-center justify-center
+        ${
+          !calendarName.trim() || isSaving
             ? "bg-[#3b3c3c] text-[#8a8a8a] cursor-not-allowed"
             : "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
         }`}
->
-    {isSaving ? (
-        <>
-            <div className="w-4 h-4 mr-2 border-2 border-t-white border-b-gray-400 border-l-transparent border-r-transparent rounded-full animate-spin"></div>
-            Zapisywanie...
-        </>
-    ) : (
-        "Zapisz kalendarz"
-    )}
-</button>
+          >
+            {isSaving ? (
+              <>
+                <div className="w-4 h-4 mr-2 border-2 border-t-white border-b-gray-400 border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+                Zapisywanie...
+              </>
+            ) : (
+              "Zapisz kalendarz"
+            )}
+          </button>
         </div>
       </div>
 
@@ -368,12 +387,20 @@ console.log("Settings fontowe:", fontSettings);
       </div>
 
       <div className="lg:col-span-4 justify-center flex mt-4">
-        <div className=" w-[292px] mx-auto rounded-4xl shadow-lg ">
-          <div className=" rounded overflow-hidden shadow ">
+        {/* KONTENER SKALUJĄCY */}
+        <div
+          className="mx-auto rounded-4xl shadow-lg origin-top"
+          style={{ zoom: "0.08" }}
+        >
+          <div
+            className="rounded overflow-hidden shadow bg-white"
+            style={{ width: "3661px" }}
+          >
+            {/* --- GŁÓWKA (21 cm = 2480 px) --- */}
             <div
               ref={headerRef}
-              className="relative w-full bg-gray-200 flex items-center justify-center"
-              style={{ height: "198px", width: "100%" }}
+              className="relative w-full bg-gray-200 flex items-center justify-center overflow-hidden"
+              style={{ height: "2480px", width: "3661px" }}
             >
               {image ? (
                 <>
@@ -381,6 +408,7 @@ console.log("Settings fontowe:", fontSettings);
                     src={imageFromDisk ? URL.createObjectURL(image) : image.url}
                     alt="Nagłówek"
                     className="w-full h-full object-cover"
+                    draggable={false} // Ważne: blokuje domyślne przeciąganie obrazka przeglądarki
                   />
                   {yearActive && (
                     <span
@@ -390,22 +418,35 @@ console.log("Settings fontowe:", fontSettings);
                           yearPosition,
                           setYearPosition,
                           spanRef,
-                          xLimits,
-                          yLimits,
+                          xLimits, // Upewnij się, że xLimits są ustawione na 0-3661 (z YearText)
+                          yLimits, // Upewnij się, że yLimits są ustawione na 0-2480 (z YearText)
                           setDragging,
                           dragStartPos,
+                          zoom: 0.08, // Przekazujemy zoom, aby przesuwanie myszką działało płynnie
                         })
                       }
                       style={{
                         position: "absolute",
-                        color: yearColor,
+                        // ZMIANA 1: Używamy bezpośrednio współrzędnych z edytora (są już w dużej skali)
+                        left: `${yearPosition.coords.x}px`,
+                        top: `${yearPosition.coords.y}px`,
+
+                        // ZMIANA 2: Usuwamy mnożnik * 12.5. Edytor YearText zwraca już duże wartości (100-1000px)
                         fontSize: `${yearFontSize}px`,
+
+                        color: yearColor,
                         fontWeight: yearFontWeight,
                         fontFamily: yearFontFamily,
                         cursor: "move",
                         userSelect: "none",
                         whiteSpace: "nowrap",
-                        ...getYearPositionStyles(yearPosition),
+                        lineHeight: 1, // Zapobiega dziwnym odstępom przy dużych fontach
+
+                        // Opcjonalnie: Jeśli preset to 'center', można dodać translate,
+                        // ale przy swobodnym przesuwaniu (custom) lepiej zostawić top-left anchor.
+                        // Jeśli Twoje presety w YearText ustawiają X na środek, to tekst zacznie się od środka.
+                        // Aby go wycentrować idealnie względem punktu X, można dodać warunek, ale
+                        // dla prostoty drag&drop najlepiej zostawić standardowe pozycjonowanie.
                       }}
                     >
                       {yearText}
@@ -413,16 +454,19 @@ console.log("Settings fontowe:", fontSettings);
                   )}
                 </>
               ) : (
-                <span className="text-gray-500">Brak grafiki nagłówka</span>
+                <span className="text-gray-500" style={{ fontSize: "100px" }}>
+                  Brak grafiki nagłówka
+                </span>
               )}
             </div>
 
+            {/* --- PLECKI / DÓŁ --- */}
             <div
               ref={bottomRef}
               className="w-full flex flex-col items-center overflow-hidden"
               style={{
-                height: "602px",
-                width: "292px",
+                height: "7087px",
+                width: "3661px",
                 ...getBottomSectionBackground({
                   style,
                   bgColor,
@@ -436,46 +480,60 @@ console.log("Settings fontowe:", fontSettings);
             >
               {months.map((month, index) => (
                 <Fragment key={month}>
+                  {/* --- KALENDARIUM (Siatka dni) --- */}
                   <div
                     className="bg-white shadow-sm flex flex-col items-center border border-gray-200"
                     style={{
-                      height: "132px",
-                      width: "273px",
-                      marginTop: "4px",
+                      height: "1594px",
+                      width: "3425px",
+                      // ZMIANA: Symetryczne odstępy góra/dół
+                      marginTop: "25px",
+                      marginBottom: "25px",
+                      borderWidth: "5px",
                     }}
                   >
-                    <h3 className="text-[12px] font-bold text-blue-700 uppercase mt-1">
+                    <h3
+                      className="font-bold text-blue-700 uppercase mt-4"
+                      style={{ fontSize: "150px", marginTop: "40px" }}
+                    >
                       {month}
                     </h3>
-                    <div className="w-full flex-grow text-[10px] text-gray-400 flex items-center justify-center">
+                    <div
+                      className="w-full flex-grow text-gray-400 flex items-center justify-center"
+                      style={{ fontSize: "100px" }}
+                    >
                       [Siatka dni]
                     </div>
                   </div>
 
+                  {/* --- PASEK REKLAMOWY --- */}
                   <div
-                    className="w-full flex items-center px-2 justify-center overflow-hidden"
-                    style={{ height: "65px" }}
+                    className="w-full flex items-center justify-center px-28 overflow-hidden"
+                    style={{ height: "768px" }}
                   >
                     {isImageMode[index] ? (
                       <ImageEditor
                         imageSrc={monthImages[index]}
                         setImageSrc={(newValue) =>
                           setMonthImages((prev) =>
-                            prev.map((img, i) => (i === index ? newValue : img))
+                            prev.map((img, i) =>
+                              i === index ? newValue : img,
+                            ),
                           )
                         }
                         imageScale={imageScales[index]}
                         setImageScale={(newValue) =>
                           setImageScales((prev) =>
-                            prev.map((s, i) => (i === index ? newValue : s))
+                            prev.map((s, i) => (i === index ? newValue : s)),
                           )
                         }
                         position={positions[index]}
                         setPosition={(newValue) =>
                           setPositions((prev) =>
-                            prev.map((p, i) => (i === index ? newValue : p))
+                            prev.map((p, i) => (i === index ? newValue : p)),
                           )
                         }
+                        containerZoom={0.08}
                       />
                     ) : (
                       <LimitedTextarea
@@ -486,6 +544,7 @@ console.log("Settings fontowe:", fontSettings);
                         onChange={handleMonthTextChange}
                         placeholder="Wpisz tekst reklamowy..."
                         maxChars={100}
+                        scale={12.5}
                       />
                     )}
                   </div>

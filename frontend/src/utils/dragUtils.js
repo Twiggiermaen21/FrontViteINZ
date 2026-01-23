@@ -1,34 +1,22 @@
+// Pomocnicza funkcja clamp (bez zmian)
 export const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
 
 export const handleMouseDown = (e, {
   yearPosition,
   setYearPosition,
-  spanRef,
-  xLimits,
-  yLimits,
   setDragging,
-  dragStartPos
+  dragStartPos,
+  zoom = 1 // Domyślnie 1, ale przekażemy tu 0.08
 }) => {
   e.preventDefault();
+  e.stopPropagation(); // Ważne, żeby nie kolidowało z innymi eventami
   setDragging(true);
 
-  let startX, startY;
-
-  if (yearPosition.coords) {
-    startX = clamp(yearPosition.coords.x, xLimits.min, xLimits.max);
-    startY = clamp(yearPosition.coords.y, yLimits.min, yLimits.max);
-  } else {
-    const rect = spanRef.current.getBoundingClientRect();
-    const parentRect = spanRef.current.parentElement.getBoundingClientRect();
-
-    startX = rect.left - parentRect.left + rect.width / 2;
-    startY = rect.top - parentRect.top + rect.height / 2;
-
-    startX = clamp(startX, xLimits.min, xLimits.max);
-    startY = clamp(startY, yLimits.min, yLimits.max);
-
-    setYearPosition({ coords: { x: startX, y: startY } });
-  }
+  // Pobieramy aktualną pozycję startową (zakładamy, że yearPosition trzyma poprawne dane)
+  // Nie używamy tu getBoundingClientRect do ustalania pozycji, bo przy zoomie to bywa mylące.
+  // Ufamy współrzędnym, które mamy w stanie.
+  const startX = yearPosition.coords.x;
+  const startY = yearPosition.coords.y;
 
   dragStartPos.current = {
     mouseX: e.clientX,
@@ -41,20 +29,43 @@ export const handleMouseDown = (e, {
 export const handleMouseMove = (e, {
   dragging,
   dragStartPos,
-  xLimits,
-  yLimits,
-  setYearPosition
+  setYearPosition,
+  zoom = 1,           // Ważne: Przekazujemy zoom (0.08)
+  containerRef,       // Potrzebne do granic (headerRef)
+  spanRef             // Potrzebne do granic (spanRef)
 }) => {
   if (!dragging) return;
 
-  const deltaX = e.clientX - dragStartPos.current.mouseX;
-  const deltaY = e.clientY - dragStartPos.current.mouseY;
+  // 1. Obliczamy przesunięcie uwzględniając ZOOM
+  // Dzielenie przez zoom "naprawia" powolne przesuwanie
+  const deltaX = (e.clientX - dragStartPos.current.mouseX) / zoom;
+  const deltaY = (e.clientY - dragStartPos.current.mouseY) / zoom;
 
+  let newX = dragStartPos.current.elemX + deltaX;
+  let newY = dragStartPos.current.elemY + deltaY;
+
+  // 2. Dynamiczne obliczanie granic (żeby nie wyjść poza obszar)
+  if (containerRef?.current && spanRef?.current) {
+    const containerW = containerRef.current.offsetWidth; // np. 3661
+    const containerH = containerRef.current.offsetHeight; // np. 2480
+    
+    const elemW = spanRef.current.offsetWidth;
+    const elemH = spanRef.current.offsetHeight;
+
+    // Granice: od 0 do (SzerokośćKontenera - SzerokośćElementu)
+    const maxX = containerW - elemW;
+    const maxY = containerH - elemH;
+
+    newX = clamp(newX, 0, maxX);
+    newY = clamp(newY, 0, maxY);
+  }
+
+  // 3. Aktualizacja stanu
   setYearPosition((prev) => ({
     ...prev,
     coords: {
-      x: clamp(dragStartPos.current.elemX + deltaX, xLimits.min, xLimits.max),
-      y: clamp(dragStartPos.current.elemY + deltaY, yLimits.min, yLimits.max),
+      x: newX,
+      y: newY,
     },
   }));
 };

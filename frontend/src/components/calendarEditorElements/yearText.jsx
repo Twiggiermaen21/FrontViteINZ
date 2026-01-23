@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 
+// Stałe wymiary główki w wysokiej rozdzielczości
+const HEADER_WIDTH = 3661;
+const HEADER_HEIGHT = 2480;
+
 const YearText = ({
   yearText,
   setYearText,
@@ -30,44 +34,91 @@ const YearText = ({
     }
   }, [dragging]);
 
+  // Obliczanie limitów dla dużej rozdzielczości
+  const updateLimitsByFontSize = (fontSize) => {
+    // Marginesy bezpieczeństwa zależne od wielkości fontu
+    // Dzielniki (0.8, 1.6) dobrane eksperymentalnie, aby napis nie wychodził poza krawędź
+    
+    let newMinX = fontSize / 2; 
+    let newMaxX = HEADER_WIDTH - (fontSize * 2); // Zakładamy, że rok ma 4 cyfry, więc jest szeroki
+    
+    let newMinY = fontSize / 2;
+    let newMaxY = HEADER_HEIGHT - (fontSize / 1.2);
+
+    setXLimits({
+      min: Math.max(0, newMinX),
+      max: Math.max(0, newMaxX),
+    });
+
+    setYLimits({
+      min: Math.max(0, newMinY),
+      max: Math.max(0, newMaxY),
+    });
+  };
+
+  const handleFontSizeChange = (e) => {
+    const newSize = Number(e.target.value);
+    setYearFontSize(newSize);
+    updateLimitsByFontSize(newSize);
+
+    // Upewniamy się, że po zmianie rozmiaru napis nie "wyleci" poza obszar
+    setYearPosition((prev) => ({
+      ...prev,
+      coords: {
+        x: Math.min(Math.max(prev.coords.x, 0), HEADER_WIDTH),
+        y: Math.min(Math.max(prev.coords.y, 0), HEADER_HEIGHT),
+      },
+    }));
+  };
+
   const handleYearPositionChange = (value) => {
     let newPosition = {};
+    
+    // Współrzędne przeliczone dla formatu 3661x2480
+    const centerX = HEADER_WIDTH / 2;     // ~1830
+    const centerY = HEADER_HEIGHT / 2;    // ~1240
+    const endX = HEADER_WIDTH - 600;      // Prawy margines (bezpieczny dla tekstu)
+    const endY = HEADER_HEIGHT - 300;     // Dolny margines
+    const startX = 100;
+    const startY = 200; // Trochę niżej, żeby nie uciekło pod krawędź przy dużej czcionce
 
     switch (value) {
       case "top-left":
-        newPosition = { position: value, coords: { x: 0, y: 0 } };
+        newPosition = { position: value, coords: { x: startX, y: startY } };
         isCustom && setIsCustom(false);
         break;
       case "top-center":
-        newPosition = { position: value, coords: { x: 50, y: 0 } };
+        // Centrujemy X, Y na górze
+        newPosition = { position: value, coords: { x: centerX - (yearFontSize), y: startY } };
         isCustom && setIsCustom(false);
         break;
       case "top-right":
-        newPosition = { position: value, coords: { x: 100, y: 0 } };
+        newPosition = { position: value, coords: { x: endX, y: startY } };
         isCustom && setIsCustom(false);
         break;
       case "center-left":
-        newPosition = { position: value, coords: { x: 0, y: 50 } }; 
+        newPosition = { position: value, coords: { x: startX, y: centerY } };
         isCustom && setIsCustom(false);
         break;
       case "center":
-        newPosition = { position: value, coords: { x: 50, y: 50 } };
+        // Idealny środek
+        newPosition = { position: value, coords: { x: centerX - (yearFontSize), y: centerY } };
         isCustom && setIsCustom(false);
         break;
       case "center-right":
-        newPosition = { position: value, coords: { x: 100, y: 50 } };
+        newPosition = { position: value, coords: { x: endX, y: centerY } };
         isCustom && setIsCustom(false);
         break;
       case "bottom-left":
-        newPosition = { position: value, coords: { x: 0, y: 100 } };
+        newPosition = { position: value, coords: { x: startX, y: endY } };
         isCustom && setIsCustom(false);
         break;
       case "bottom-center":
-        newPosition = { position: value, coords: { x: 50, y: 100 } };
+        newPosition = { position: value, coords: { x: centerX - (yearFontSize), y: endY } };
         isCustom && setIsCustom(false);
         break;
       case "bottom-right":
-        newPosition = { position: value, coords: { x: 100, y: 100 } };
+        newPosition = { position: value, coords: { x: endX, y: endY } };
         isCustom && setIsCustom(false);
         break;
       case "custom":
@@ -78,38 +129,6 @@ const YearText = ({
     }
 
     setYearPosition(newPosition);
-  };
-
-const updateLimitsByFontSize = (fontSize) => {
-  
-  let newMinX =  fontSize / 0.8;
-  let newMaxX = 292 - fontSize / 0.8;
-  let newMinY = fontSize / 1.6;
-  let newMaxY = 198 - fontSize / 1.6;
-
-  setXLimits({ 
-    min: newMinX, 
-    max: newMaxX
-  });
-
-  setYLimits({ 
-    min: newMinY, 
-    max: newMaxY 
-  });
-};
-
-  const handleFontSizeChange = (e) => {
-    const newSize = Number(e.target.value);
-    setYearFontSize(newSize);
-    updateLimitsByFontSize(newSize);
-
-    setYearPosition((prev) => ({
-      ...prev,
-      coords: {
-        x: Math.min(Math.max(prev.coords.x, xLimits.min), xLimits.max),
-        y: Math.min(Math.max(prev.coords.y, yLimits.min), yLimits.max),
-      },
-    }));
   };
 
   return (
@@ -132,11 +151,10 @@ const updateLimitsByFontSize = (fontSize) => {
           </div>
         </div>
         Napis z rokiem
-        
       </h3>
 
       {/* Rok */}
-      <div className="flex   gap-4">
+      <div className="flex gap-4">
         {/* Wybór roku */}
         <div className="w-1/2 ">
           <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
@@ -170,17 +188,19 @@ const updateLimitsByFontSize = (fontSize) => {
       </div>
 
       {/* Rozmiar */}
-      <div className="mb-0 ">
+      <div className="mb-0">
         <label className="block text-sm font-medium text-[#d2e4e2] mb-1">
           Rozmiar czcionki (px)
         </label>
+        {/* ZAKRES DOSTOSOWANY DO WYSOKIEJ ROZDZIELCZOŚCI (100 - 1000px) */}
         <input
           type="range"
-          min="12"
-          max="72"
+          min="100"
+          max="1000"
+          step="10"
           value={yearFontSize}
           onChange={handleFontSizeChange}
-          className="w-full  accent-[#6d8f91]"
+          className="w-full accent-[#6d8f91]"
         />
         <div className="text-xs text-[#989c9e] text-right">
           {yearFontSize}px
@@ -197,11 +217,11 @@ const updateLimitsByFontSize = (fontSize) => {
           onChange={(e) => setYearFontFamily(e.target.value)}
           className="w-full rounded-lg px-3 py-2 text-sm bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91]"
         >
-           {fontFamilies.map((font) => (
-                <option key={font} value={font}>
-                  {font}
-                </option>
-              ))}
+          {fontFamilies.map((font) => (
+            <option key={font} value={font}>
+              {font}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -241,56 +261,52 @@ const updateLimitsByFontSize = (fontSize) => {
           <option value="bottom-right">Dół - prawo</option>
           {isCustom && (
             <option value="custom">
-              Własna (X:{yearPosition.coords.x}, Y:{yearPosition.coords.y})
+              Własna (X:{Math.round(yearPosition.coords.x)}, Y:{Math.round(yearPosition.coords.y)})
             </option>
           )}
         </select>
 
-       {isCustom && (
-  <div className="mt-2 grid grid-cols-2 gap-2">
-    {/* Pole X */}
-    <div className="flex items-center space-x-2">
-      <label className="text-xs font-bold text-[#d2e4e2]">X</label>
-      <input
-        type="number"
-        min={xLimits.min}
-        max={xLimits.max}
-        value={yearPosition.coords.x}
-        onChange={(e) => {
-          let val = Number(e.target.value);
-          if (val < xLimits.min) val = xLimits.min;
-          if (val > xLimits.max) val = xLimits.max;
-          setYearPosition((prev) => ({
-            ...prev,
-            coords: { ...prev.coords, x: val },
-          }));
-        }}
-        className="w-full rounded-md px-1 py-0.5 text-xs bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none"
-      />
-    </div>
+        {isCustom && (
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            {/* Pole X */}
+            <div className="flex items-center space-x-2">
+              <label className="text-xs font-bold text-[#d2e4e2]">X</label>
+              <input
+                type="number"
+                min="0"
+                max={HEADER_WIDTH}
+                value={yearPosition.coords.x}
+                onChange={(e) => {
+                  let val = Number(e.target.value);
+                  setYearPosition((prev) => ({
+                    ...prev,
+                    coords: { ...prev.coords, x: val },
+                  }));
+                }}
+                className="w-full rounded-md px-1 py-0.5 text-xs bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none"
+              />
+            </div>
 
-    {/* Pole Y */}
-    <div className="flex items-center space-x-2">
-      <label className="text-xs font-bold text-[#d2e4e2]">Y</label>
-      <input
-        type="number"
-        min={yLimits.min}
-        max={yLimits.max}
-        value={yearPosition.coords.y}
-        onChange={(e) => {
-          let val = Number(e.target.value);
-          if (val < yLimits.min) val = yLimits.min;
-          if (val > yLimits.max) val = yLimits.max;
-          setYearPosition((prev) => ({
-            ...prev,
-            coords: { ...prev.coords, y: val },
-          }));
-        }}
-        className="w-full rounded-md px-1 py-0.5 text-xs bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none"
-      />
-    </div>
-  </div>
-)}
+            {/* Pole Y */}
+            <div className="flex items-center space-x-2">
+              <label className="text-xs font-bold text-[#d2e4e2]">Y</label>
+              <input
+                type="number"
+                min="0"
+                max={HEADER_HEIGHT}
+                value={yearPosition.coords.y}
+                onChange={(e) => {
+                  let val = Number(e.target.value);
+                  setYearPosition((prev) => ({
+                    ...prev,
+                    coords: { ...prev.coords, y: val },
+                  }));
+                }}
+                className="w-full rounded-md px-1 py-0.5 text-xs bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] focus:outline-none"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
