@@ -63,7 +63,7 @@ const BrowseCalendars = () => {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      console.log("Pobrany kalendarze:", response.data);
+      
       setCalendars((prev) => {
         const incoming = response.data.results; // tablica kalendarzy
 
@@ -73,7 +73,7 @@ const BrowseCalendars = () => {
 
         return [...prev, ...filtered];
       });
-      console.log("Zaktualizowane kalendarze:", calendars);
+      
     } catch (err) {
       console.error("Błąd pobierania pojedynczego kalendarza:", err);
     }
@@ -155,7 +155,6 @@ const BrowseCalendars = () => {
   const handleAddToProduction = async () => {
     try {
       const token = localStorage.getItem(ACCESS_TOKEN);
-      console.log("Selected Project in BrowseCalendars:", deadline);
       const response = await axios.post(
         `${apiUrl}/production/`,
         {
@@ -204,12 +203,12 @@ const BrowseCalendars = () => {
 
     // Dodajemy nasłuchiwanie na zmianę rozmiaru
     window.addEventListener("resize", handleResize);
-    console.log("Initial width set to:", width);
+    
     // Sprzątamy po sobie (cleanup), żeby nie zapchać pamięci
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  console.log("calendars:", calendars[2]);
+  
 
   return (
     <div

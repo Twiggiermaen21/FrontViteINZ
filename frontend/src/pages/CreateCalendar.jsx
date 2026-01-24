@@ -179,7 +179,7 @@ export default function CreateCalendar() {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log("✅ Kalendarz zapisany:", response.data);
+      
       alert("✅ Kalendarz został zapisany!");
     } catch (error) {
       console.error("❌ Błąd zapisu:", error.response?.data || error.message);

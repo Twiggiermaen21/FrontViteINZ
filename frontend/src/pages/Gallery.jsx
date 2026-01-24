@@ -68,7 +68,7 @@ const Gallery = () => {
       fetchImages();
     }
   };
-console.log("images:", images);
+
   return (
     <div className="p-6">
        <h1 className="text-4xl font-extrabold mb-4 text-[#afe5e6]">Gallery</h1>

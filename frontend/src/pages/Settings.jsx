@@ -33,7 +33,7 @@ export default function Settings() {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log(user);
+  
     if (user) {
       setUsername(user.username || "");
       setFirstName(user.first_name || "");

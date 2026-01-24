@@ -26,7 +26,7 @@ const ProductionList = () => {
       const res = await axios.get(`${apiUrl}/calendar/${calendarId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Pobrano kalendarz:", res.data);
+     
       return res.data;
     } catch (err) {
       console.error("Błąd pobierania kalendarza:", err);
@@ -50,7 +50,7 @@ const ProductionList = () => {
           params: { page: pageToFetch }, // Używamy lokalnej zmiennej pageToFetch
         });
 
-        console.log(`Pobrano stronę: ${pageToFetch}`, res.data);
+        
 
         setProductions((prev) =>
           reset

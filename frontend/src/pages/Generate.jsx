@@ -94,8 +94,6 @@ export default function Generate() {
       }
 
       // 🔹 POST na backend (np. /api/colors/)
-      console.log(trimmed);
-      console.log(config);
       const res = await axios.post(
         `${apiUrl}/${endpoint}/`,
         { nazwa: trimmed },
@@ -115,7 +113,6 @@ export default function Generate() {
       // 🔹 Ustaw jako wybraną nową wartość
       setSelectedValues((prev) => ({ ...prev, [field]: res.data.id }));
 
-      console.log(`✅ Dodano nową wartość "${trimmed}" do ${endpoint}`);
     } catch (err) {
       console.error("❌ Błąd przy dodawaniu nowej opcji:", err);
       alert("Nie udało się dodać nowej opcji do bazy danych.");

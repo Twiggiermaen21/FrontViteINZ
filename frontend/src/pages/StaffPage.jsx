@@ -126,7 +126,6 @@ const StaffProductionList = () => {
     updateProductionStatus(item.id, "in_production", "zaakceptowana i włączona do produkcji");
     
     // 2. Wysłanie requestu o wydruk (generowanie)
-    console.log("Initiating calendar print request for calendar ID:", item.calendar);
     try {
       const token = localStorage.getItem(ACCESS_TOKEN);
       const res = await axios.post(
@@ -139,7 +138,6 @@ const StaffProductionList = () => {
           },
         }
       );
-      console.log("CalendarPrint response:", res.data);
     } catch (error) {
       console.error("Błąd CalendarPrint:", error.response || error.message);
     }
