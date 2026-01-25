@@ -79,7 +79,6 @@ const CalendarPreview = ({ calendar }) => {
               bgColor: calendar.bottom?.color ?? calendar.bottom?.start_color,
               gradientEndColor: calendar.bottom?.end_color,
               gradientTheme: calendar.bottom?.theme,
-              gradientStrength: calendar.bottom?.strength,
               gradientVariant: calendar.bottom?.direction,
               backgroundImage: calendar.bottom?.url,
             }),

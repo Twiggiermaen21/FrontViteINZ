@@ -3,7 +3,7 @@ export const getBottomSectionBackground = ({
   bgColor,
   gradientEndColor,
   gradientTheme,
-  gradientStrength,
+  
   gradientVariant,
   backgroundImage,
 }) => {
@@ -36,8 +36,8 @@ export const getBottomSectionBackground = ({
     }
 
     const blendMap = { soft: "66", medium: "99", hard: "cc" };
-    const alphaHex = blendMap[gradientStrength] || "99";
-    const blendedEnd = gradientEndColor + alphaHex;
+    
+    const blendedEnd = gradientEndColor;
 
     let gradientStyle;
     switch (gradientVariant) {

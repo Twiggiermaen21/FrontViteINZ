@@ -37,7 +37,7 @@ export const fontFamilies = [
   "Verdana",
   "Roboto",
 ];
-export const fontWeights = ["300", "400", "500", "600", "700", "bold", "normal"];
+export const fontWeights = [ "normal","bold"];
 
 export const STATUS_MAP = {
     "draft": "PROJEKT",

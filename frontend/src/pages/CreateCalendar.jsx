@@ -9,7 +9,6 @@ import YearText from "../components/calendarEditorElements/yearText";
 import LimitedTextarea from "../components/calendarEditorElements/contentEdittableText";
 import ImageEditor from "../components/calendarEditorElements/ImageEditor";
 import MonthEditor from "../components/calendarEditorElements/textOrImg";
-import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 import {
   handleMouseDown,
@@ -27,7 +26,6 @@ export default function CreateCalendar() {
   const [imagesBackground, setImagesBackground] = useState([]);
   const [gradientVariant, setGradientVariant] = useState("diagonal");
   const [gradientEndColor, setGradientEndColor] = useState("#ffffff");
-  const [gradientStrength, setGradientStrength] = useState("medium");
   const [gradientTheme, setGradientTheme] = useState("classic");
   const [backgroundImage, setBackgroundImage] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -123,7 +121,6 @@ export default function CreateCalendar() {
         formData.append("gradient_start_color", bgColor);
         formData.append("gradient_end_color", gradientEndColor);
         formData.append("gradient_direction", direction);
-        formData.append("gradient_strength", gradientStrength);
         formData.append("gradient_theme", gradientTheme);
       } else {
         formData.append("bottom_type", "theme-gradient");
@@ -327,8 +324,7 @@ export default function CreateCalendar() {
             setGradientVariant={setGradientVariant}
             gradientTheme={gradientTheme}
             setGradientTheme={setGradientTheme}
-            gradientStrength={gradientStrength}
-            setGradientStrength={setGradientStrength}
+       
           />
         )}
         {style === "style3" && (
@@ -472,7 +468,6 @@ export default function CreateCalendar() {
                   bgColor,
                   gradientEndColor,
                   gradientTheme,
-                  gradientStrength,
                   gradientVariant,
                   backgroundImage,
                 }),
