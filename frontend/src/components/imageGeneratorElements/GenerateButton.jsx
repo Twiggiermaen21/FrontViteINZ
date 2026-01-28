@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function GenerateButton({ generateImage, loading: externalLoading, staffMode}) {
+export default function GenerateButton({ generateImage, loading: externalLoading}) {
   const [repeatCount, setRepeatCount] = useState(1);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -43,22 +43,6 @@ export default function GenerateButton({ generateImage, loading: externalLoading
           {loading ? `Generating ${progress}/${repeatCount}...` : "Generate"}
         </button>
 
-        {/* Select widoczny tylko w staff mode */}
-        {staffMode && (
-          <select
-            name="repeat"
-            value={repeatCount}
-            onChange={(e) => setRepeatCount(Number(e.target.value))}
-            className="w-auto p-2 rounded-lg bg-[#374b4b] text-[#d2e4e2] font-semibold focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition cursor-pointer"
-          >
-            <option value="">Choose repeats</option>
-            {Array.from({ length: 10 }, (_, i) => (
-              <option key={i} value={i + 1}>
-                {i + 1}
-              </option>
-            ))}
-          </select>
-        )}
       </div>
     </div>
   );

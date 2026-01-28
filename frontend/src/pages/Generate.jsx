@@ -18,7 +18,7 @@ export default function Generate() {
   const [newOptionValue, setNewOptionValue] = useState("");
   const [imageName, setImageName] = useState("");
   const [isStaff, setIsStaff] = useState(false);
-  const [staff, setStaff] = useState(false);
+ 
 
   const examplePrompts = [
     "A futuristic city skyline at night",
@@ -33,7 +33,7 @@ export default function Generate() {
       const user = localStorage.getItem("user");
       if (user) {
         const parsed = JSON.parse(user);
-        setStaff(parsed.is_staff); // ✅ poprawnie ustawiamy stan
+        setIsStaff(parsed.is_staff); // ✅ poprawnie ustawiamy stan
       }
     };
     const fetchData = async () => {
@@ -324,31 +324,8 @@ const handleDeleteOption = async (field, id) => {
         />
 
         {/* BUTTON */}
-        <GenerateButton generateImage={generateImage} loading={loading} staffMode={isStaff} />
+        <GenerateButton generateImage={generateImage} loading={loading} />
 
-
-        {staff && (
-          <>
-            {/* STAFF TOGGLE */}
-            <label className="mt-2 block text-xs font-semibold text-[#989c9e] uppercase mb-1">
-              Staff Mode
-            </label>
-            <div
-              onClick={() => setIsStaff(!isStaff)}
-              className={`bottom-6 right-6 w-[78px] h-[30px] flex items-center rounded-full cursor-pointer transition-all duration-300 ${
-                isStaff ? "bg-[#6d8f91]" : "bg-[#374b4b]"
-              }`}
-            >
-              <div
-                className={`absolute w-[26px] h-[26px] bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center text-[11px] font-bold text-[#374b4b] ${
-                  isStaff ? "translate-x-[46px]" : "translate-x-[4px]"
-                }`}
-              >
-                {isStaff ? "ON" : "OFF"}
-              </div>
-            </div>
-          </>
-        )}
       </div>
 
       {/* PRAWY PANEL */}

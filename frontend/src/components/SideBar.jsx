@@ -18,10 +18,8 @@ const navbar = [
   { label: "Dashboard", path: "/ai/dashboard", Icon: House },
   { label: "Generuj", path: "/ai/generate", Icon: SquarePen },
   { label: "Galeria", path: "/ai/gallery", Icon: ImageMinus },
-  { label: "Edytuj zdjęcie", path: "/ai/edit", Icon: Edit3, staffOnly: true },
   { label: "Nowy kalendarz", path: "/ai/create-calendar", Icon: CalendarPlus },
   { label: "Kalendarze", path: "/ai/calendars", Icon: CalendarSearch },
-  { label: "Edytuj kalendarz", path: "/ai/edit-calendar", Icon: Edit3, staffOnly: true },
   { label: "Produkcja", path: "/ai/production-list", Icon: Printer },
   { label: "Strona dla pracowników", path: "/ai/staffpage", Icon: Shield, staffOnly: true },
 ];

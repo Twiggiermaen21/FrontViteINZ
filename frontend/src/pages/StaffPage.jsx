@@ -312,7 +312,7 @@ const StaffProductionList = () => {
                             )}
 
                             {/* Odrzucenie */}
-                            {englishStatusKey !== "done" && englishStatusKey !== "rejected" && (
+                            {englishStatusKey == "waiting"  && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();

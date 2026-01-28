@@ -6,8 +6,6 @@ const tiles = [
   { path: "/ai/gallery", label: "Gallery", image: "/dashboard/galeria.png" },
   { path: "/ai/calendars", label: "Browse Calendars", image: "/dashboard/kalendarzeGaleria.png" },
   { path: "/ai/create-calendar", label: "Create Calendar", image: "/dashboard/kalendarz.png" },
-  { path: "/ai/edit-calendar", label: "Edit Calendar", image: "/dashboard/edit-calendar.png", staffOnly: true },
-  { path: "/ai/edit", label: "Edit Image", image: "/dashboard/edit.png", staffOnly: true },
 ];
 
 const Dashboard = () => {
@@ -24,13 +22,9 @@ const Dashboard = () => {
     item.staffOnly ? user?.is_staff : true
   );
 
-  const gridCols = user?.is_staff
-    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
-    : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2";
-
   return (
     <div
-      className={`grid ${gridCols} gap-8 p-8 max-w-7xl mx-auto w-full`}
+      className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8 p-8 max-w-7xl mx-auto w-full`}
     >
       {visibleTiles.map((tile) => (
         <Link

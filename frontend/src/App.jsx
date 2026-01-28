@@ -12,8 +12,6 @@ import Dashboard from "./pages/Dashboard";
 import Gallery from "./pages/Gallery";
 import BrowseCalendars from "./pages/BrowseCalendars";
 import CreateCalendar from "./pages/CreateCalendar";
-import EditCalendar from "./pages/EditCalendar";
-import EditImage from "./pages/EditImage";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Settings from "./pages/Settings";
 import FlappyBird from "./components/menuElements/FlappyBird";
@@ -62,8 +60,8 @@ function App() {
             <Route path="gallery" element={<Gallery />} />
             <Route path="calendars" element={<BrowseCalendars />} />
             <Route path="create-calendar" element={<CreateCalendar />} />
-            <Route path="edit-calendar" element={<EditCalendar />} />
-            <Route path="edit" element={<EditImage />} />
+            
+           
             <Route path="settings" element={<Settings />} />
             <Route path="logout" element={<Logout />} />
             <Route path="game" element={<FlappyBird />} />

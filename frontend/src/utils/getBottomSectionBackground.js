@@ -3,7 +3,6 @@ export const getBottomSectionBackground = ({
   bgColor,
   gradientEndColor,
   gradientTheme,
-  
   gradientVariant,
   backgroundImage,
 }) => {
@@ -22,10 +21,6 @@ export const getBottomSectionBackground = ({
           background: `linear-gradient(135deg, ${bgColor} 0%, ${gradientEndColor} 100%)`,
           color: "white",
         },
-        mesh: {
-          background: `linear-gradient(120deg, ${bgColor} 0%, ${gradientEndColor} 100%)`,
-          color: "white",
-        },
         waves: {
           background: `repeating-linear-gradient(135deg, ${bgColor}, ${gradientEndColor} 20%, ${bgColor} 40%)`,
           color: "white",
@@ -35,8 +30,6 @@ export const getBottomSectionBackground = ({
       return themes[gradientTheme] || { background: bgColor };
     }
 
-    const blendMap = { soft: "66", medium: "99", hard: "cc" };
-    
     const blendedEnd = gradientEndColor;
 
     let gradientStyle;

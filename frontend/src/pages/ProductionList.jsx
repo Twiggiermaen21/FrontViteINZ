@@ -26,7 +26,7 @@ const ProductionList = () => {
       const res = await axios.get(`${apiUrl}/calendar/${calendarId}/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-     
+
       return res.data;
     } catch (err) {
       console.error("Błąd pobierania kalendarza:", err);
@@ -49,8 +49,6 @@ const ProductionList = () => {
           headers: { Authorization: `Bearer ${token}` },
           params: { page: pageToFetch }, // Używamy lokalnej zmiennej pageToFetch
         });
-
-        
 
         setProductions((prev) =>
           reset
@@ -221,10 +219,11 @@ const ProductionList = () => {
                             Termin Realizacji:
                           </p>
                           <p className="text-lg font-bold">
-                           
-  {item.deadline 
-    ? new Date(item.deadline).toLocaleDateString('pl-PL') 
-    : "Nieokreślony"}
+                            {item.deadline
+                              ? new Date(item.deadline).toLocaleDateString(
+                                  "pl-PL",
+                                )
+                              : "Nieokreślony"}
                           </p>
                         </div>
                       </div>
