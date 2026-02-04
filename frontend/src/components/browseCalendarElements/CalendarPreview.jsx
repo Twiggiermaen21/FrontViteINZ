@@ -160,7 +160,7 @@ const CalendarFieldContent = ({ calendar, index }) => {
           fontFamily: fieldData.font,
           fontWeight: fieldData.weight,
           color: fieldData.color,
-          lineHeight: "1.2",
+          // lineHeight: "1.2",
           padding: 0,
           paddingTop: `${scaledPadding}px`, // Zastosowanie przeskalowanego paddingu
           display: "block",

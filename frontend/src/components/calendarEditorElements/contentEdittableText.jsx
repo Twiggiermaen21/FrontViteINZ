@@ -83,7 +83,7 @@ const LimitedTextarea = ({
           fontFamily: currentSettings.fontFamily,
           fontWeight: currentSettings.fontWeight,
           color: currentSettings.fontColor,
-          lineHeight: "1.2",
+          // lineHeight: "1.2",
           padding: 0,
           paddingTop: `${scaledPadding}px`, // Zastosowanie skali do paddingu
           display: "block",
