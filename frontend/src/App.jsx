@@ -15,7 +15,7 @@ import CreateCalendar from "./pages/CreateCalendar";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Settings from "./pages/Settings";
 import FlappyBird from "./components/menuElements/FlappyBird";
-import ActivateAccount from "./pages/activateAccount";
+import ActivateAccount from "./pages/ActivateAccount";
 import ProductionList from "./pages/ProductionList";
 import StaffPage from "./pages/StaffPage";
 
