@@ -50,3 +50,8 @@ export const STATUS_MAP = {
     "waiting":"OCZEKIWANIE NA AKCEPTACJĘ"
 };
 
+export const CMYK_SIMULATION_STYLE = {
+  filter: "saturate(0.85) brightness(0.96) contrast(0.98)",
+  // Opcjonalnie: wymuszenie renderowania kolorów (nie wszystkie przeglądarki wspierają)
+  colorRendering: "optimizeSpeed", 
+};

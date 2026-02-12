@@ -15,7 +15,7 @@ import {
   handleMouseMove,
   handleMouseUp,
 } from "../utils/dragUtils";
-
+import { CMYK_SIMULATION_STYLE } from "../constants";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 export default function CreateCalendar() {
@@ -386,7 +386,7 @@ export default function CreateCalendar() {
         {/* KONTENER SKALUJĄCY */}
         <div
           className="mx-auto rounded-4xl shadow-lg origin-top"
-          style={{ zoom: "0.08" }}
+          style={{ zoom: "0.08" ,...CMYK_SIMULATION_STYLE }}
         >
           <div
             className="rounded overflow-hidden shadow bg-white"

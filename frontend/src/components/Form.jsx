@@ -14,7 +14,7 @@ export default function Form({ route, method }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
+  const [infoMessage, setInfoMessage] = useState(""); // Stan dla komunikatu sukcesu
 
   const navigate = useNavigate();
   const name = method === "login" ? "Zaloguj się" : "Zarejestruj się";
@@ -23,6 +23,7 @@ export default function Form({ route, method }) {
     e.preventDefault();
     setLoading(true);
     setErrorMessage("");
+    setInfoMessage(""); // Czyścimy poprzednie komunikaty sukcesu
 
     try {
       let payload;
@@ -46,10 +47,13 @@ export default function Form({ route, method }) {
         localStorage.setItem("user", JSON.stringify(res.data.user));
         navigate("/ai/dashboard");
       } else {
-        setInfoMessage("Rejestracja zakończona! Sprawdź e-mail, aby aktywować konto.");
+        // --- ZMIANA TUTAJ: Nowy komunikat i dłuższy czas oczekiwania ---
+        setInfoMessage("Rejestracja zakończona pomyślnie! Aktywuj swoje konto klikając w link, który został wysłany na Twój adres e-mail.");
+        
+        // Zwiększyłem czas do 5000ms (5 sekund), żeby użytkownik zdążył przeczytać komunikat
         setTimeout(() => {
           navigate("/login");
-        }, 3000);
+        }, 5000);
       }
     } catch (error) {
       console.error(error);
@@ -59,7 +63,13 @@ export default function Form({ route, method }) {
         } else if (error.response.data.detail) {
           setErrorMessage(error.response.data.detail);
         } else {
-          setErrorMessage("Wystąpił błąd. Spróbuj ponownie.");
+          // Obsługa błędów walidacji (np. zajęty email)
+          try {
+            const fieldErrors = Object.values(error.response.data).flat().join(", ");
+            setErrorMessage(fieldErrors || "Wystąpił błąd. Spróbuj ponownie.");
+          } catch (e) {
+            setErrorMessage("Wystąpił nieoczekiwany błąd danych.");
+          }
         }
       } else {
         setErrorMessage("Błąd połączenia z serwerem");
@@ -68,14 +78,6 @@ export default function Form({ route, method }) {
       setLoading(false);
     }
   };
-
-  if (infoMessage) {
-    return (
-      <div className="p-6 bg-[#2a2b2b] rounded-xl text-center text-[#e8f3f2]">
-        <p className="text-lg font-semibold">{infoMessage}</p>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-[#d2e4e2] font-sans">
@@ -135,7 +137,6 @@ export default function Form({ route, method }) {
             className="w-full p-4 pr-12 rounded-xl bg-[#2a2b2b] text-[#e8f3f2] placeholder:text-[#6b7a7a] focus:outline-none focus:ring-2 focus:ring-[#6d8f91] border border-[#3b4a4a] transition"
             required
           />
-          {/* Tylko ikonka oka wewnątrz inputa */}
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
@@ -145,7 +146,6 @@ export default function Form({ route, method }) {
           </button>
         </div>
 
-        {/* LINK ZAPOMNIAŁEŚ HASŁA - POD INPUTEM, NA ŚRODKU */}
         {method === "login" && (
           <div className="mt-5 flex justify-center w-full">
             <a 
@@ -158,13 +158,22 @@ export default function Form({ route, method }) {
         )}
       </div>
 
-      {errorMessage && <p className="text-red-400 text-sm font-semibold">{errorMessage}</p>}
+      {/* --- ZMIANA TUTAJ: Wyświetlanie komunikatu o sukcesie --- */}
+      {infoMessage && (
+        <div className="p-3 bg-green-900/40 border border-green-600/50 rounded-xl text-center">
+            <p className="text-green-400 text-sm font-bold">{infoMessage}</p>
+        </div>
+      )}
+
+      {/* Wyświetlanie błędów */}
+      {errorMessage && <p className="text-red-400 text-sm font-semibold text-center">{errorMessage}</p>}
 
       {loading && <LoadingIndicator />}
 
       <button
         type="submit"
-        className="w-full py-4 text-lg rounded-xl font-bold mt-2 bg-[#6d8f91] hover:bg-[#afe5e6] hover:text-[#1e1f1f] text-[#e8f3f2] transition-all duration-300 cursor-pointer shadow-lg"
+        disabled={loading} // Dobra praktyka: zablokuj przycisk podczas ładowania
+        className="w-full py-4 text-lg rounded-xl font-bold mt-2 bg-[#6d8f91] hover:bg-[#afe5e6] hover:text-[#1e1f1f] text-[#e8f3f2] transition-all duration-300 cursor-pointer shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {name}
       </button>

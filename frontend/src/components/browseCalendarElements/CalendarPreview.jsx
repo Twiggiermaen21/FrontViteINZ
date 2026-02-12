@@ -1,8 +1,7 @@
 import React from "react";
 import { getBottomSectionBackground } from "../../utils/getBottomSectionBackground";
 import { getPaddingTopFromText } from "../../utils/textPadding";
-import { MONTHS } from "../../constants";
-
+import { MONTHS ,CMYK_SIMULATION_STYLE} from "../../constants";
 // Stałe wymiary dla łatwiejszego zarządzania (zgodne z Twoim edytorem)
 const DIMENSIONS = {
   WIDTH: 3661,
@@ -19,7 +18,7 @@ const CalendarPreview = ({ calendar }) => {
 
   return (
     // 1. KONTENER SKALUJĄCY (Zoom 0.08)
-    <div className="mx-auto rounded shadow-lg overflow-hidden bg-white origin-top" style={{ zoom: 0.08 }}>
+    <div className="mx-auto rounded shadow-lg overflow-hidden bg-white origin-top" style={{ zoom: 0.08, ...CMYK_SIMULATION_STYLE }}>
       
       {/* 2. GŁÓWNY KONTENER (Pełna rozdzielczość 3661px) */}
       <div style={{ width: `${DIMENSIONS.WIDTH}px` }}>

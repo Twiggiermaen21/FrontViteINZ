@@ -60,8 +60,6 @@ function App() {
             <Route path="gallery" element={<Gallery />} />
             <Route path="calendars" element={<BrowseCalendars />} />
             <Route path="create-calendar" element={<CreateCalendar />} />
-            
-           
             <Route path="settings" element={<Settings />} />
             <Route path="logout" element={<Logout />} />
             <Route path="game" element={<FlappyBird />} />
