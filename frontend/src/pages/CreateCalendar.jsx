@@ -273,7 +273,7 @@ export default function CreateCalendar() {
         <div className="bg-[#2a2b2b] rounded-3xl p-5 shadow-lg mt-4">
           <label className="block text-sm font-medium text-[#d2e4e2] mb-2">
             Wpisz nazwę kalendarza
-          </label>ww
+          </label>
           <input
             type="text"
             value={calendarName}

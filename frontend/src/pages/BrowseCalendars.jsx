@@ -209,7 +209,6 @@ const BrowseCalendars = () => {
   }, []);
 
   
-
   return (
     <div
       style={{ width: width }}

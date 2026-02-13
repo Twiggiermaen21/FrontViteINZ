@@ -1,16 +1,17 @@
 import React from "react";
 import { getBottomSectionBackground } from "../../utils/getBottomSectionBackground";
 import { getPaddingTopFromText } from "../../utils/textPadding";
-import { MONTHS ,CMYK_SIMULATION_STYLE} from "../../constants";
-// Stałe wymiary dla łatwiejszego zarządzania (zgodne z Twoim edytorem)
+import { MONTHS, CMYK_SIMULATION_STYLE } from "../../constants";
+
+// Stałe wymiary
 const DIMENSIONS = {
   WIDTH: 3661,
   HEADER_HEIGHT: 2480,
-  BOTTOM_HEIGHT: 7087, // Reszta wysokości
+  BOTTOM_HEIGHT: 7087,
   MONTH_BOX_HEIGHT: 1594,
   MONTH_BOX_WIDTH: 3425,
   AD_STRIP_HEIGHT: 768,
-  SCALE_FACTOR: 12.5, // Mnożnik dla paddingów itp.
+  SCALE_FACTOR: 12.5,
 };
 
 const CalendarPreview = ({ calendar }) => {
@@ -44,11 +45,9 @@ const CalendarPreview = ({ calendar }) => {
               style={{
                 position: "absolute",
                 color: calendar.year_data.color,
-                // Zakładamy, że w bazie dane są już zapisane w dużej skali (np. 400px), więc nie mnożymy
                 fontSize: `${calendar.year_data.size}px`, 
                 fontWeight: calendar.year_data.weight,
                 fontFamily: calendar.year_data.font,
-                // Bezpośrednie koordynaty z bazy (duża rozdzielczość)
                 left: `${calendar.year_data.positionX}px`,
                 top: `${calendar.year_data.positionY}px`,
                 lineHeight: 1,
@@ -83,67 +82,70 @@ const CalendarPreview = ({ calendar }) => {
             }),
           }}
         >
-          {[calendar.field1, calendar.field2, calendar.field3].map(
-            (field, index) => (
-              <React.Fragment key={`group-${calendar.id}-${index}`}>
-                
-                {/* Box miesiąca */}
-                <div
-                  className="bg-white shadow-sm flex flex-col items-center border-gray-200"
-                  style={{
-                    height: `${DIMENSIONS.MONTH_BOX_HEIGHT}px`,
-                    width: `${DIMENSIONS.MONTH_BOX_WIDTH}px`,
-                    marginTop: "25px",      // Symetryczne odstępy
-                    marginBottom: "25px",   // Symetryczne odstępy
-                    borderWidth: "5px",     // Grubsza ramka
-                  }}
+          {/* Iterujemy 3 razy (dla 3 pól reklamowych) */}
+          {[0, 1, 2].map((index) => (
+            <React.Fragment key={`group-${calendar.id}-${index}`}>
+              
+              {/* Box miesiąca */}
+              <div
+                className="bg-white shadow-sm flex flex-col items-center border-gray-200"
+                style={{
+                  height: `${DIMENSIONS.MONTH_BOX_HEIGHT}px`,
+                  width: `${DIMENSIONS.MONTH_BOX_WIDTH}px`,
+                  marginTop: "25px",
+                  marginBottom: "25px",
+                  borderWidth: "5px",
+                }}
+              >
+                <h3 
+                  className="font-bold text-blue-700 uppercase tracking-wide"
+                  style={{ fontSize: "150px", marginTop: "40px", marginBottom: "10px" }}
                 >
-                  <h3 
-                    className="font-bold text-blue-700 uppercase tracking-wide"
-                    style={{ fontSize: "150px", marginTop: "40px", marginBottom: "10px" }}
-                  >
-                    {MONTHS[index]}
-                  </h3>
-                  <div 
-                    className="w-full text-gray-400 flex items-center justify-center"
-                    style={{ fontSize: "100px", flexGrow: 1 }}
-                  >
-                    [Siatka dni dla {MONTHS[index]}]
-                  </div>
+                  {MONTHS[index]}
+                </h3>
+                <div 
+                  className="w-full text-gray-400 flex items-center justify-center"
+                  style={{ fontSize: "100px", flexGrow: 1 }}
+                >
+                  [Siatka dni dla {MONTHS[index]}]
                 </div>
+              </div>
 
-                {/* Box reklamowy (Dynamiczne pole) */}
-                <div
-                  className="w-full flex items-center justify-center px-28 overflow-hidden"
-                  style={{ height: `${DIMENSIONS.AD_STRIP_HEIGHT}px` }}
-                >
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <CalendarFieldContent
-                      calendar={calendar}
-                      index={index}
-                    />
-                  </div>
+              {/* Box reklamowy (Dynamiczne pole) */}
+              <div
+                className="w-full flex items-center justify-center px-28 overflow-hidden"
+                style={{ height: `${DIMENSIONS.AD_STRIP_HEIGHT}px` }}
+              >
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <CalendarFieldContent
+                    calendar={calendar}
+                    index={index}
+                  />
                 </div>
-              </React.Fragment>
-            )
-          )}
+              </div>
+            </React.Fragment>
+          ))}
         </div>
       </div>
     </div>
   );
 };
 
-// --- Sub-komponent do renderowania zawartości pola ---
+// --- POPRAWIONY Sub-komponent ---
 const CalendarFieldContent = ({ calendar, index }) => {
-  const fieldData = calendar[`field${index + 1}`];
+  // Pobieramy dane dynamicznie: field1, field2, field3
+  const fieldKey = `field${index + 1}`;
+  const fieldData = calendar[fieldKey];
 
+  // Jeśli pola nie ma w ogóle w bazie/odpowiedzi -> null
   if (!fieldData) return null;
 
-  const isTextField = fieldData.text !== undefined;
-  const isImageField = fieldData.path !== undefined;
+  // Sprawdzamy typ na podstawie dostępnych kluczy
+  const isTextField = fieldData.text !== undefined && fieldData.text !== null;
+  // Ważne: sprawdzamy czy path istnieje (dla obrazka)
+  const isImageField = fieldData.path !== undefined && fieldData.path !== null;
 
   if (isTextField) {
-    // Obliczamy padding i skalujemy go
     const basePadding = getPaddingTopFromText(fieldData.text);
     const scaledPadding = basePadding * DIMENSIONS.SCALE_FACTOR;
 
@@ -154,14 +156,12 @@ const CalendarFieldContent = ({ calendar, index }) => {
         readOnly
         defaultValue={fieldData.text}
         style={{
-          // fieldData.size powinno być już duże (np. 200), jeśli pochodzi z nowego edytora
           fontSize: `${fieldData.size}px`, 
           fontFamily: fieldData.font,
           fontWeight: fieldData.weight,
           color: fieldData.color,
-          // lineHeight: "1.2",
           padding: 0,
-          paddingTop: `${scaledPadding}px`, // Zastosowanie przeskalowanego paddingu
+          paddingTop: `${scaledPadding}px`,
           display: "block",
         }}
       />
@@ -169,30 +169,31 @@ const CalendarFieldContent = ({ calendar, index }) => {
   }
 
   if (isImageField) {
-    return calendar.images_for_fields
-      ?.filter((img) => img.field_number === index + 1)
-      .map((img) => (
-        <div
-          key={`img-${calendar.id}-${index}-${img.id}`}
-          className="mx-auto w-full overflow-hidden relative"
-          style={{ height: "100%" }} // Wypełnia kontener 768px
-        >
-          <img
-            src={img.url}
-            alt="Field content"
-            style={{
-              position: "absolute",
-              // Pozycje z bazy powinny być już w dużej skali
-              left: `${Number(fieldData.positionX || 0)}px`,
-              top: `${Number(fieldData.positionY || 0)}px`,
-              // Obrazek skalujemy transformacją
-              transform: `scale(${Number(fieldData.size || 1)})`, // Tutaj size to mnożnik skali (np. 1.5)
-              transformOrigin: "top left",
-              maxWidth: "none",
-            }}
-          />
-        </div>
-      ));
+    // console.log("Rendering image:", fieldData.path);
+
+    // --- TU BYŁ BŁĄD: dodano return ---
+    return (
+      <div
+        key={`img-${calendar.id}-${index}-${fieldData.id}`}
+        className="mx-auto w-full overflow-hidden relative"
+        style={{ height: "100%" }} // Wypełnia kontener paska reklamowego
+      >
+        <img
+          src={fieldData.path} // URL z Django
+          alt={`Reklama ${index + 1}`}
+          style={{
+            position: "absolute",
+            // Pozycje i skala z bazy danych
+            left: `${Number(fieldData.positionX || 0)}px`,
+            top: `${Number(fieldData.positionY || 0)}px`,
+            transform: `scale(${Number(fieldData.size || 1)})`, 
+            transformOrigin: "top left",
+            maxWidth: "none",
+          }}
+          draggable={false}
+        />
+      </div>
+    );
   }
 
   return null;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { saveAs } from 'file-saver';
 import { ACCESS_TOKEN } from "../constants";
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview";
 // Importujemy helpery (upewnij się, że plik productionHelpers.js istnieje w utils)
@@ -24,6 +25,7 @@ const StaffProductionList = () => {
   const [fullCalendarData, setFullCalendarData] = useState({});
   const [loadingCalendarId, setLoadingCalendarId] = useState(null);
   const [isUpdatingId, setIsUpdatingId] = useState(null);
+      const token = localStorage.getItem(ACCESS_TOKEN);
 
   const fetchCalendarById = useCallback(async (calendarId) => {
     try {
@@ -127,10 +129,9 @@ const StaffProductionList = () => {
     
     // 2. Wysłanie requestu o wydruk (generowanie)
     try {
-      const token = localStorage.getItem(ACCESS_TOKEN);
       const res = await axios.post(
         `${apiUrl}/calendar-print/`,
-        { id_kalendarz: item.calendar },
+        { id_kalendarz: item.calendar, id_production: item.id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -146,8 +147,23 @@ const StaffProductionList = () => {
   const handleReadyForPrint = (item) =>
     updateProductionStatus(item.id, "archived", "przygotowana do druku (archived)");
 
-  const handlePrint = (item) =>
-    updateProductionStatus(item.id, "done", "wysłana do druku");
+const handleDownload = async (productionId) => {
+  try {
+    const response = await axios.get(
+      `${apiUrl}/calendar-download/${productionId.id}/`, 
+      {
+        headers: { 'Authorization': `Bearer ${token}` },
+        responseType: 'blob' 
+      }
+    );
+
+    // Biblioteka saveAs sama zajmie się poprawnym zapisem na dysku
+    saveAs(response.data, `final_calendar_${productionId.id}_CMYK.jpg`);
+
+  } catch (error) {
+    console.error("Błąd pobierania:", error);
+  }
+};
 
   const handleReject = (item) => {
     if (!window.confirm("Czy na pewno chcesz ODRZUCIĆ tę pozycję?")) return;
@@ -302,12 +318,12 @@ const StaffProductionList = () => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handlePrint(item);
+                                  handleDownload(item);
                                 }}
                                 className="bg-cyan-600 text-white py-2 px-4 rounded-lg hover:bg-cyan-700 transition font-semibold disabled:opacity-50"
                                 disabled={isUpdating}
                               >
-                                🚀 WYSŁANO DO DRUKU (Gotowy)
+                                🚀 Pobierz gotowy Plik do druku
                               </button>
                             )}
 
@@ -326,9 +342,19 @@ const StaffProductionList = () => {
                             )}
 
                             {englishStatusKey === "done" && (
-                              <p className="text-green-500 font-bold">
-                                Pozycja zakończona i wydrukowana.
-                              </p>
+                            
+                               <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownload(item);
+                                }}
+                                className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition font-semibold disabled:opacity-50"
+                                disabled={isUpdating}
+                              >
+                                🚀 Pobierz gotowy Plik do druku
+                              </button>
+
+
                             )}
                             {englishStatusKey === "rejected" && (
                               <p className="text-red-500 font-bold">
