@@ -3,31 +3,36 @@ import { getBottomSectionBackground } from "../../utils/getBottomSectionBackgrou
 import { getPaddingTopFromText } from "../../utils/textPadding";
 import { MONTHS, CMYK_SIMULATION_STYLE } from "../../constants";
 
-// Stałe wymiary
+
+// Definiujemy wymiary przeniesione z pierwszego komponentu
 const DIMENSIONS = {
-  WIDTH: 3661,
-  HEADER_HEIGHT: 2480,
-  BOTTOM_HEIGHT: 7087,
-  MONTH_BOX_HEIGHT: 1594,
-  MONTH_BOX_WIDTH: 3425,
-  AD_STRIP_HEIGHT: 768,
-  SCALE_FACTOR: 12.5,
+  WIDTH: 3720,
+  HEADER_HEIGHT: 2430,
+  BOTTOM_HEIGHT: 6900,
+  MONTH_BOX_HEIGHT: 1650,
+  MONTH_BOX_WIDTH: 3540,
+  AD_STRIP_HEIGHT: 360,
+  SCALE_FACTOR: 12.5, // Zachowane do ewentualnego przeliczania paddingu
 };
+
 
 const CalendarPreview = ({ calendar }) => {
   if (!calendar) return null;
 
   return (
     // 1. KONTENER SKALUJĄCY (Zoom 0.08)
-    <div className="mx-auto rounded shadow-lg overflow-hidden bg-white origin-top" style={{ zoom: 0.08, ...CMYK_SIMULATION_STYLE }}>
+    <div 
+      className="mx-auto rounded-4xl shadow-lg overflow-hidden bg-white origin-top" 
+      style={{ zoom: 0.08, ...CMYK_SIMULATION_STYLE }}
+    >
       
-      {/* 2. GŁÓWNY KONTENER (Pełna rozdzielczość 3661px) */}
+      {/* 2. GŁÓWNY KONTENER (Pełna rozdzielczość 3720px) */}
       <div style={{ width: `${DIMENSIONS.WIDTH}px` }}>
         
-        {/* --- HEADER SECTION --- */}
+        {/* --- HEADER SECTION (Główka) --- */}
         <div 
           className="relative bg-gray-200 flex items-center justify-center overflow-hidden"
-          style={{ height: `${DIMENSIONS.HEADER_HEIGHT}px` }}
+          style={{ height: `${DIMENSIONS.HEADER_HEIGHT}px`, width: `${DIMENSIONS.WIDTH}px` }}
         >
           {calendar.top_image ? (
             <img
@@ -60,11 +65,12 @@ const CalendarPreview = ({ calendar }) => {
           )}
         </div>
 
-        {/* --- BOTTOM SECTION --- */}
+        {/* --- BOTTOM SECTION (Plecki) --- */}
         <div
           className="flex flex-col items-center overflow-hidden"
           style={{
             height: `${DIMENSIONS.BOTTOM_HEIGHT}px`,
+            width: `${DIMENSIONS.WIDTH}px`,
             ...getBottomSectionBackground({
               style:
                 calendar.bottom?.content_type_id === 26
@@ -82,18 +88,21 @@ const CalendarPreview = ({ calendar }) => {
             }),
           }}
         >
-          {/* Iterujemy 3 razy (dla 3 pól reklamowych) */}
+          {/* Początkowy odstęp (jak w pierwszym kodzie) */}
+          <div className="mb-[30px] w-full" />
+          
+          {/* Iterujemy 3 razy (dla 3 pól kalendarium i reklamowych) */}
           {[0, 1, 2].map((index) => (
             <React.Fragment key={`group-${calendar.id}-${index}`}>
               
-              {/* Box miesiąca */}
+              {/* Box miesiąca (Kalendarium) */}
               <div
-                className="bg-white shadow-sm flex flex-col items-center border-gray-200"
+                className="bg-white shadow-sm flex flex-col items-center border border-gray-200"
                 style={{
                   height: `${DIMENSIONS.MONTH_BOX_HEIGHT}px`,
                   width: `${DIMENSIONS.MONTH_BOX_WIDTH}px`,
-                  marginTop: "25px",
-                  marginBottom: "25px",
+                  marginTop: "90px",
+                  marginBottom: "90px",
                   borderWidth: "5px",
                 }}
               >
@@ -113,7 +122,7 @@ const CalendarPreview = ({ calendar }) => {
 
               {/* Box reklamowy (Dynamiczne pole) */}
               <div
-                className="w-full flex items-center justify-center px-28 overflow-hidden"
+                className="w-full flex items-center mb-[120px] justify-center px-28 overflow-hidden"
                 style={{ height: `${DIMENSIONS.AD_STRIP_HEIGHT}px` }}
               >
                 <div className="relative w-full h-full flex items-center justify-center">
@@ -131,22 +140,19 @@ const CalendarPreview = ({ calendar }) => {
   );
 };
 
-// --- POPRAWIONY Sub-komponent ---
+// --- Sub-komponent bez zmian w strukturze, używa DIMENSIONS.SCALE_FACTOR ---
 const CalendarFieldContent = ({ calendar, index }) => {
-  // Pobieramy dane dynamicznie: field1, field2, field3
   const fieldKey = `field${index + 1}`;
   const fieldData = calendar[fieldKey];
 
-  // Jeśli pola nie ma w ogóle w bazie/odpowiedzi -> null
   if (!fieldData) return null;
 
-  // Sprawdzamy typ na podstawie dostępnych kluczy
   const isTextField = fieldData.text !== undefined && fieldData.text !== null;
-  // Ważne: sprawdzamy czy path istnieje (dla obrazka)
   const isImageField = fieldData.path !== undefined && fieldData.path !== null;
 
   if (isTextField) {
-    const basePadding = getPaddingTopFromText(fieldData.text);
+    // Upewnij się, że getPaddingTopFromText jest zdefiniowane w pliku
+    const basePadding = getPaddingTopFromText(fieldData.text); 
     const scaledPadding = basePadding * DIMENSIONS.SCALE_FACTOR;
 
     return (
@@ -169,21 +175,17 @@ const CalendarFieldContent = ({ calendar, index }) => {
   }
 
   if (isImageField) {
-    // console.log("Rendering image:", fieldData.path);
-
-    // --- TU BYŁ BŁĄD: dodano return ---
     return (
       <div
         key={`img-${calendar.id}-${index}-${fieldData.id}`}
         className="mx-auto w-full overflow-hidden relative"
-        style={{ height: "100%" }} // Wypełnia kontener paska reklamowego
+        style={{ height: "100%" }}
       >
         <img
-          src={fieldData.path} // URL z Django
+          src={fieldData.path}
           alt={`Reklama ${index + 1}`}
           style={{
             position: "absolute",
-            // Pozycje i skala z bazy danych
             left: `${Number(fieldData.positionX || 0)}px`,
             top: `${Number(fieldData.positionY || 0)}px`,
             transform: `scale(${Number(fieldData.size || 1)})`, 

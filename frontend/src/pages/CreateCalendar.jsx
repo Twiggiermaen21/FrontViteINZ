@@ -53,7 +53,7 @@ export default function CreateCalendar() {
       fontFamily: "Arial",
       fontWeight: "400",
       fontColor: "#333333",
-      fontSize: 200, // Startowa wielkość tekstu reklamowego
+      fontSize: 180, // Startowa wielkość tekstu reklamowego
     })),
   );
 
@@ -505,7 +505,7 @@ export default function CreateCalendar() {
                   {/* --- PASEK REKLAMOWY --- */}
                   <div
                     className="w-full flex items-center mb-[120px] justify-center px-28 overflow-hidden"
-                    style={{ height: "768px" }}
+                    style={{ height: "360px" }}
                   >
                     {isImageMode[index] ? (
                       <ImageEditor
