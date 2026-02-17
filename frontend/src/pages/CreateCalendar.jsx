@@ -390,13 +390,13 @@ export default function CreateCalendar() {
         >
           <div
             className="rounded overflow-hidden shadow bg-white"
-            style={{ width: "3661px" }}
+            style={{ width: "3720px" }}
           >
-            {/* --- GŁÓWKA (21 cm = 2480 px) --- */}
+            {/* --- GŁÓWKA (21 cm = 2430 px) --- */}
             <div
               ref={headerRef}
-              className="relative w-full bg-gray-200 flex items-center justify-center overflow-hidden"
-              style={{ height: "2480px", width: "3661px" }}
+              className="relative w-full  bg-gray-200 flex items-center justify-center overflow-hidden"
+              style={{ height: "2430px", width: "3720px" }}
             >
               {image ? (
                 <>
@@ -461,8 +461,8 @@ export default function CreateCalendar() {
               ref={bottomRef}
               className="w-full flex flex-col items-center overflow-hidden"
               style={{
-                height: "7087px",
-                width: "3661px",
+                height: "6900px",
+                width: "3720px",
                 ...getBottomSectionBackground({
                   style,
                   bgColor,
@@ -473,17 +473,18 @@ export default function CreateCalendar() {
                 }),
               }}
             >
+              <div className="mb-[30px]  w-full " />
               {months.map((month, index) => (
                 <Fragment key={month}>
                   {/* --- KALENDARIUM (Siatka dni) --- */}
                   <div
                     className="bg-white shadow-sm flex flex-col items-center border border-gray-200"
                     style={{
-                      height: "1594px",
-                      width: "3425px",
+                      height: "1650px",
+                      width: "3540px",
                       // ZMIANA: Symetryczne odstępy góra/dół
-                      marginTop: "25px",
-                      marginBottom: "25px",
+                      marginTop: "90px",
+                      marginBottom: "90px",
                       borderWidth: "5px",
                     }}
                   >
@@ -503,7 +504,7 @@ export default function CreateCalendar() {
 
                   {/* --- PASEK REKLAMOWY --- */}
                   <div
-                    className="w-full flex items-center justify-center px-28 overflow-hidden"
+                    className="w-full flex items-center mb-[120px] justify-center px-28 overflow-hidden"
                     style={{ height: "768px" }}
                   >
                     {isImageMode[index] ? (
