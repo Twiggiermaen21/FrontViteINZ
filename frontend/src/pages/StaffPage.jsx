@@ -153,18 +153,22 @@ const handleDownload = async (productionId) => {
       `${apiUrl}/calendar-download/${productionId.id}/`, 
       {
         headers: { 'Authorization': `Bearer ${token}` },
-        responseType: 'blob' 
+        responseType: 'blob' // To jest kluczowe dla plików binarnych (zip, jpg, pdf)
       }
     );
 
-    // Biblioteka saveAs sama zajmie się poprawnym zapisem na dysku
-    saveAs(response.data, `final_calendar_${productionId.id}_CMYK.jpg`);
+    // ZMIANA TUTAJ:
+    // 1. Zmieniamy nazwę pliku, aby odzwierciedlała, że to paczka.
+    // 2. Zmieniamy rozszerzenie na .zip
+    const fileName = `calendar_package_${productionId.id}.zip`;
+
+    saveAs(response.data, fileName);
 
   } catch (error) {
     console.error("Błąd pobierania:", error);
+    // Tutaj warto dodać obsługę błędu dla użytkownika (np. toast/alert)
   }
 };
-
   const handleReject = (item) => {
     if (!window.confirm("Czy na pewno chcesz ODRZUCIĆ tę pozycję?")) return;
     updateProductionStatus(item.id, "rejected", "odrzucona");
