@@ -1,28 +1,67 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 @import "tailwindcss";
 
-
-*{
+body {
     font-family: "Outfit", sans-serif;
-}
+}  
 
-@theme{
+@theme {
     --color-primary: #5044E5;
 }
 
+/* --- DEFINICJE TWOICH CZCIONEK --- */
+/* Ścieżka '/fonts/...' odnosi się do folderu public/fonts */
+
+@font-face {
+  font-family: 'Arial';
+  src: url('/fonts/arial.ttf') format('truetype');
+ 
+}
+
+@font-face {
+  font-family: 'Courier New';
+  src: url('/fonts/cour.ttf') format('truetype');
+  
+}
+
+@font-face {
+  font-family: 'Georgia';
+  src: url('/fonts/georgia.ttf') format('truetype');
+  
+}
+
+@font-face {
+  font-family: 'Roboto';
+  src: url('/fonts/roboto.ttf') format('truetype');
+ 
+}
+@font-face {
+  font-family: 'Tahoma';
+  src: url('/fonts/tahoma.ttf') format('truetype');
+  
+}
+@font-face {
+  font-family: 'Verdana';
+  src: url('/fonts/verdana.ttf') format('truetype');
+  
+}
+/* Jeśli masz też Tahoma i Verdana w plikach, dodaj je analogicznie. 
+   Jeśli ich nie dodasz, przeglądarka weźmie systemowe. */
+
+/* --- STYLE SCROLLBARA --- */
 .custom-scroll::-webkit-scrollbar {
-  width: 8px; /* szerokość scrollbara */
+  width: 8px;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #6d8f91, #afe5e6); /* gradient jak w przycisku */
-  border-radius: 9999px; /* maksymalne zaokrąglenie */
+  background: linear-gradient(180deg, #6d8f91, #afe5e6);
+  border-radius: 9999px;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #5b7576, #8fd4d5); /* ciemniejszy gradient przy hover */
+  background: linear-gradient(180deg, #5b7576, #8fd4d5);
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  background: transparent; /* track niewidoczny */
+  background: transparent;
 }
