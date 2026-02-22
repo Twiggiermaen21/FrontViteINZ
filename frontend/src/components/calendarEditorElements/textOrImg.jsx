@@ -193,7 +193,7 @@ const MonthEditor = ({
               </div>
               <input
                 type="range"
-                min="0.5"
+                min="0.1"
                 max="3"
                 step="0.01"
                 value={imageScales || 1}

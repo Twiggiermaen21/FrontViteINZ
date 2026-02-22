@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { saveAs } from 'file-saver';
+import { saveAs } from "file-saver";
 import { ACCESS_TOKEN } from "../constants";
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview";
 // Importujemy helpery (upewnij się, że plik productionHelpers.js istnieje w utils)
-import { MONTHS, STATUS_MAP} from "../constants";
-import {getStatusStyle} from "../utils/getStatusStyle";
+import { MONTHS, STATUS_MAP } from "../constants";
+import { getStatusStyle } from "../utils/getStatusStyle";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const LoadingSpinner = () => (
@@ -13,7 +13,6 @@ const LoadingSpinner = () => (
     <div className="w-16 h-16 border-4 border-t-[#afe5e6] border-b-[#6d8f91] border-l-transparent border-r-transparent rounded-full animate-spin"></div>
   </div>
 );
-
 
 /* ================= STAFF PRODUCTION LIST ================= */
 const StaffProductionList = () => {
@@ -25,14 +24,17 @@ const StaffProductionList = () => {
   const [fullCalendarData, setFullCalendarData] = useState({});
   const [loadingCalendarId, setLoadingCalendarId] = useState(null);
   const [isUpdatingId, setIsUpdatingId] = useState(null);
-      const token = localStorage.getItem(ACCESS_TOKEN);
+  const token = localStorage.getItem(ACCESS_TOKEN);
 
   const fetchCalendarById = useCallback(async (calendarId) => {
     try {
       const token = localStorage.getItem(ACCESS_TOKEN);
-      const res = await axios.get(`${apiUrl}/calendarByIdStaff/${calendarId}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        `${apiUrl}/calendarByIdStaff/${calendarId}/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       return res.data;
     } catch (err) {
       console.error("Błąd pobierania kalendarza:", err);
@@ -103,30 +105,39 @@ const StaffProductionList = () => {
         const res = await axios.patch(
           `${apiUrl}/production-staff/${productionId}/`,
           { status: newStatus },
-          { headers: { Authorization: `Bearer ${token}` } }
+          { headers: { Authorization: `Bearer ${token}` } },
         );
 
         setProductions((prev) =>
-          prev.map((p) => (p.id === productionId ? res.data : p))
+          prev.map((p) => (p.id === productionId ? res.data : p)),
         );
 
-        alert(`Sukces: Pozycja ID ${productionId} została ${actionDescription}.`);
+        alert(
+          `Sukces: Pozycja ID ${productionId} została ${actionDescription}.`,
+        );
         setExpandedId(null);
       } catch (err) {
         console.error(`Błąd podczas ${actionDescription}:`, err);
-        const errorMessage = err.response?.data?.detail || "Wystąpił nieznany błąd.";
-        alert(`Nie udało się wykonać akcji (${actionDescription}). Błąd: ${errorMessage}`);
+        const errorMessage =
+          err.response?.data?.detail || "Wystąpił nieznany błąd.";
+        alert(
+          `Nie udało się wykonać akcji (${actionDescription}). Błąd: ${errorMessage}`,
+        );
       } finally {
         setIsUpdatingId(null);
       }
     },
-    []
+    [],
   );
 
   const handleAccept = async (item) => {
     // 1. Aktualizacja statusu
-    updateProductionStatus(item.id, "in_production", "zaakceptowana i włączona do produkcji");
-    
+    updateProductionStatus(
+      item.id,
+      "in_production",
+      "zaakceptowana i włączona do produkcji",
+    );
+
     // 2. Wysłanie requestu o wydruk (generowanie)
     try {
       const res = await axios.post(
@@ -137,7 +148,7 @@ const StaffProductionList = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
     } catch (error) {
       console.error("Błąd CalendarPrint:", error.response || error.message);
@@ -145,40 +156,42 @@ const StaffProductionList = () => {
   };
 
   const handleReadyForPrint = (item) =>
-    updateProductionStatus(item.id, "archived", "przygotowana do druku (archived)");
-
-const handleDownload = async (productionId) => {
-  try {
-    const response = await axios.get(
-      `${apiUrl}/calendar-download/${productionId.id}/`, 
-      {
-        headers: { 'Authorization': `Bearer ${token}` },
-        responseType: 'blob' // To jest kluczowe dla plików binarnych (zip, jpg, pdf)
-      }
+    updateProductionStatus(
+      item.id,
+      "archived",
+      "przygotowana do druku (archived)",
     );
 
-    // ZMIANA TUTAJ:
-    // 1. Zmieniamy nazwę pliku, aby odzwierciedlała, że to paczka.
-    // 2. Zmieniamy rozszerzenie na .zip
-    const fileName = `calendar_package_${productionId.id}.zip`;
+  const handleDownload = async (productionId) => {
+    try {
+      const response = await axios.get(
+        `${apiUrl}/calendar-download/${productionId.id}/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          responseType: "blob", // To jest kluczowe dla plików binarnych (zip, jpg, pdf)
+        },
+      );
 
-    saveAs(response.data, fileName);
+      // ZMIANA TUTAJ:
+      // 1. Zmieniamy nazwę pliku, aby odzwierciedlała, że to paczka.
+      // 2. Zmieniamy rozszerzenie na .zip
+      const fileName = `calendar_package_${productionId.id}.zip`;
 
-  } catch (error) {
-    console.error("Błąd pobierania:", error);
-    // Tutaj warto dodać obsługę błędu dla użytkownika (np. toast/alert)
-  }
-};
+      saveAs(response.data, fileName);
+    } catch (error) {
+      console.error("Błąd pobierania:", error);
+      // Tutaj warto dodać obsługę błędu dla użytkownika (np. toast/alert)
+    }
+  };
   const handleReject = (item) => {
     if (!window.confirm("Czy na pewno chcesz ODRZUCIĆ tę pozycję?")) return;
     updateProductionStatus(item.id, "rejected", "odrzucona");
   };
-
+  console.log(productions);
+  console.log(fullCalendarData);
   return (
     <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl mx-auto text-white shadow-2xl">
       {/* Style dla scrollbara */}
-     
-
       <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
         Panel Zarządzania Produkcją
       </h1>
@@ -202,7 +215,8 @@ const handleDownload = async (productionId) => {
             const isUpdating = isUpdatingId === item.id;
 
             const englishStatusKey = item.status || "Nieokreślony";
-            const polishStatusText = STATUS_MAP[englishStatusKey] || STATUS_MAP["Nieokreślony"];
+            const polishStatusText =
+              STATUS_MAP[englishStatusKey] || STATUS_MAP["Nieokreślony"];
 
             return (
               <div
@@ -219,11 +233,14 @@ const handleDownload = async (productionId) => {
                       {item.calendar_name || "Brak nazwy kalendarza"}
                     </div>
                     <div className="text-sm text-gray-400 mt-1">
-                      Utworzono: {new Date(item.created_at).toLocaleDateString()}
+                      Utworzono:{" "}
+                      {new Date(item.created_at).toLocaleDateString()}
                     </div>
                   </div>
 
-                  <div className={`py-1 px-3 rounded-full text-sm font-semibold ml-4 ${getStatusStyle(englishStatusKey)}`}>
+                  <div
+                    className={`py-1 px-3 rounded-full text-sm font-semibold ml-4 ${getStatusStyle(englishStatusKey)}`}
+                  >
                     {polishStatusText}
                   </div>
 
@@ -255,17 +272,26 @@ const handleDownload = async (productionId) => {
                       <div className="flex flex-wrap gap-6 p-4 bg-[#1e1f1f] rounded-lg shadow-inner">
                         <div>
                           <div className="text-sm text-gray-400">Ilość:</div>
-                          <div className="text-xl font-bold">{item.quantity} szt.</div>
+                          <div className="text-xl font-bold">
+                            {item.quantity} szt.
+                          </div>
                         </div>
                         <div>
-                          <div className="text-sm text-gray-400">Termin Realizacji:</div>
-<div className="text-xl font-bold">
-  {item.deadline 
-    ? new Date(item.deadline).toLocaleDateString('pl-PL') 
-    : "Nieokreślony"}
-</div>                        </div>
+                          <div className="text-sm text-gray-400">
+                            Termin Realizacji:
+                          </div>
+                          <div className="text-xl font-bold">
+                            {item.deadline
+                              ? new Date(item.deadline).toLocaleDateString(
+                                  "pl-PL",
+                                )
+                              : "Nieokreślony"}
+                          </div>{" "}
+                        </div>
                         <div>
-                          <div className="text-sm text-gray-400">Ostatnia zmiana:</div>
+                          <div className="text-sm text-gray-400">
+                            Ostatnia zmiana:
+                          </div>
                           <div className="text-xl font-bold text-yellow-300">
                             {new Date(item.updated_at).toLocaleDateString()}
                           </div>
@@ -273,9 +299,49 @@ const handleDownload = async (productionId) => {
                       </div>
 
                       <div className="pt-2">
-                        <div className="text-sm text-gray-400 mb-1">Notatka:</div>
+                        <div className="text-sm text-gray-400 mb-1">
+                          Notatka:
+                        </div>
                         <div className="bg-[#1e1f1f] p-4 rounded-lg whitespace-pre-wrap italic text-sm">
                           {item.production_note || "Brak notatki."}
+                        </div>
+                        <div className="text-sm mt-2 text-gray-400 mb-1">
+                          E-mail:
+                        </div>
+                        <div className="bg-[#1e1f1f] p-4 rounded-lg flex justify-between items-center">
+                          <span className="whitespace-pre-wrap italic text-sm text-gray-300">
+                            {item.author_email}
+                          </span>
+
+                          <button
+                            onClick={() =>
+                              navigator.clipboard.writeText(item.author_email)
+                            }
+                            className="ml-4 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+                            title="Skopiuj e-mail"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect
+                                x="9"
+                                y="9"
+                                width="13"
+                                height="13"
+                                rx="2"
+                                ry="2"
+                              ></rect>
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                            </svg>
+                          </button>
                         </div>
                       </div>
 
@@ -332,7 +398,7 @@ const handleDownload = async (productionId) => {
                             )}
 
                             {/* Odrzucenie */}
-                            {englishStatusKey == "waiting"  && (
+                            {englishStatusKey == "waiting" && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -346,8 +412,7 @@ const handleDownload = async (productionId) => {
                             )}
 
                             {englishStatusKey === "done" && (
-                            
-                               <button
+                              <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleDownload(item);
@@ -357,8 +422,6 @@ const handleDownload = async (productionId) => {
                               >
                                 🚀 Pobierz gotowy Plik do druku
                               </button>
-
-
                             )}
                             {englishStatusKey === "rejected" && (
                               <p className="text-red-500 font-bold">
@@ -377,11 +440,15 @@ const handleDownload = async (productionId) => {
         </div>
 
         {loading && (
-          <p className="text-center text-gray-400 mt-6">Ładowanie kolejnych pozycji...</p>
+          <p className="text-center text-gray-400 mt-6">
+            Ładowanie kolejnych pozycji...
+          </p>
         )}
 
         {!hasMore && productions.length > 0 && (
-          <p className="text-center text-gray-400 mt-6">Wszystkie pozycje zostały załadowane.</p>
+          <p className="text-center text-gray-400 mt-6">
+            Wszystkie pozycje zostały załadowane.
+          </p>
         )}
 
         {hasMore && !loading && (
