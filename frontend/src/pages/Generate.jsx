@@ -21,10 +21,10 @@ export default function Generate() {
  
 
   const examplePrompts = [
-    "A futuristic city skyline at night",
-    "Cute cat wearing glasses",
-    "Fantasy forest with glowing mushrooms",
-    "Minimalist abstract shapes",
+ "Futurystyczna panorama miasta nocą",
+"Uroczy kot w okularach",
+"Fantastyczny las ze świecącymi grzybami",
+"Minimalistyczne, abstrakcyjne kształty",
   ];
 
   // 🧩 Pobieranie opcji dla selectów
@@ -210,13 +210,13 @@ const handleDeleteOption = async (field, id) => {
         {/* PROMPT */}
         <div className="mb-6">
           <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-2">
-            Your prompt
+            Twój opis grafiki
           </label>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows="3"
-            placeholder="Describe what you want to generate..."
+            placeholder="Opisz, co chcesz wygenerować..."
             className="w-full p-4 rounded-xl bg-[#d2e4e2] text-[#1e1f1f] placeholder:text-[#595f5e] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
           />
         </div>
@@ -224,7 +224,7 @@ const handleDeleteOption = async (field, id) => {
         {/* EXAMPLES */}
         <div className="mb-8">
           <h3 className="text-sm font-semibold text-white mb-3">
-            Try an example:
+            Wypróbuj gotowe prompt'y:
           </h3>
           <div className="flex flex-wrap gap-3">
             {examplePrompts.map((ex, i) => (
@@ -262,7 +262,7 @@ const handleDeleteOption = async (field, id) => {
             <input
               type="text"
               autoFocus
-              placeholder="Enter new value"
+              placeholder="Wprowadź nową wartość"
               value={newOptionValue}
               onChange={(e) => setNewOptionValue(e.target.value)}
               onBlur={() => handleConfirmNewOption(field)}
@@ -279,7 +279,7 @@ const handleDeleteOption = async (field, id) => {
               onChange={(e) => handleSelectChange(e, field)}
               className="flex-1 p-2 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
             >
-              <option value="">Choose</option>
+              <option value="">Wybierz</option>
               {fieldOptions.map((item) => (
                 <option key={item.id || item.nazwa} value={item.id || item.nazwa}>
                   {item.nazwa}
@@ -313,13 +313,13 @@ const handleDeleteOption = async (field, id) => {
           htmlFor="imageName"
           className="block text-xs font-semibold text-[#989c9e] uppercase mb-1"
         >
-          Image Name
+          Nazwa grafiki
         </label>
         <input
           type="text"
           value={imageName}
           onChange={(e) => setImageName(e.target.value)}
-          placeholder="Enter image name"
+          placeholder="„Wprowadź nazwę grafiki"
           className="w-full p-2 mb-4 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
         />
 
@@ -338,7 +338,7 @@ const handleDeleteOption = async (field, id) => {
           )}
           {images.length === 0 && !loading && (
             <div className="text-[#989c9e] text-lg text-center opacity-70 mt-4">
-              Your generated images will appear here.
+            Wygenerowane obrazy pojawią się tutaj.
             </div>
           )}
           {images.map((url, index) => (
