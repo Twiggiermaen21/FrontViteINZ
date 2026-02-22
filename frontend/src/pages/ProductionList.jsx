@@ -141,7 +141,7 @@ const ProductionList = () => {
       </h1>
 
       {/* Kontener scrollowania - max 800px wysokości */}
-      <div className="max-h-[660px] overflow-y-auto custom-scroll pr-4">
+      <div className="max-h-165 overflow-y-auto custom-scroll pr-4">
         <div className="space-y-4">
           {!loadingMore && productions.length === 0 && (
             <p className="text-lg text-center text-gray-400 py-10">

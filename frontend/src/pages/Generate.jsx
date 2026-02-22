@@ -242,7 +242,7 @@ const handleDeleteOption = async (field, id) => {
         {/* SELECTY */}
        
 <div
-  className="max-h-[200px] overflow-y-auto pr-2 grid grid-cols-1 gap-4 mb-6 custom-scroll"
+  className="max-h-50 overflow-y-auto pr-2 grid grid-cols-1 gap-4 mb-6 custom-scroll"
 >
   {fields.map((field) => {
     const fieldOptions = Array.isArray(options[field]?.results)
@@ -319,7 +319,7 @@ const handleDeleteOption = async (field, id) => {
           type="text"
           value={imageName}
           onChange={(e) => setImageName(e.target.value)}
-          placeholder="„Wprowadź nazwę grafiki"
+          placeholder="Wprowadź nazwę grafiki"
           className="w-full p-2 mb-4 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
         />
 

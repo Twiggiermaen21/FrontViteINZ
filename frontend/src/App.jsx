@@ -18,6 +18,7 @@ import FlappyBird from "./components/menuElements/FlappyBird";
 import ActivateAccount from "./pages/ActivateAccount";
 import ProductionList from "./pages/ProductionList";
 import StaffPage from "./pages/StaffPage";
+import { useEffect, useState } from "react";
 
 function Logout() {
   localStorage.clear();
@@ -30,6 +31,28 @@ function RegisterAndLogout() {
 }
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Tutaj normalnie robisz fetha do swojego API
+    // Symulujemy opóźnienie sieci za pomocą setTimeout
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1500); 
+  }, []);
+if (isLoading) {
+  return (
+    <div className="flex flex-col justify-center items-center h-screen w-full bg-[#1e1f1f]">
+      {/* Kręcące się kółko z kolorami Twojego motywu */}
+      <div className="w-16 h-16 rounded-full border-[5px] border-[#3c3d3d] border-t-[#afe5e6] border-r-[#6d8f91] animate-spin mb-6"></div>
+      
+      {/* Pulsujący tekst */}
+      <div className="text-[#d2e4e2] text-lg font-semibold tracking-wider uppercase animate-pulse">
+        Chwila moment, pobieramy dane...
+      </div>
+    </div>
+  );
+}
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <BrowserRouter>

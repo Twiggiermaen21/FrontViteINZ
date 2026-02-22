@@ -89,7 +89,7 @@ const CalendarPreview = ({ calendar }) => {
           }}
         >
           {/* Początkowy odstęp (jak w pierwszym kodzie) */}
-          <div className="mb-[30px] w-full" />
+          <div className="mb-7.5 w-full" />
           
           {/* Iterujemy 3 razy (dla 3 pól kalendarium i reklamowych) */}
           {[0, 1, 2].map((index) => (
@@ -122,7 +122,7 @@ const CalendarPreview = ({ calendar }) => {
 
               {/* Box reklamowy (Dynamiczne pole) */}
               <div
-                className="w-full flex items-center mb-[120px] justify-center px-28 overflow-hidden"
+                className="w-full flex items-center mb-30 justify-center px-28 overflow-hidden"
                 style={{ height: `${DIMENSIONS.AD_STRIP_HEIGHT}px` }}
               >
                 <div className="relative w-full h-full flex items-center justify-center">
