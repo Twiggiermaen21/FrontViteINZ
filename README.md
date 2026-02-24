@@ -32,37 +32,6 @@ Interfejs użytkownika systemu B2B dla drukarni, umożliwiający klientom projek
 
 ---
 
-## 🏗️ Architektura aplikacji
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    React App (Vite)                      │
-│                                                         │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐  │
-│  │  Pages   │  │  Compo-  │  │  Hooks   │  │ State  │  │
-│  │          │  │  nents   │  │          │  │ Mgmt   │  │
-│  ├──────────┤  ├──────────┤  ├──────────┤  ├────────┤  │
-│  │ Calendar │  │ AI Form  │  │ useAuth  │  │Context │  │
-│  │ Creator  │  │ Preview  │  │ useAPI   │  │  API   │  │
-│  │ Gallery  │  │ Navbar   │  │ useCalendar│ │        │  │
-│  │ Profile  │  │ Cards    │  │          │  │        │  │
-│  │ Orders   │  │ Dialogs  │  │          │  │        │  │
-│  └──────────┘  └──────────┘  └──────────┘  └────────┘  │
-│                                                         │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │              Axios — HTTP Client                   │  │
-│  │         (JWT Token Auto-Refresh)                   │  │
-│  └──────────────────────┬─────────────────────────────┘  │
-└─────────────────────────┼───────────────────────────────┘
-                          │ HTTPS (REST API)
-                          ▼
-              ┌──────────────────────┐
-              │  Django Backend API  │
-              └──────────────────────┘
-```
-
----
-
 ## 📁 Struktura projektu
 
 ```
@@ -205,31 +174,11 @@ Tokeny JWT są automatycznie odświeżane przez interceptor Axios — użytkowni
 
 ---
 
-## 🔄 Komunikacja z API
-
-Warstwa `services/` zapewnia czystą abstrakcję nad endpointami backendowymi:
-
-```javascript
-// Przykład — generowanie grafiki AI
-const response = await imageService.generate({
-  style: "fotorealistyczny",
-  composition: "centralna",
-  colors: "ciepła",
-  atmosphere: "spokojna",
-  prompt: "Zimowy krajobraz z ośnieżonymi górami..."
-});
-
-// Przykład — zlecenie produkcji PSD
-const production = await calendarService.produce(calendarId);
-```
-
----
-
 ## 🚀 Uruchomienie
 
 ```bash
 # Klonowanie repozytorium
-git clone https://github.com/your-username/ai-calendar-frontend.git
+git clone https://github.com/Twiggiermaen21/ai-calendar-frontend.git
 cd ai-calendar-frontend
 
 # Instalacja zależności
@@ -254,7 +203,6 @@ npm run preview
 ```env
 VITE_API_BASE_URL=http://localhost:8000/api
 VITE_GOOGLE_CLIENT_ID=your-google-client-id
-VITE_CLOUDINARY_CLOUD_NAME=your-cloud-name
 ```
 
 ---
