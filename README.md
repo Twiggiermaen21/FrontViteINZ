@@ -178,7 +178,7 @@ Tokeny JWT są automatycznie odświeżane przez interceptor Axios — użytkowni
 
 ```bash
 # Klonowanie repozytorium
-git clone https://github.com/Twiggiermaen21/ai-calendar-frontend.git
+git clone https://github.com/Twiggiermaen21/FrontViteINZ.git
 cd ai-calendar-frontend
 
 # Instalacja zależności
