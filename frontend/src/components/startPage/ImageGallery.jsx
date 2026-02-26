@@ -44,7 +44,7 @@ export default function ImageGallery() {
 
   return (
     <div className="flex flex-col mt-16 items-center bg-[#1e1f1f] text-[#d2e4e2] py-12">
-      <h1 className="text-3xl font-semibold text-center bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] bg-clip-text text-transparent">
+      <h1 className="text-3xl font-semibold text-center bg-linear-to-r from-[#6d8f91] to-[#afe5e6] bg-clip-text text-transparent">
         Explore the Library
       </h1>
       <p className="text-sm text-[#989c9e] text-center mt-3 max-w-lg mx-auto">
@@ -61,7 +61,7 @@ export default function ImageGallery() {
           {groupedImages.map((group, i) => (
             <div
               key={i}
-              className="flex justify-center w-full flex-shrink-0 px-4 py-6"
+              className="flex justify-center w-full shrink-0 px-4 py-6"
             >
               {group.map((src, j) => (
                 <img
@@ -84,7 +84,7 @@ export default function ImageGallery() {
             onClick={() => goToSlide(i)}
             className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
               currentIndex === i
-                ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] shadow-md scale-110"
+                ? "bg-linear-to-r from-[#6d8f91] to-[#afe5e6] shadow-md scale-110"
                 : "bg-[#374b4b]"
             }`}
           ></span>

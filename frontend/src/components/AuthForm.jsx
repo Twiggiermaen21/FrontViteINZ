@@ -2,7 +2,6 @@ import api from "../api";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { GOOGLE_TOKEN } from "../constants";
-// import "../styles/AuthForm.css";
 import google from "../../public/google.png";
 import { useAuth } from "../auth";
 
@@ -16,8 +15,6 @@ const AuthForm = ({ route, method }) => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const navigate = useNavigate();
-    
-    // Replace useAuthentication with useAuth
     const { login, isAuthorized } = useAuth();
 
     const handleSubmit = async (event) => {
@@ -28,16 +25,13 @@ const AuthForm = ({ route, method }) => {
 
         try {
             if (method === "login") {
-                // Use the login method from AuthContext
-                const success = await login({ username, password });
-                
+                const success = await login({ username, password });                
                 if (success) {
                     navigate("/dashboard", { replace: true });
                 } else {
                     setError("Login failed. Please check your credentials.");
                 }
             } else {
-                // Registration logic
                 const res = await api.post(route, { username, password });
                 setSuccess("Registration successful. Please login.");
                 setTimeout(() => navigate("/login", { replace: true }), 2000);
@@ -63,24 +57,17 @@ const AuthForm = ({ route, method }) => {
     };
 
     const handleGoogleLogin = () => {
-        // console.log(apiUrl)
-        window.location.href = "http://127.0.0.1:8000/accounts/google/login/";
-        
-        
+        window.location.href = `${apiUrl}/accounts/google/login/`;        
     };
 
     useEffect(() => {
         const handleGoogleCallback = async () => {
-            // Check if we are on the callback page
             if (window.location.pathname === '/google-callback') {
-                // Extract the token from URL query params
                 const params = new URLSearchParams(window.location.search);
                 const googleToken = params.get("access_token");
 
                 if (googleToken) {
-                    localStorage.setItem(GOOGLE_TOKEN, googleToken);
-                    
-                    // Validate the token through the AuthContext
+                    localStorage.setItem(GOOGLE_TOKEN, googleToken);                    
                     await login({ google_token: googleToken });
                     navigate("/dashboard", { replace: true });
                 }

@@ -12,7 +12,6 @@ export const useCalendars = () => {
 
   const scrollRef = useRef(null);
 
-  // 🔹 Pobieranie danych (paginacja)
   const fetchCalendars = useCallback(async () => {
     if (loading || !hasMore) return;
 
@@ -27,7 +26,6 @@ export const useCalendars = () => {
 
       const newCalendars = res.data.results;
 
-      // 🔸 Unikamy duplikatów po `id`
       setCalendars((prev) => {
         const all = [...prev, ...newCalendars];
         const unique = all.filter(
@@ -49,12 +47,10 @@ export const useCalendars = () => {
     }
   }, [loading, hasMore, page]);
 
-  // 🔹 Pierwsze pobranie
   useEffect(() => {
     fetchCalendars();
   }, []);
 
-  // 🔹 Infinite scroll
   const handleScroll = useCallback(() => {
     const container = scrollRef.current;
     if (!container) return;

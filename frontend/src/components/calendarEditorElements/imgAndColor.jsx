@@ -23,7 +23,7 @@ const ImgColor = ({ bgColor, setBgColor, image, setGradientEndColor }) => {
             extractColorsFromImage(image.url, setBgColor, setGradientEndColor)
           }
           className="mt-4 w-full px-4 py-2 rounded-lg text-sm font-medium
-            bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]
+            bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]
             hover:opacity-90 transition-colors"
         >
           Dobierz automatycznie z grafiki

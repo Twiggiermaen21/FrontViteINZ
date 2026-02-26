@@ -13,7 +13,6 @@ const CalendarDetailsModal = ({
   setQuantity,
   setNote,
 }) => {
-  // Logika daty: dzisiaj + 7 dni
   const minDate = new Date();
   minDate.setDate(minDate.getDate() + 7);
   const minDateString = minDate.toISOString().split("T")[0];
@@ -23,18 +22,13 @@ const CalendarDetailsModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Walidacja daty
     if (new Date(deadline) < minDate) {
       alert(
         "Termin realizacji musi być wyznaczony na co najmniej tydzień od dzisiaj.",
       );
       return;
     }
-
-    // 1. Przekazanie danych do produkcji
     onAddToProduction(selectedCalendar.id, { quantity, deadline, note });
-
-    // 2. ZAMKNIĘCIE MODALA
     onClose();
   };
 
@@ -121,11 +115,18 @@ const CalendarDetailsModal = ({
 
               <button
                 type="submit"
-                className="w-full py-4 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300 shadow-lg mt-2 cursor-pointer"
+                className="w-full py-4 text-lg rounded-xl font-bold bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300 shadow-lg mt-2 cursor-pointer"
               >
                 Dodaj do produkcji
               </button>
             </form>
+          </div>
+          <div className="flex items-center gap-2 mb-4 p-3 bg-blue-900/30 border border-blue-700/50 rounded-lg">
+            <span className="text-blue-400 text-lg">ℹ️</span>
+            <p className="text-sm text-blue-300">
+              Pobrane pliki są w formacie CMYK gotowym do druku. Kolory na
+              ekranie mogą nieznacznie różnić się od wydruku.
+            </p>
           </div>
 
           <div className="mt-auto border-t border-[#2a2b2b] pt-6 flex justify-between items-center">
@@ -136,7 +137,7 @@ const CalendarDetailsModal = ({
               className="bg-red-900/20 text-red-400 border border-red-900/50 py-2 px-6 rounded-lg hover:bg-red-600 hover:text-white transition-all text-sm font-medium cursor-pointer"
               onClick={() => {
                 onDelete(selectedCalendar.id);
-                onClose(); // Opcjonalnie: zamyka modal również po usunięciu
+                onClose();
               }}
             >
               Usuń projekt

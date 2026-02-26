@@ -6,24 +6,18 @@ export default function FlappyBirdPage() {
   const [pipes, setPipes] = useState([{ x: 400, gap: 150, scored: false }]);
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-
   const gravity = 0.5;
   const jumpStrength = -8;
   const gameHeight = 400;
   const pipeWidth = 50;
-
-  // parametry dynamiczne
   const baseGap = 180;
-  const minGap = 110; // minimalna przerwa między rurami
+  const minGap = 110; 
   const baseSpeed = 2;
-  const maxSpeed = 4; // maksymalna prędkość
-  const spawnDelay = 3500; // co ile ms tworzyć rurę
-
-  // obliczamy trudność zależną od wyniku
+  const maxSpeed = 4; 
+  const spawnDelay = 3500; 
   const gapSize = Math.max(baseGap - score * 5, minGap);
   const pipeSpeed = Math.min(baseSpeed + score * 0.1, maxSpeed);
 
-  // Ruch + grawitacja
   useEffect(() => {
     if (gameOver) return;
 
@@ -41,12 +35,11 @@ export default function FlappyBirdPage() {
     return () => clearInterval(loop);
   }, [velocity, gameOver, pipeSpeed]);
 
-  // Generowanie rur
   useEffect(() => {
     if (gameOver) return;
 
     const pipeGen = setInterval(() => {
-      const randomGap = Math.random() * 180 + 100; // środek otworu
+      const randomGap = Math.random() * 180 + 100;
       setPipes((p) => [
         ...p,
         { x: 400, gap: randomGap, scored: false },
@@ -56,7 +49,7 @@ export default function FlappyBirdPage() {
     return () => clearInterval(pipeGen);
   }, [gameOver]);
 
-  // Kolizje + punkty
+
   useEffect(() => {
     const birdTop = birdY;
     const birdBottom = birdY + 24;
@@ -67,14 +60,11 @@ export default function FlappyBirdPage() {
 
     setPipes((pipes) =>
       pipes.map((pipe) => {
-        // kolizja
         if (pipe.x < 80 && pipe.x + pipeWidth > 40) {
           if (birdTop < pipe.gap - gapSize / 2 || birdBottom > pipe.gap + gapSize / 2) {
             setGameOver(true);
           }
         }
-
-        // naliczanie punktu (tylko raz)
         if (!pipe.scored && pipe.x + pipeWidth < 40) {
           setScore((s) => s + 1);
           return { ...pipe, scored: true };
@@ -85,7 +75,6 @@ export default function FlappyBirdPage() {
     );
   }, [birdY]);
 
-  // Skok / restart
   const handleJump = () => {
     if (gameOver) {
       setBirdY(200);
@@ -173,7 +162,7 @@ export default function FlappyBirdPage() {
 
       <button
         onClick={handleJump}
-        className="mt-6 px-6 py-3 rounded-xl bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-bold hover:opacity-90 transition-all duration-300"
+        className="mt-6 px-6 py-3 rounded-xl bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-bold hover:opacity-90 transition-all duration-300"
       >
         {gameOver ? "Restart" : "Jump"}
       </button>

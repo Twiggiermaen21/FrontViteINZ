@@ -114,8 +114,6 @@ export default function CalendarEditor() {
         try {
           const color = await fac.getColorAsync(img);
           const hex = color.hex;
-
-          // Wygeneruj drugi kolor (jaśniejszy lub ciemniejszy)
           const adjustBrightness = (hex, percent) => {
             const num = parseInt(hex.slice(1), 16);
             const r = Math.min(255, Math.max(0, (num >> 16) + percent))
@@ -162,22 +160,18 @@ export default function CalendarEditor() {
 
   const handleSaveCalendar = async () => {
   const token = localStorage.getItem(ACCESS_TOKEN);
-
-  // Zamiast zwykłego obiektu robimy FormData
   const formData = new FormData();
 
-  // ----- TOP IMAGE -----
   if (image !== null) {
     if (imageFromDisk) {
       formData.append("imageFromDisk", "true");
-      formData.append("top_image", image); // raw plik
+      formData.append("top_image", image); 
     } else {
       formData.append("imageFromDisk", "false");
-      formData.append("top_image", image.id); // tylko ID obrazka
+      formData.append("top_image", image.id); 
     }
   }
 
-  // ----- STYLE -----
   if (style === "style1") {
     formData.append("bottom_type", "color");
     formData.append("bottom_color", bgColor);
@@ -212,7 +206,6 @@ export default function CalendarEditor() {
     formData.append("bottom_image", backgroundImage.id);
   }
 
-  // ----- YEAR -----
   if (yearActive) {
     formData.append("yearColor", yearColor);
     formData.append("yearFontSize", yearFontSize);
@@ -224,9 +217,8 @@ export default function CalendarEditor() {
   }
 
 
-  // ----- MIESIĄCE -----
   for (let i = 0; i < months.length; i++) {
-    const fieldName = `field${i + 1}`; // field1, field2...
+    const fieldName = `field${i + 1}`; 
 
     if (isImageMode[i]) {
       formData.append(
@@ -252,7 +244,7 @@ export default function CalendarEditor() {
     }
   }
 
-  // ----- REQUEST -----
+
   try {
     const response = await axios.post(`${apiUrl}/calendars/`, formData, {
       headers: {
@@ -282,14 +274,10 @@ export default function CalendarEditor() {
       startX = clamp(yearPosition.coords.x, xLimits.min, xLimits.max);
       startY = clamp(yearPosition.coords.y, yLimits.min, yLimits.max);
     } else {
-      // Zamiana preset na konkretne coords
       const rect = spanRef.current.getBoundingClientRect();
       const parentRect = spanRef.current.parentElement.getBoundingClientRect();
-
       startX = rect.left - parentRect.left + rect.width / 2;
       startY = rect.top - parentRect.top + rect.height / 2;
-
-      // Ograniczenie wartości do zakresu
       startX = clamp(startX, xLimits.min, xLimits.max);
       startY = clamp(startY, yLimits.min, yLimits.max);
 
@@ -352,7 +340,7 @@ export default function CalendarEditor() {
     try {
       const res = await axios.get(`${apiUrl}/generate/`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { page, page_size: 12 }, // backend musi obsługiwać paginację
+        params: { page, page_size: 12 }, 
       });
 
       setImages((prev) => [...prev, ...res.data.results]);
@@ -363,7 +351,7 @@ export default function CalendarEditor() {
       if (err.response?.status === 401) {
   setTimeout(() => {
     window.location.reload();
-  }, 500); // odświeży po 0.5 sekundy
+  }, 500); 
 }
     } finally {
       setLoading(false);
@@ -386,8 +374,6 @@ useEffect(() => {
     if (file) {
       setImage(file);
       setImageFromDisk(true);
-
-      // pobranie wymiarów obrazu
       const img = new Image();
       img.onload = () => {
         setDimensions({ width: img.width, height: img.height });
@@ -503,11 +489,11 @@ useEffect(() => {
 
       {/* Preview area */}
       <div className="lg:col-span-3">
-        <div className="border rounded w-[372px] h-[972px] mx-auto bg-white overflow-hidden shadow">
+        <div className="border rounded w-93 h-243 mx-auto bg-white overflow-hidden shadow">
           {/* Header */}
           <div
             ref={headerRef}
-            className="relative h-[252px] bg-gray-200 flex items-center justify-center"
+            className="relative h-63 bg-gray-200 flex items-center justify-center"
           >
             {image ? (
               <>
@@ -546,7 +532,7 @@ useEffect(() => {
           {/* Bottom */}
           <div
             ref={bottomRef}
-            className="h-[720px] px-3 py-4 flex flex-col  items-center text-center"
+            className="h-180 px-3 py-4 flex flex-col  items-center text-center"
             style={getBottomSectionBackground({
               style,
               bgColor,
@@ -563,7 +549,7 @@ useEffect(() => {
                   <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
                     {month}
                   </h3>
-                  <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
+                  <div className="w-full h-21.25 text-sm text-gray-600 flex items-center justify-center">
                     [Siatka dni dla {month}]
                   </div>
                 </div>

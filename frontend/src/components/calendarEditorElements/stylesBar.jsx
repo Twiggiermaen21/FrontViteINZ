@@ -24,8 +24,6 @@ const StyleSidebar = ({
     if (file) {
       setImage(file);
       setImageFromDisk(true);
-
-      // pobranie wymiarów obrazu
       const img = new Image();
       img.onload = () => {
         setDimensions({ width: img.width, height: img.height });
@@ -34,7 +32,6 @@ const StyleSidebar = ({
     }
   };
 
-  //  Infinite scroll — automatyczne ładowanie przy przewinięciu do końca
   const handleScroll = useCallback(() => {
     const container = scrollRef.current;
     if (!container || loading || !hasMore) return;
@@ -71,7 +68,7 @@ const StyleSidebar = ({
               className={`w-full text-left px-3.5 py-2.5 rounded-lg text-sm transition-colors
                 ${
                   style === key
-                    ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
+                    ? "bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
                     : "text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white"
                 }`}
             >
@@ -116,7 +113,6 @@ const StyleSidebar = ({
           )}
         </div>
 
-
         <h2 className="text-base font-semibold text-[#d2e4e2] mb-2">
           Wgraj własną grafikę
         </h2>
@@ -125,12 +121,9 @@ const StyleSidebar = ({
           type="file"
           accept="image/*"
           onChange={handleFileUpload}
-                    className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90"
-
+          className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-linear-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90"
         />
       </div>
-
-      
     </>
   );
 };

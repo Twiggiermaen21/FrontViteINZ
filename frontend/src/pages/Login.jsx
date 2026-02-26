@@ -11,9 +11,9 @@ export default function Login() {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#1e1f1f] text-[#d2e4e2]">
-      <div className="flex w-full max-w-6xl min-h-[40rem] bg-[#2a2b2b] rounded-3xl overflow-hidden shadow-2xl border border-[#374b4b]">
+      <div className="flex w-full max-w-6xl min-h-160 bg-[#2a2b2b] rounded-3xl overflow-hidden shadow-2xl border border-[#374b4b]">
         {/* LEWA STRONA (zachowana oryginalna kolorystyka) */}
-        <div className="flex-1 bg-gradient-to-br from-[#6d8f91] via-[#8ebabb] to-[#afe5e6] relative flex items-center justify-center p-10">
+        <div className="flex-1 bg-linear-to-br from-[#6d8f91] via-[#8ebabb] to-[#afe5e6] relative flex items-center justify-center p-10">
           <img
             src="/astronaut.png"
             alt="Astronaut"
@@ -48,11 +48,11 @@ export default function Login() {
           </div>
 
           <div className="flex items-center my-6">
-            <div className="flex-grow border-t border-[#374b4b]"></div>
+            <div className="grow border-t border-[#374b4b]"></div>
             <span className="mx-4 text-[#989c9e] text-sm">
               lub zaloguj się przez Google
             </span>
-            <div className="flex-grow border-t border-[#374b4b]"></div>
+            <div className="grow border-t border-[#374b4b]"></div>
           </div>
 
           <div className="flex justify-center">

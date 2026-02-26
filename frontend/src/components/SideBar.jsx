@@ -31,10 +31,9 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
   useEffect(() => {
     if (clicks === 5) {
       navigate("/ai/game");
-      setClicks(0); // reset po przejściu
+      setClicks(0); 
     }
 
-    // Reset po 2 sekundach bez klikania
     const timer = setTimeout(() => setClicks(0), 2000);
     return () => clearTimeout(timer);
   }, [clicks, navigate]);
@@ -69,7 +68,7 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
                 `px-3.5 py-2.5 flex items-center gap-3 rounded-lg transition-colors
                  ${
                    isActive
-                     ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
+                     ? "bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
                      : "text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white"
                  }`
               }

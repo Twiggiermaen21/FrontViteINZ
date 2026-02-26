@@ -15,8 +15,7 @@ const BrowseCalendars = () => {
   const [quantity, setQuantity] = useState(1);
   const [deadline, setDeadline] = useState("");
   const [note, setNote] = useState("");
-
-  const [selectedCalendar, setSelectedCalendar] = useState(null); // ✅ do modala
+  const [selectedCalendar, setSelectedCalendar] = useState(null); 
   const scrollRef = useRef(null);
   const thumbRef = useRef(null);
 
@@ -65,8 +64,7 @@ const BrowseCalendars = () => {
       );
       
       setCalendars((prev) => {
-        const incoming = response.data.results; // tablica kalendarzy
-
+        const incoming = response.data.results; 
         const filtered = incoming.filter(
           (item) => !prev.some((c) => c.id === item.id),
         );
@@ -89,7 +87,7 @@ const BrowseCalendars = () => {
     }
   }, [selectedProject, calendars, loading, fetchSingleCalendar]);
 
-  // Scroll thumb update
+  
   const updateThumb = useCallback(() => {
     if (!scrollRef.current || !thumbRef.current) return;
     const container = scrollRef.current;
@@ -134,7 +132,7 @@ const BrowseCalendars = () => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  // Funkcja do usuwania kalendarza
+
   const deleteCalendar = async (id) => {
     const confirmed = window.confirm("Czy na pewno chcesz usunąć kalendarz?");
     if (!confirmed) return;
@@ -172,14 +170,10 @@ const BrowseCalendars = () => {
       );
 
       alert("✅ Dodano do produkcji!");
-
-      // reset formularza
       setQuantity(1);
       setDeadline("");
       setNote("");
-
-      // jeśli masz odświeżanie listy:
-      // fetchProductions();
+      setSelectedCalendar(null);
     } catch (err) {
       console.error("Błąd dodawania do produkcji", err);
 
@@ -191,7 +185,6 @@ const BrowseCalendars = () => {
     }
   };
 
-  // Sprawdzamy, czy window istnieje (zabezpieczenie dla Next.js/SSR)
   const isWindow = typeof window !== "undefined";
 
   const [width, setWidth] = useState(isWindow ? window.innerWidth : 0);
@@ -201,10 +194,10 @@ const BrowseCalendars = () => {
 
     const handleResize = () => setWidth(Math.max(window.innerWidth - 320, 300));
 
-    // Dodajemy nasłuchiwanie na zmianę rozmiaru
+   
     window.addEventListener("resize", handleResize);
     
-    // Sprzątamy po sobie (cleanup), żeby nie zapchać pamięci
+    
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -212,7 +205,7 @@ const BrowseCalendars = () => {
   return (
     <div
       style={{ width: width }}
-      className=" mt-4  bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]  max-w-[1600px]"
+      className=" mt-4  bg-[#2a2b2b] rounded-4xl p-8 shadow-lg space-y-4 max-h-[1900]  max-w-400"
     >
       <h1 className="text-4xl font-extrabold mb-6 text-[#afe5e6]">
         Przeglądaj kalendarze
@@ -235,10 +228,10 @@ const BrowseCalendars = () => {
               .map((calendar, index) => (
                 <div
                   key={calendar.id}
-                  className={`flex-shrink-0 relative my-3 flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105 hover:shadow-xl
+                  className={`shrink-0 relative my-3 flex flex-col items-center justify-center cursor-pointer transition-transform transform hover:scale-105 hover:shadow-xl
       ${index === 0 ? "ml-6" : ""}
       ${index === calendars.length - 1 ? "mr-6" : ""}`}
-                  onClick={() => setSelectedCalendar(calendar)} // otwieranie modala
+                  onClick={() => setSelectedCalendar(calendar)}
                 >
                   <h1 className="text-xl font-bold text-white mb-2">
                     {calendar.name}
@@ -261,7 +254,7 @@ const BrowseCalendars = () => {
         <CalendarDetailsModal
           selectedCalendar={selectedCalendar}
           onClose={() => setSelectedCalendar(null)}
-          onDelete={deleteCalendar} // Zakładam, że masz tę funkcję w rodzicu
+          onDelete={deleteCalendar} 
           onAddToProduction={handleAddToProduction}
           deadline={deadline}
           quantity={quantity}

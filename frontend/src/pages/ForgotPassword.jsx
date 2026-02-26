@@ -1,6 +1,6 @@
 import { useState } from "react";
 import api from "../api";
-import { Link } from "react-router-dom"; // Import Link do nawigacji
+import { Link } from "react-router-dom"; 
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -15,9 +15,7 @@ export default function ForgotPassword() {
     setError("");
 
     try {
-      // Upewnij się, że endpoint pasuje do Twojego backendu (często jest to /auth/password-reset/)
       await api.post("/auth/send-email/", { email });
-
       setMessage(
         "Jeśli konto istnieje, wysłaliśmy na podany adres email link do resetu hasła."
       );
@@ -32,7 +30,6 @@ export default function ForgotPassword() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1e1f1f] text-[#d2e4e2] p-4">
       <div className="w-full max-w-md bg-[#2a2b2b] rounded-3xl shadow-2xl border border-[#374b4b] p-8">
-        
         <h2 className="text-3xl font-bold mb-2 text-center text-[#e0e0e0]">
           Nie pamiętasz hasła?
         </h2>

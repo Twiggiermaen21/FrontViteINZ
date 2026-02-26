@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-
-// Stałe wymiary główki w wysokiej rozdzielczości
 const HEADER_WIDTH = 3661;
 const HEADER_HEIGHT = 2480;
 
@@ -34,14 +32,9 @@ const YearText = ({
     }
   }, [dragging]);
 
-  // Obliczanie limitów dla dużej rozdzielczości
   const updateLimitsByFontSize = (fontSize) => {
-    // Marginesy bezpieczeństwa zależne od wielkości fontu
-    // Dzielniki (0.8, 1.6) dobrane eksperymentalnie, aby napis nie wychodził poza krawędź
-    
     let newMinX = fontSize / 2; 
-    let newMaxX = HEADER_WIDTH - (fontSize * 2); // Zakładamy, że rok ma 4 cyfry, więc jest szeroki
-    
+    let newMaxX = HEADER_WIDTH - (fontSize * 2);
     let newMinY = fontSize / 2;
     let newMaxY = HEADER_HEIGHT - (fontSize / 1.2);
 
@@ -60,8 +53,6 @@ const YearText = ({
     const newSize = Number(e.target.value);
     setYearFontSize(newSize);
     updateLimitsByFontSize(newSize);
-
-    // Upewniamy się, że po zmianie rozmiaru napis nie "wyleci" poza obszar
     setYearPosition((prev) => ({
       ...prev,
       coords: {
@@ -74,13 +65,12 @@ const YearText = ({
   const handleYearPositionChange = (value) => {
     let newPosition = {};
     
-    // Współrzędne przeliczone dla formatu 3661x2480
-    const centerX = HEADER_WIDTH / 2;     // ~1830
-    const centerY = HEADER_HEIGHT / 2;    // ~1240
-    const endX = HEADER_WIDTH - 600;      // Prawy margines (bezpieczny dla tekstu)
-    const endY = HEADER_HEIGHT - 300;     // Dolny margines
+    const centerX = HEADER_WIDTH / 2;     
+    const centerY = HEADER_HEIGHT / 2;    
+    const endX = HEADER_WIDTH - 600;    
+    const endY = HEADER_HEIGHT - 300;    
     const startX = 100;
-    const startY = 200; // Trochę niżej, żeby nie uciekło pod krawędź przy dużej czcionce
+    const startY = 200;
 
     switch (value) {
       case "top-left":
@@ -88,7 +78,6 @@ const YearText = ({
         isCustom && setIsCustom(false);
         break;
       case "top-center":
-        // Centrujemy X, Y na górze
         newPosition = { position: value, coords: { x: centerX - (yearFontSize), y: startY } };
         isCustom && setIsCustom(false);
         break;
@@ -101,7 +90,6 @@ const YearText = ({
         isCustom && setIsCustom(false);
         break;
       case "center":
-        // Idealny środek
         newPosition = { position: value, coords: { x: centerX - (yearFontSize), y: centerY } };
         isCustom && setIsCustom(false);
         break;
@@ -144,7 +132,7 @@ const YearText = ({
             className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center text-[10px] font-bold ${
               yearActive
                 ? "translate-x-6 text-[#6d8f91]"
-                : "translate-x-[2px] text-[#374b4b]"
+                : "translate-x-0.5 text-[#374b4b]"
             }`}
           >
             {yearActive ? "ON" : "OFF"}

@@ -9,12 +9,9 @@ const LimitedTextarea = ({
   placeholder = "",
   index = 0,
   maxChars = 1000,
-  scale = 1, // NOWOŚĆ: Parametr skali (dla wersji print będzie to ok. 12.5)
+  scale = 1, 
 }) => {
   const currentSettings = fontSettings[index] || {};
-
-  // Zakładam, że useAutoFontSize dostosowuje się do szerokości kontenera.
-  // Jeśli hook ma sztywne limity (np. max 40px), trzeba będzie zajrzeć też do niego.
   const [ref, fontSize] = useAutoFontSize(
     value,
     index,
@@ -55,12 +52,10 @@ const LimitedTextarea = ({
     onChange(index, allowed);
   };
 
-  // Obliczamy padding i skalujemy go
   const basePadding = getPaddingTopFromText(value);
   const scaledPadding = basePadding * scale;
 
   return (
-    // ZMIANA: Usunięto sztywne my-2, teraz div wypełnia rodzica (h-full)
     <div className="relative w-full h-full flex flex-col justify-center">
       <textarea
         ref={ref}
@@ -71,26 +66,17 @@ const LimitedTextarea = ({
         rows={2}
         maxLength={maxChars}
         placeholder={placeholder}
-        // ZMIANA: 
-        // 1. h-full zamiast h-[65px]
-        // 2. focus:ring powiększony (np. ring-[20px]), żeby był widoczny przy zoom 0.08
-        //    (można użyć stylu inline dla ring, jeśli Tailwind nie łapie dynamicznych wartości)
         className="w-full h-full resize-none text-center bg-transparent focus:outline-none overflow-hidden"
         style={{
-          // Jeśli fontSize z hooka jest mały, tu można go przemnożyć: 
-          // fontSize: `${fontSize * scale}px`, (zależnie jak działa Twój hook)
           fontSize: `${fontSize}px`, 
           fontFamily: currentSettings.fontFamily,
           fontWeight: currentSettings.fontWeight,
           color: currentSettings.fontColor,
-          // lineHeight: "1.2",
           padding: 0,
-          paddingTop: `${scaledPadding}px`, // Zastosowanie skali do paddingu
+          paddingTop: `${scaledPadding}px`, 
           display: "block",
-          outline: "none" // Reset domyślnego
+          outline: "none" 
         }}
-        // Opcjonalnie: Grubszy border przy focusie za pomocą stylów inline, 
-        // bo Tailwindowe ring-2 zniknie przy zoomie
         onFocus={(e) => e.target.style.outline = `${2 * scale}px solid #60a5fa`}
         onBlur={(e) => e.target.style.outline = "none"}
       />

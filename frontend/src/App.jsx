@@ -34,8 +34,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Tutaj normalnie robisz fetha do swojego API
-    // Symulujemy opóźnienie sieci za pomocą setTimeout
     setTimeout(() => {
       setIsLoading(false);
     }, 1500); 

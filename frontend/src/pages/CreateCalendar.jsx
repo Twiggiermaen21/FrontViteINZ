@@ -31,7 +31,6 @@ export default function CreateCalendar() {
   const [isSaving, setIsSaving] = useState(false);
   const headerRef = useRef();
   const bottomRef = useRef();
-
   const [yearActive, setYearActive] = useState(false);
   const [yearText, setYearText] = useState("2026");
   const [yearColor, setYearColor] = useState("#ffffff");
@@ -41,22 +40,16 @@ export default function CreateCalendar() {
   });
   const [xLimits, setXLimits] = useState({ min: 0, max: 3661 });
   const [yLimits, setYLimits] = useState({ min: 0, max: 2480 });
-
   const [monthTexts, setMonthTexts] = useState(["", "", ""]);
   const months = ["Grudzień", "Styczeń", "Luty"];
-
-  // 4. Ustawienia czcionek dla Pasków Reklamowych
-  // Pasek ma teraz 768px wysokości, więc czcionka 14px byłaby niewidoczna.
-  // Ustawiamy ok. 180-200px na start.
   const [fontSettings, setFontSettings] = useState(
     months.map(() => ({
       fontFamily: "Arial",
       fontWeight: "400",
       fontColor: "#333333",
-      fontSize: 180, // Startowa wielkość tekstu reklamowego
+      fontSize: 180, 
     })),
   );
-
   const [monthImages, setMonthImages] = useState(() => months.map(() => ""));
   const [isImageMode, setIsImageMode] = useState(() => months.map(() => false));
   const [imageScales, setImageScales] = useState(() => months.map(() => 1));
@@ -74,13 +67,10 @@ export default function CreateCalendar() {
   const [pageBackground, setPageBackground] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [hasMoreBackground, setHasMoreBackground] = useState(true);
-
-  // ROZDZIELONE STANY ŁADOWANIA
   const [loading, setLoading] = useState(false);
   const [loadingBg, setLoadingBg] = useState(false);
-
   const [calendarName, setCalendarName] = useState("");
-
+  
   const handleMonthTextChange = (index, value) => {
     const newTexts = [...monthTexts];
     newTexts[index] = value;
@@ -182,7 +172,7 @@ export default function CreateCalendar() {
       console.error("❌ Błąd zapisu:", error.response?.data || error.message);
       alert("❌ Nie udało się zapisać kalendarza.");
     } finally {
-      setIsSaving(false); // Odblokowujemy przycisk niezależnie od wyniku (success/error)
+      setIsSaving(false); 
     }
   };
 
@@ -207,7 +197,7 @@ export default function CreateCalendar() {
 
   const fetchImagesBackground = async () => {
     if (!hasMoreBackground || loadingBg) return;
-    setLoadingBg(true); // UŻYCIE loadingBg
+    setLoadingBg(true); 
     const token = localStorage.getItem(ACCESS_TOKEN);
     try {
       const res = await axios.get(`${apiUrl}/generate/`, {
@@ -220,7 +210,7 @@ export default function CreateCalendar() {
     } catch (err) {
       console.error("Błąd podczas pobierania obrazów tła:", err);
     } finally {
-      setLoadingBg(false); // UŻYCIE loadingBg
+      setLoadingBg(false); 
     }
   };
 
@@ -235,9 +225,9 @@ export default function CreateCalendar() {
         dragging,
         dragStartPos,
         setYearPosition,
-        zoom: 0.08, // <--- PRZEKAZUJEMY ZOOM
-        containerRef: headerRef, // <--- PRZEKAZUJEMY REF KONTENERA (ten co ma 3661px szerokości)
-        spanRef: spanRef, // <--- PRZEKAZUJEMY REF NAPISU
+        zoom: 0.08, 
+        containerRef: headerRef,
+        spanRef: spanRef, 
       });
     };
 
@@ -254,7 +244,7 @@ export default function CreateCalendar() {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [dragging, setYearPosition]); // Zależności useEffecta
+  }, [dragging, setYearPosition]); 
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-14 gap-6 px-4">
@@ -283,7 +273,6 @@ export default function CreateCalendar() {
           />
           <button
             onClick={handleSaveCalendar}
-            // Przyciski blokuje się, jeśli nazwa jest pusta LUB trwa zapis
             disabled={!calendarName.trim() || isSaving}
             className={`mt-2 w-full px-6 py-2 rounded-lg text-sm font-semibold shadow transition-all duration-200 flex items-center justify-center
         ${
@@ -334,7 +323,7 @@ export default function CreateCalendar() {
             backgroundImage={backgroundImage}
             setBackgroundImage={setBackgroundImage}
             hasMore={hasMoreBackground}
-            loading={loadingBg} // PRZEKAZANIE loadingBg
+            loading={loadingBg} 
           />
         )}
 
@@ -404,7 +393,7 @@ export default function CreateCalendar() {
                     src={imageFromDisk ? URL.createObjectURL(image) : image.url}
                     alt="Nagłówek"
                     className="w-full h-full object-cover"
-                    draggable={false} // Ważne: blokuje domyślne przeciąganie obrazka przeglądarki
+                    draggable={false} 
                   />
                   {yearActive && (
                     <span
@@ -414,35 +403,25 @@ export default function CreateCalendar() {
                           yearPosition,
                           setYearPosition,
                           spanRef,
-                          xLimits, // Upewnij się, że xLimits są ustawione na 0-3661 (z YearText)
-                          yLimits, // Upewnij się, że yLimits są ustawione na 0-2480 (z YearText)
+                          xLimits, 
+                          yLimits, 
                           setDragging,
                           dragStartPos,
-                          zoom: 0.08, // Przekazujemy zoom, aby przesuwanie myszką działało płynnie
+                          zoom: 0.08, 
                         })
                       }
                       style={{
                         position: "absolute",
-                        // ZMIANA 1: Używamy bezpośrednio współrzędnych z edytora (są już w dużej skali)
                         left: `${yearPosition.coords.x}px`,
                         top: `${yearPosition.coords.y}px`,
-
-                        // ZMIANA 2: Usuwamy mnożnik * 12.5. Edytor YearText zwraca już duże wartości (100-1000px)
                         fontSize: `${yearFontSize}px`,
-
                         color: yearColor,
                         fontWeight: yearFontWeight,
                         fontFamily: yearFontFamily,
                         cursor: "move",
                         userSelect: "none",
                         whiteSpace: "nowrap",
-                        lineHeight: 1, // Zapobiega dziwnym odstępom przy dużych fontach
-
-                        // Opcjonalnie: Jeśli preset to 'center', można dodać translate,
-                        // ale przy swobodnym przesuwaniu (custom) lepiej zostawić top-left anchor.
-                        // Jeśli Twoje presety w YearText ustawiają X na środek, to tekst zacznie się od środka.
-                        // Aby go wycentrować idealnie względem punktu X, można dodać warunek, ale
-                        // dla prostoty drag&drop najlepiej zostawić standardowe pozycjonowanie.
+                        lineHeight: 1, 
                       }}
                     >
                       {yearText}
@@ -473,7 +452,7 @@ export default function CreateCalendar() {
                 }),
               }}
             >
-              <div className="mb-[30px]  w-full " />
+              <div className="mb-7.5  w-full " />
               {months.map((month, index) => (
                 <Fragment key={month}>
                   {/* --- KALENDARIUM (Siatka dni) --- */}
@@ -482,7 +461,6 @@ export default function CreateCalendar() {
                     style={{
                       height: "1650px",
                       width: "3540px",
-                      // ZMIANA: Symetryczne odstępy góra/dół
                       marginTop: "90px",
                       marginBottom: "90px",
                       borderWidth: "5px",
@@ -495,7 +473,7 @@ export default function CreateCalendar() {
                       {month}
                     </h3>
                     <div
-                      className="w-full flex-grow text-gray-400 flex items-center justify-center"
+                      className="w-full grow text-gray-400 flex items-center justify-center"
                       style={{ fontSize: "100px" }}
                     >
                       [Siatka dni]
@@ -504,7 +482,7 @@ export default function CreateCalendar() {
 
                   {/* --- PASEK REKLAMOWY --- */}
                   <div
-                    className="w-full flex items-center mb-[120px] justify-center px-28 overflow-hidden"
+                    className="w-full flex items-center mb-30 justify-center px-28 overflow-hidden"
                     style={{ height: "360px" }}
                   >
                     {isImageMode[index] ? (

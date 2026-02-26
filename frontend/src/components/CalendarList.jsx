@@ -4,7 +4,6 @@ import { ACCESS_TOKEN } from "../constants";
 
 import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
 
-
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const CalendarList = () => {
@@ -34,18 +33,16 @@ const CalendarList = () => {
       setPage((prev) => prev + 1);
     } catch (err) {
       console.error("Błąd podczas pobierania danych:", err);
-       if (err.response?.status === 401) {
-  setTimeout(() => {
-    window.location.reload();
-  }, 500); // odświeży po 0.5 sekundy
-}
-    
+      if (err.response?.status === 401) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // Załaduj pierwszą stronę
   const didFetch = useRef(false);
 
   useEffect(() => {
@@ -54,13 +51,9 @@ const CalendarList = () => {
       didFetch.current = true;
     }
   }, []);
- 
 
   return (
-    <div className="relative w-full max-w-[1512px] mx-auto">
-  
-
-
+    <div className="relative w-full max-w-378 mx-auto">
       {/* Wrapper z możliwością przewijania */}
       <div className="overflow-hidden px-12">
         <div
@@ -73,10 +66,10 @@ const CalendarList = () => {
             calendars.map((calendar) => (
               <div
                 key={calendar.id}
-                className="w-[372px] h-[972px] bg-white border rounded overflow-hidden shadow shrink-0"
+                className="w-93 h-243 bg-white border rounded overflow-hidden shadow shrink-0"
               >
                 {/* Header */}
-                <div className="relative h-[252px] bg-gray-200 flex items-center justify-center overflow-hidden">
+                <div className="relative h-63 bg-gray-200 flex items-center justify-center overflow-hidden">
                   {calendar.top_image ? (
                     <>
                       <img
@@ -108,16 +101,16 @@ const CalendarList = () => {
 
                 {/* Bottom */}
                 <div
-                  className="h-[720px] px-3 py-4 flex flex-col items-center text-center"
+                  className="h-180 px-3 py-4 flex flex-col items-center text-center"
                   style={getBottomSectionBackground({
                     style:
                       calendar.bottom?.content_type_id === 26
                         ? "style1"
                         : calendar.bottom?.content_type_id === 27
-                        ? "style2"
-                        : calendar.bottom?.content_type_id === 28
-                        ? "style3"
-                        : null,
+                          ? "style2"
+                          : calendar.bottom?.content_type_id === 28
+                            ? "style3"
+                            : null,
                     bgColor:
                       calendar.bottom?.color ?? calendar.bottom?.start_color,
                     gradientEndColor: calendar.bottom?.end_color,
@@ -135,45 +128,46 @@ const CalendarList = () => {
                       const isImage = "path" in field;
 
                       return (
-                        <> 
-                        <div
-                          key={index}
-                          className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
-                        >
-                          <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
-                            {months[index]}
-                          </h3>
-                          <div className="w-full h-[85px] text-sm text-gray-600 flex items-center justify-center">
-                            [Siatka dni dla {months[index]}]
+                        <>
+                          <div
+                            key={index}
+                            className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
+                          >
+                            <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
+                              {months[index]}
+                            </h3>
+                            <div className="w-full h-21.25 text-sm text-gray-600 flex items-center justify-center">
+                              [Siatka dni dla {months[index]}]
+                            </div>
                           </div>
-                        </div>  
                           <div className="text-xl font-bold text-blue-700 uppercase tracking-wide mt-2">
                             {isText
                               ? field.text
                               : isImage
-                              ? (calendar.images_for_fields.map((img, idx) =>
-                                   img.field_number  === index+1 ? (
-                                    <img
-                                      key={idx}
-                                      src={img.url}
-                                      alt="Image"
-                                      style={{
-                                        left: field.positionX,
-                                        top: field.positionY,
-                                        height: 60,
-                                        transform: `scale(${field.size})`,
-                                        transformOrigin: "top left",
-                                        userSelect: "none",
-                                      }}
-                                    />
-                                  ) :console.log("blad")
-                                ))
-                              : console.log("blad")}
+                                ? calendar.images_for_fields.map((img, idx) =>
+                                    img.field_number === index + 1 ? (
+                                      <img
+                                        key={idx}
+                                        src={img.url}
+                                        alt="Image"
+                                        style={{
+                                          left: field.positionX,
+                                          top: field.positionY,
+                                          height: 60,
+                                          transform: `scale(${field.size})`,
+                                          transformOrigin: "top left",
+                                          userSelect: "none",
+                                        }}
+                                      />
+                                    ) : (
+                                      console.log("blad")
+                                    ),
+                                  )
+                                : console.log("blad")}
                           </div>
-                        
-                     </> );
-                    }
-                  
+                        </>
+                      );
+                    },
                   )}
                 </div>
               </div>
@@ -181,8 +175,6 @@ const CalendarList = () => {
           )}
         </div>
       </div>
-
-  
 
       {/* 🔹 Przyciski doładowania */}
       <div className="text-center mt-4">

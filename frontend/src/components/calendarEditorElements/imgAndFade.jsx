@@ -10,7 +10,6 @@ const GradientSettings = ({
   setGradientVariant,
   gradientTheme,
   setGradientTheme,
-  // gradientStrength i setGradientStrength usunięte z propsów, skoro nie są używane
 }) => {
   return (
     <div className="bg-[#2a2b2b] rounded-4xl p-4 shadow-lg mt-4 space-y-2">
@@ -25,7 +24,7 @@ const GradientSettings = ({
             extractColorsFromImage(image.url, setBgColor, setGradientEndColor)
           }
           className="w-full px-4 py-2 rounded-lg text-sm font-medium
-            bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]
+            bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]
             hover:opacity-90 transition-colors"
         >
           Dobierz kolory z grafiki

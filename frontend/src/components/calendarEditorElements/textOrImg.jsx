@@ -11,7 +11,7 @@ const MonthEditor = ({
   index,
   isImageMode,
   fontSettings,
-  monthImages, // To jest pojedynczy obrazek dla tego miesiąca (z propsów rodzica)
+  monthImages, 
   imageScales,
   fontFamilies,
   fontWeights,
@@ -22,23 +22,17 @@ const MonthEditor = ({
 }) => {
   const fileInputRef = useRef(null);
 
-  // Funkcja usuwająca obrazek i resetująca input
   const handleRemoveImage = () => {
-    // 1. Reset w stanie (tablica obrazów)
     setMonthImages((prev) => {
       const newImages = [...prev];
       newImages[index] = null;
       return newImages;
     });
-
-    // 2. Reset skali
     setImageScales((prev) => {
       const newScales = [...prev];
       newScales[index] = 1;
       return newScales;
     });
-
-    // 3. Reset inputu pliku (żeby można było wybrać ten sam plik ponownie)
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -55,7 +49,7 @@ const MonthEditor = ({
         >
           <div
             className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center text-[10px] font-bold text-[#374b4b] ${
-              isImageMode ? "translate-x-6" : "translate-x-[2px]"
+              isImageMode ? "translate-x-6" : "translate-x-0.5"
             }`}
           >
             {isImageMode ? "🖼️" : "T"}
@@ -173,7 +167,7 @@ const MonthEditor = ({
           </div>
 
           <input
-            ref={fileInputRef} // Dodany ref do resetowania
+            ref={fileInputRef} 
             type="file"
             accept="image/*"
             onChange={(e) =>
@@ -181,7 +175,7 @@ const MonthEditor = ({
             }
             className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer 
               file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium 
-              file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90 mb-2"
+              file:bg-linear-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90 mb-2"
           />
 
           {/* Pasek do skalowania - pokazujemy tylko gdy jest obrazek */}

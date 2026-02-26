@@ -1,12 +1,8 @@
 // BottomImageSection.jsx
-import React, { use, useEffect, useRef, useState } from "react";
+import React, {  useEffect, useRef, } from "react";
 import ImgColor from "../calendarEditorElements/imgAndColor";
 import GradientSettings from "../calendarEditorElements/imgAndFade";
 import BackgroundImg from "../calendarEditorElements/imgAndImg";
-import axios from "axios";
-import { ACCESS_TOKEN } from "../../constants";
-
-const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const BottomImageSection = ({
   style,
@@ -49,7 +45,6 @@ const BottomImageSection = ({
     console.log("work")
     let newBottom = { ...selectedCalendar.bottom };
 
-    // ustawiamy content_type_id jeśli style3
     if (style === "style1") {
       newBottom.content_type_id = 26;
     }
@@ -60,7 +55,6 @@ const BottomImageSection = ({
       newBottom.content_type_id = 28;
     }
 
-    // aktualizujemy tylko odpowiednie pola dla danego stylu
     if (style === "style1") {
       newBottom.color = bgColor;
     } else if (style === "style2") {

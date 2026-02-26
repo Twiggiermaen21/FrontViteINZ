@@ -1,15 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
-import { getBottomSectionBackground } from "../utils/getBottomSectionBackground";
-import { getYearPositionStyles } from "../utils/getYearPositionStyles";
 import { MONTHS, STATUS_MAP } from "../constants";
 import { getStatusStyle } from "../utils/getStatusStyle";
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview.jsx";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
-/* ================= LISTA PRODUKCJI ================= */
 const ProductionList = () => {
   const [productions, setProductions] = useState([]);
   const [page, setPage] = useState(1);
@@ -41,13 +38,12 @@ const ProductionList = () => {
       setLoadingMore(true);
       const token = localStorage.getItem(ACCESS_TOKEN);
 
-      // Ustalmy stronę do pobrania na sztywno przed zapytaniem
       const pageToFetch = reset ? 1 : page;
 
       try {
         const res = await axios.get(`${apiUrl}/production/`, {
           headers: { Authorization: `Bearer ${token}` },
-          params: { page: pageToFetch }, // Używamy lokalnej zmiennej pageToFetch
+          params: { page: pageToFetch }, 
         });
 
         setProductions((prev) =>
@@ -62,9 +58,6 @@ const ProductionList = () => {
         );
 
         setHasMore(!!res.data.next);
-
-        // === KLUCZOWA POPRAWKA ===
-        // Zamiast (prev) => prev + 1, ustawiamy na podstawie strony, którą właśnie pobraliśmy
         setPage(pageToFetch + 1);
       } catch (err) {
         console.error("Błąd listy produkcji:", err);

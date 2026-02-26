@@ -1,4 +1,3 @@
-// przełączanie trybu obrazka
 export const toggleImageMode = (index, setIsImageMode) => {
   setIsImageMode((prev) => {
     const newMode = [...prev];
@@ -7,7 +6,6 @@ export const toggleImageMode = (index, setIsImageMode) => {
   });
 };
 
-// zmiana obrazka
 export const handleImageChange = (index, e, setMonthImages, setImageScales) => {
   if (e.target.files && e.target.files[0]) {
     const file = e.target.files[0];
@@ -26,7 +24,7 @@ export const handleImageChange = (index, e, setMonthImages, setImageScales) => {
   }
 };
 
-// zmiana skali obrazka
+
 export const handleImageScaleChange = (index, value, setImageScales) => {
   setImageScales((prev) => {
     const newScales = [...prev];
@@ -35,21 +33,6 @@ export const handleImageScaleChange = (index, value, setImageScales) => {
   });
 };
 
-// zmiana tekstu miesiąca
-// export const handleMonthTextChange = (index, value, monthTexts, setMonthTexts) => {
-//   const newTexts = [...monthTexts];
-//   newTexts[index] = value;
-//   setMonthTexts(newTexts);
-// };
-
-// zmiana ustawień czcionki
-// export const handleFontSettingChange = (index, field, value, fontSettings, setFontSettings) => {
-//   const updated = [...fontSettings];
-//   updated[index] = { ...updated[index], [field]: value };
-//   setFontSettings(updated);
-// };
-
-// działa na POJEDYNCZYM obiekcie, nie na tablicy
 export const handleFontSettingChange = (index, field, value, fontSettings, setFontSettings) => {
   const updated = [...fontSettings];
   updated[index] = { ...updated[index], [field]: value };

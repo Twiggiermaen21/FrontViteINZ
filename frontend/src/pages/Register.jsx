@@ -5,10 +5,10 @@ import { NAME_WEB } from "../assets/assets";
 export default function Register() {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#1e1f1f] text-[#d2e4e2]">
-      <div className="flex w-full max-w-6xl min-h-[40rem] bg-[#2a2b2b] rounded-3xl overflow-hidden shadow-2xl border border-[#374b4b]">
+      <div className="flex w-full max-w-6xl min-h-160 bg-[#2a2b2b] rounded-3xl overflow-hidden shadow-2xl border border-[#374b4b]">
         
         {/* LEWA STRONA (Spójna z Login - gradient morski) */}
-        <div className="flex-1 bg-gradient-to-br from-[#6d8f91] via-[#8ebabb] to-[#afe5e6] relative flex items-center justify-center p-10">
+        <div className="flex-1 bg-linear-to-br from-[#6d8f91] via-[#8ebabb] to-[#afe5e6] relative flex items-center justify-center p-10">
           <img
             src="/astronaut.png"
             alt="Astronaut"
@@ -41,9 +41,6 @@ export default function Register() {
               Zaloguj się
             </a>
           </div>
-
-          {/* Opcjonalnie: Możesz tu dodać separator i GoogleLogin dla rejestracji, 
-              jeśli Twój backend to obsługuje, analogicznie jak w Login */}
         </div>
 
       </div>

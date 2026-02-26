@@ -198,7 +198,7 @@ export default function Settings() {
           id="imageUpload"
           accept="image/*"
           onChange={handleImageUpload}
-          className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gradient-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90"
+          className="block w-full text-sm rounded-lg bg-[#1e1f1f] text-[#d2e4e2] border border-[#374b4b] hover:border-[#6d8f91] cursor-pointer file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-linear-to-r file:from-[#6d8f91] file:to-[#afe5e6] file:text-[#1e1f1f] hover:file:opacity-90"
           type="file"
         ></input>
 
@@ -210,7 +210,7 @@ export default function Settings() {
         <button
           onClick={handleSaveImage}
           disabled={loadingImage}
-          className="w-full mt-2 py-3 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300"
+          className="w-full mt-2 py-3 text-lg rounded-xl font-bold bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300"
         >
           {loadingImage ? <LoadingIndicator /> : "Zapisz zdjęcie"}
         </button>
@@ -250,7 +250,7 @@ export default function Settings() {
           <button
             type="submit"
             disabled={loadingProfile}
-            className="w-full py-3 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]"
+            className="w-full py-3 text-lg rounded-xl font-bold bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]"
           >
             {loadingProfile ? <LoadingIndicator /> : "Zaktualizuj profil"}
           </button>
@@ -270,7 +270,7 @@ export default function Settings() {
           <button
             type="submit"
             disabled={loadingEmail}
-            className="w-full py-3 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]"
+            className="w-full py-3 text-lg rounded-xl font-bold bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]"
           >
             {loadingEmail ? <LoadingIndicator /> : "Zmień email"}
           </button>
@@ -306,7 +306,7 @@ export default function Settings() {
           <button
             type="submit"
             disabled={loadingPassword}
-            className="w-full py-3 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]"
+            className="w-full py-3 text-lg rounded-xl font-bold bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f]"
           >
             {loadingPassword ? <LoadingIndicator /> : "Zmień hasło"}
           </button>

@@ -12,7 +12,6 @@ export const extractColorsFromImage = async (imgUrl, setBgColor, setGradientEndC
         const color = await fac.getColorAsync(img);
         const hex = color.hex;
 
-        // Funkcja pomocnicza do rozjaśniania/przyciemniania
         const adjustBrightness = (hex, percent) => {
           const num = parseInt(hex.slice(1), 16);
           const r = Math.min(255, Math.max(0, (num >> 16) + percent))

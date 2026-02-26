@@ -37,7 +37,7 @@ const Dashboard = () => {
   alt={tile.label}
   className="w-full h-72 object-cover brightness-90 group-hover:brightness-110 transition-all duration-300 border-18 rounded-3xl border-[#2a2b2b]"
 />
-          <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-6">
+          <div className="absolute bottom-0 left-0 w-full bg-linear-to-t from-black/70 to-transparent p-6">
             <h3 className="text-white text-xl font-semibold">{tile.label}</h3>
           </div>
           <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-20 transition-opacity rounded-3xl"></div>

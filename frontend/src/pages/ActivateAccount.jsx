@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+const apiUrl = `${import.meta.env.VITE_API_URL}`;
 
 export default function ActivateAccount() {
   const { uidb64, token } = useParams();
   const [message, setMessage] = useState("Aktywacja konta...");
   const [error, setError] = useState("");
-  const [activated, setActivated] = useState(false); // flaga aktywacji
+  const [activated, setActivated] = useState(false); 
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (activated) return; // jeśli już aktywowano, nic nie robimy
+    if (activated) return; 
 
     const activateUser = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/activate-account/${uidb64}/${token}/`
+          `${apiUrl}/activate-account/${uidb64}/${token}/`
         );
 
         setMessage(res.data.detail);
-        setActivated(true); // ustawiamy flagę, żeby nie powtarzać
+        setActivated(true); 
         setTimeout(() => navigate("/login"), 3000);
       } catch (err) {
         console.error(err);
         setError("Nie udało się aktywować konta. Link mógł wygasnąć.");
-        setActivated(true); // blokujemy kolejne próby
+        setActivated(true); 
       }
     };
 

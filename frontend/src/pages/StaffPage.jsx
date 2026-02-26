@@ -3,7 +3,6 @@ import axios from "axios";
 import { saveAs } from "file-saver";
 import { ACCESS_TOKEN } from "../constants";
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview";
-// Importujemy helpery (upewnij się, że plik productionHelpers.js istnieje w utils)
 import { MONTHS, STATUS_MAP } from "../constants";
 import { getStatusStyle } from "../utils/getStatusStyle";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
@@ -14,7 +13,6 @@ const LoadingSpinner = () => (
   </div>
 );
 
-/* ================= STAFF PRODUCTION LIST ================= */
 const StaffProductionList = () => {
   const [productions, setProductions] = useState([]);
   const [page, setPage] = useState(1);
@@ -131,14 +129,12 @@ const StaffProductionList = () => {
   );
 
   const handleAccept = async (item) => {
-    // 1. Aktualizacja statusu
     updateProductionStatus(
       item.id,
       "in_production",
       "zaakceptowana i włączona do produkcji",
     );
 
-    // 2. Wysłanie requestu o wydruk (generowanie)
     try {
       const res = await axios.post(
         `${apiUrl}/calendar-print/`,
@@ -168,19 +164,15 @@ const StaffProductionList = () => {
         `${apiUrl}/calendar-download/${productionId.id}/`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          responseType: "blob", // To jest kluczowe dla plików binarnych (zip, jpg, pdf)
+          responseType: "blob", 
         },
       );
 
-      // ZMIANA TUTAJ:
-      // 1. Zmieniamy nazwę pliku, aby odzwierciedlała, że to paczka.
-      // 2. Zmieniamy rozszerzenie na .zip
       const fileName = `calendar_package_${productionId.id}.zip`;
 
       saveAs(response.data, fileName);
     } catch (error) {
       console.error("Błąd pobierania:", error);
-      // Tutaj warto dodać obsługę błędu dla użytkownika (np. toast/alert)
     }
   };
   const handleReject = (item) => {
@@ -200,7 +192,7 @@ const StaffProductionList = () => {
       </p>
 
       {/* Kontener scrollowania - max 800px wysokości */}
-      <div className="max-h-[600px] overflow-y-auto custom-scroll pr-4">
+      <div className="max-h-150 overflow-y-auto custom-scroll pr-4">
         <div className="space-y-4">
           {productions.length === 0 && !loading && (
             <p className="text-lg text-center text-gray-400 py-10">

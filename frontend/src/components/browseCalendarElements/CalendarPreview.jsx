@@ -4,7 +4,6 @@ import { getPaddingTopFromText } from "../../utils/textPadding";
 import { MONTHS, CMYK_SIMULATION_STYLE } from "../../constants";
 
 
-// Definiujemy wymiary przeniesione z pierwszego komponentu
 const DIMENSIONS = {
   WIDTH: 3720,
   HEADER_HEIGHT: 2430,
@@ -12,7 +11,7 @@ const DIMENSIONS = {
   MONTH_BOX_HEIGHT: 1650,
   MONTH_BOX_WIDTH: 3540,
   AD_STRIP_HEIGHT: 360,
-  SCALE_FACTOR: 12.5, // Zachowane do ewentualnego przeliczania paddingu
+  SCALE_FACTOR: 12.5, 
 };
 
 
@@ -20,7 +19,6 @@ const CalendarPreview = ({ calendar }) => {
   if (!calendar) return null;
 
   return (
-    // 1. KONTENER SKALUJĄCY (Zoom 0.08)
     <div 
       className="mx-auto rounded-4xl shadow-lg overflow-hidden bg-white origin-top" 
       style={{ zoom: 0.08, ...CMYK_SIMULATION_STYLE }}
@@ -140,7 +138,6 @@ const CalendarPreview = ({ calendar }) => {
   );
 };
 
-// --- Sub-komponent bez zmian w strukturze, używa DIMENSIONS.SCALE_FACTOR ---
 const CalendarFieldContent = ({ calendar, index }) => {
   const fieldKey = `field${index + 1}`;
   const fieldData = calendar[fieldKey];
@@ -151,7 +148,6 @@ const CalendarFieldContent = ({ calendar, index }) => {
   const isImageField = fieldData.path !== undefined && fieldData.path !== null;
 
   if (isTextField) {
-    // Upewnij się, że getPaddingTopFromText jest zdefiniowane w pliku
     const basePadding = getPaddingTopFromText(fieldData.text); 
     const scaledPadding = basePadding * DIMENSIONS.SCALE_FACTOR;
 

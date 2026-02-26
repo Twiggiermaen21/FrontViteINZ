@@ -30,7 +30,6 @@ const EditRightPanel = ({
   setMonthImages,
   fontSettings,
   setFontSettings,
-
   yearText,
   setYearText,
   yearColor,
@@ -91,7 +90,7 @@ const EditRightPanel = ({
     try {
       const res = await axios.get(`${apiUrl}/generate/`, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { page: pageBackground, page_size: 12 }, // backend musi obsługiwać paginację
+        params: { page: pageBackground, page_size: 12 }, 
       });
 
       setImagesBackground((prev) => [...prev, ...res.data.results]);
@@ -102,7 +101,7 @@ const EditRightPanel = ({
       if (err.response?.status === 401) {
         setTimeout(() => {
           window.location.reload();
-        }, 500); // odświeży po 0.5 sekundy
+        }, 500);
       }
     } finally {
       setLoading(false);
@@ -122,7 +121,6 @@ const EditRightPanel = ({
     }
   }, [style]);
 
-  // 🔹 Pobieranie obrazów z backendu
   const fetchImages = async () => {
     if (!hasMore || loading) return;
 
@@ -135,7 +133,6 @@ const EditRightPanel = ({
         params: { page, page_size: 6 },
       });
 
-      // 🔹 Scalanie bez duplikatów
       setImages((prev) => {
         const combined = [...prev, ...res.data.results];
         const unique = combined.filter(
@@ -158,18 +155,16 @@ const EditRightPanel = ({
     }
   };
 
-  // 🔹 Pierwsze pobranie
   useEffect(() => {
     fetchImages();
   }, []);
 
-  // 🔹 Infinite scroll
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
 
     const handleScroll = () => {
-      if (loading || !hasMore) return; // ✅ zabezpieczenie
+      if (loading || !hasMore) return; 
 
       if (
         container.scrollTop + container.clientHeight >=
@@ -224,11 +219,9 @@ const EditRightPanel = ({
     setSaving(true);
     const formData = new FormData();
     const token = localStorage.getItem(ACCESS_TOKEN);
-    // przykładowe pola
     formData.append("name", calendarName);
     formData.append("top_image", selectedImageUrl.id);
-    // np. zmiana top_image jeśli wybierzesz nowy plik:
-    // formData.append("top_image", fileInput.files[0]);
+   
     formData.append("year_data", JSON.stringify(pom));
     if(style==="style3"){
     // formData.append("bottom_image",backgroundImage.id);
@@ -272,7 +265,7 @@ const EditRightPanel = ({
             className={`flex-1 text-center py-2 px-3 rounded-lg font-medium transition-all duration-200 mx-1
           ${
             openSection === key
-              ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] shadow-md"
+              ? "bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] shadow-md"
               : "bg-[#3a3b3b] text-gray-300 hover:bg-[#404242] hover:text-white"
           }`}
           >
@@ -335,7 +328,7 @@ const EditRightPanel = ({
                     className={`w-full text-left px-3.5 py-2.5 rounded-lg text-sm transition-colors
                   ${
                     style === key
-                      ? "bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
+                      ? "bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] font-semibold"
                       : "text-[#d2e4e2] hover:bg-[#374b4b] hover:text-white"
                   }`}
                   >

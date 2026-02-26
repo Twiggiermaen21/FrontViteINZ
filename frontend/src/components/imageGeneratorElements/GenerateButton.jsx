@@ -38,7 +38,7 @@ export default function GenerateButton({ generateImage, loading: externalLoading
         <button
           onClick={handleGenerate}
           disabled={loading || externalLoading}
-          className="flex-1 py-4 text-lg rounded-xl font-bold bg-gradient-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300 disabled:opacity-50"
+          className="flex-1 py-4 text-lg rounded-xl font-bold bg-linear-to-r from-[#6d8f91] to-[#afe5e6] text-[#1e1f1f] hover:opacity-90 transition-all duration-300 disabled:opacity-50"
         >
           {loading ? `Generating ${progress}/${repeatCount}...` : "Generuj"}
         </button>

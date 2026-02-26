@@ -2,18 +2,14 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
-// Upewniamy się, że ścieżka prowadzi do /api (zgodnie z poprzednimi plikami)
 const apiUrl = `${import.meta.env.VITE_API_URL}`;
 
 export default function ResetPassword() {
   const { uid, token } = useParams();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
-  // Stany komunikatów
-  const [message, setMessage] = useState(""); // Komunikat ogólny (sukces/błąd tokenu)
-  const [passwordError, setPasswordError] = useState(""); // Błąd walidacji hasła
+  const [message, setMessage] = useState(""); 
+  const [passwordError, setPasswordError] = useState(""); 
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   
@@ -43,23 +39,17 @@ export default function ResetPassword() {
       console.error(err);
       setIsError(true);
 
-      // Obsługa błędów z backendu
       if (err.response && err.response.data) {
         const data = err.response.data;
-
-        // 1. Sprawdź czy to błąd walidacji hasła (klucz "new_password")
         if (data.new_password) {
-          // Backend zwraca tablicę błędów, łączymy je w string
           const errorMsg = Array.isArray(data.new_password) 
             ? data.new_password.join(" ") 
             : data.new_password;
           setPasswordError(errorMsg);
         } 
-        // 2. Sprawdź czy to błąd ogólny (klucz "detail" lub inne)
         else if (data.detail) {
           setMessage(data.detail);
         } else {
-          // Fallback, jeśli backend zwrócił coś innego (np. słownik błędów "uid", "token")
                   setMessage("Wystąpił błąd walidacji danych. Lub link do resetu jest nieprawidłowy.");
         }
       } else {

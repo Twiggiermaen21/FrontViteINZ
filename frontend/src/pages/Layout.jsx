@@ -8,7 +8,7 @@ const Layout = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [sidebar, setSidebar] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null); // <-- wybrany projekt
+  const [selectedProject, setSelectedProject] = useState(null); 
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -19,7 +19,6 @@ const Layout = () => {
 
   return (
     <div className="flex min-h-screen bg-[#1e1f1f] text-white">
-          {/* // <div className="flex h-fit min-h-full w-fit min-w-full bg-[#1e1f1f] text-white"> */}
 
       {/* SIDEBAR */}
       <SideBar sidebar={sidebar} setSidebar={setSidebar} user={user} />
@@ -35,7 +34,7 @@ const Layout = () => {
 
           {/* Prawa część - avatar i nazwa */}
           <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gradient-to-br from-[#6d8f91] to-[#afe5e6] p-[2px]">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gradient-to-br from-[#6d8f91] to-[#afe5e6] p-0.5">
               <img
                 src={user?.profile_image ? user.profile_image : assets.avatar}
                 alt="user avatar"

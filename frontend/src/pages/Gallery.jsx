@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { useOutletContext } from "react-router-dom";
-
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const Gallery = () => {
@@ -12,10 +11,7 @@ const Gallery = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
-  const isFetchingRef = useRef(false); // ⛔ lokalna blokada
-
-
-
+  const isFetchingRef = useRef(false);
 
  const fetchImages = useCallback(async () => {
   if (isFetchingRef.current || loading || !hasMore) return;
@@ -62,8 +58,6 @@ const Gallery = () => {
 
   const handleScroll = (e) => {
     const { scrollTop, scrollHeight, clientHeight } = e.target;
-
-    // tylko jeśli nie ładuje i są jeszcze dane
     if (scrollTop + clientHeight >= scrollHeight - 10 && !loading && hasMore) {
       fetchImages();
     }

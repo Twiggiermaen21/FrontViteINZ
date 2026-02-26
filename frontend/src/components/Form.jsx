@@ -14,7 +14,7 @@ export default function Form({ route, method }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [infoMessage, setInfoMessage] = useState(""); // Stan dla komunikatu sukcesu
+  const [infoMessage, setInfoMessage] = useState("");
 
   const navigate = useNavigate();
   const name = method === "login" ? "Zaloguj się" : "Zarejestruj się";
@@ -23,7 +23,7 @@ export default function Form({ route, method }) {
     e.preventDefault();
     setLoading(true);
     setErrorMessage("");
-    setInfoMessage(""); // Czyścimy poprzednie komunikaty sukcesu
+    setInfoMessage(""); 
 
     try {
       let payload;
@@ -47,11 +47,8 @@ export default function Form({ route, method }) {
         localStorage.setItem("user", JSON.stringify(res.data.user));
         navigate("/ai/dashboard");
       } else {
-        // --- ZMIANA TUTAJ: Nowy komunikat i dłuższy czas oczekiwania ---
         setInfoMessage("Rejestracja zakończona pomyślnie! Aktywuj swoje konto klikając w link, który został wysłany na Twój adres e-mail.");
-        
-        // Zwiększyłem czas do 5000ms (5 sekund), żeby użytkownik zdążył przeczytać komunikat
-        setTimeout(() => {
+                setTimeout(() => {
           navigate("/login");
         }, 5000);
       }
@@ -63,7 +60,6 @@ export default function Form({ route, method }) {
         } else if (error.response.data.detail) {
           setErrorMessage(error.response.data.detail);
         } else {
-          // Obsługa błędów walidacji (np. zajęty email)
           try {
             const fieldErrors = Object.values(error.response.data).flat().join(", ");
             setErrorMessage(fieldErrors || "Wystąpił błąd. Spróbuj ponownie.");
@@ -172,7 +168,7 @@ export default function Form({ route, method }) {
 
       <button
         type="submit"
-        disabled={loading} // Dobra praktyka: zablokuj przycisk podczas ładowania
+        disabled={loading} 
         className="w-full py-4 text-lg rounded-xl font-bold mt-2 bg-[#6d8f91] hover:bg-[#afe5e6] hover:text-[#1e1f1f] text-[#e8f3f2] transition-all duration-300 cursor-pointer shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {name}
