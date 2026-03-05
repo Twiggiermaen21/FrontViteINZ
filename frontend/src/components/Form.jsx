@@ -18,62 +18,90 @@ export default function Form({ route, method }) {
 
   const navigate = useNavigate();
   const name = method === "login" ? "Zaloguj się" : "Zarejestruj się";
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setErrorMessage("");
+  setInfoMessage("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMessage("");
-    setInfoMessage(""); 
+  const translateError = (msg) => {
+    const translations = {
+      "A user with that username already exists.": "Użytkownik z takimi danymi już istnieje.",
+      "Enter a valid email address.": "Podaj poprawny adres e-mail.",
+      "This field may not be blank.": "To pole nie może być puste.",
+      "This field is required.": "To pole jest wymagane."
+    };
 
-    try {
-      let payload;
-      if (method === "login") {
-        payload = { username, password };
-      } else {
-        payload = {
-          username,
-          email,
-          first_name: firstName,
-          last_name: lastName,
-          password,
-        };
-      }
-
-      const res = await api.post(route, payload);
-
-      if (method === "login") {
-        localStorage.setItem(ACCESS_TOKEN, res.data.access);
-        localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        navigate("/ai/dashboard");
-      } else {
-        setInfoMessage("Rejestracja zakończona pomyślnie! Aktywuj swoje konto klikając w link, który został wysłany na Twój adres e-mail.");
-                setTimeout(() => {
-          navigate("/login");
-        }, 5000);
-      }
-    } catch (error) {
-      console.error(error);
-      if (error.response?.data) {
-        if (typeof error.response.data === "string") {
-          setErrorMessage(error.response.data);
-        } else if (error.response.data.detail) {
-          setErrorMessage(error.response.data.detail);
-        } else {
-          try {
-            const fieldErrors = Object.values(error.response.data).flat().join(", ");
-            setErrorMessage(fieldErrors || "Wystąpił błąd. Spróbuj ponownie.");
-          } catch (e) {
-            setErrorMessage("Wystąpił nieoczekiwany błąd danych.");
-          }
-        }
-      } else {
-        setErrorMessage("Błąd połączenia z serwerem");
-      }
-    } finally {
-      setLoading(false);
-    }
+    return translations[msg] || msg;
   };
+
+  try {
+    let payload;
+    if (method === "login") {
+      payload = { username, password };
+    } else {
+      payload = {
+        username,
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        password,
+      };
+    }
+
+    const res = await api.post(route, payload);
+
+    if (method === "login") {
+      localStorage.setItem(ACCESS_TOKEN, res.data.access);
+      localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      navigate("/ai/dashboard");
+    } else {
+      setInfoMessage("Rejestracja zakończona pomyślnie! Aktywuj swoje konto klikając w link, który został wysłany na Twój adres e-mail.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 5000);
+    }
+  } catch (error) {
+    console.error(error);
+    if (error.response?.data) {
+      const data = error.response.data;
+
+      if (typeof data === "string") {
+        setErrorMessage(translateError(data));
+      } else if (data.detail) {
+        setErrorMessage(translateError(data.detail));
+      } else {
+        try {
+          // Pobieramy nazwy wszystkich pól, które zwróciły błąd (np. ["username", "password"])
+          const errorKeys = Object.keys(data);
+
+          if (errorKeys.length > 0) {
+            // Bierzemy tylko pierwsze pole z listy
+            const firstKey = errorKeys[0];
+
+            if (firstKey === "password") {
+              // Jeśli pierwszym błędem jest hasło, pokazujemy ogólny komunikat
+              setErrorMessage("Hasło nie może być popularne i musi zawierać co najmniej 8 znaków, w tym litery i cyfry.");
+            } else {
+              // Jeśli to inne pole, pobieramy jego pierwszą wiadomość i tłumaczymy
+              const firstErrorMsg = Array.isArray(data[firstKey]) ? data[firstKey][0] : data[firstKey];
+              setErrorMessage(translateError(firstErrorMsg));
+            }
+          } else {
+            setErrorMessage("Wystąpił błąd. Spróbuj ponownie.");
+          }
+        } catch (e) {
+          setErrorMessage("Wystąpił nieoczekiwany błąd danych.");
+        }
+      }
+    } else {
+      setErrorMessage("Błąd połączenia z serwerem.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-[#d2e4e2] font-sans">
