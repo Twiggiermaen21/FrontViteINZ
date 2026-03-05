@@ -104,17 +104,12 @@ const CalendarPreview = ({ calendar }) => {
                   borderWidth: "5px",
                 }}
               >
-                <h3 
-                  className="font-bold text-blue-700 uppercase tracking-wide"
-                  style={{ fontSize: "150px", marginTop: "40px", marginBottom: "10px" }}
-                >
-                  {MONTHS[index]}
-                </h3>
+                
                 <div 
                   className="w-full text-gray-400 flex items-center justify-center"
                   style={{ fontSize: "100px", flexGrow: 1 }}
                 >
-                  [Siatka dni dla {MONTHS[index]}]
+                  [Siatka dni]
                 </div>
               </div>
 

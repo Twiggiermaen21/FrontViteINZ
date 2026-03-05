@@ -151,12 +151,7 @@ const StaffProductionList = () => {
     }
   };
 
-  const handleReadyForPrint = (item) =>
-    updateProductionStatus(
-      item.id,
-      "archived",
-      "przygotowana do druku (archived)",
-    );
+
 
   const handleDownload = async (productionId) => {
     try {
@@ -164,7 +159,7 @@ const StaffProductionList = () => {
         `${apiUrl}/calendar-download/${productionId.id}/`,
         {
           headers: { Authorization: `Bearer ${token}` },
-          responseType: "blob", 
+          responseType: "blob",
         },
       );
 
@@ -179,8 +174,6 @@ const StaffProductionList = () => {
     if (!window.confirm("Czy na pewno chcesz ODRZUCIĆ tę pozycję?")) return;
     updateProductionStatus(item.id, "rejected", "odrzucona");
   };
-  console.log(productions);
-  console.log(fullCalendarData);
   return (
     <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl mx-auto text-white shadow-2xl">
       {/* Style dla scrollbara */}
@@ -275,8 +268,8 @@ const StaffProductionList = () => {
                           <div className="text-xl font-bold">
                             {item.deadline
                               ? new Date(item.deadline).toLocaleDateString(
-                                  "pl-PL",
-                                )
+                                "pl-PL",
+                              )
                               : "Nieokreślony"}
                           </div>{" "}
                         </div>
@@ -349,31 +342,19 @@ const StaffProductionList = () => {
                             {(englishStatusKey === "draft" ||
                               englishStatusKey === "to_produce" ||
                               englishStatusKey === "waiting") && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleAccept(item);
-                                }}
-                                className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition font-semibold disabled:opacity-50"
-                                disabled={isUpdating}
-                              >
-                                ✅ Akceptuj do produkcji
-                              </button>
-                            )}
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAccept(item);
+                                  }}
+                                  className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition font-semibold disabled:opacity-50"
+                                  disabled={isUpdating}
+                                >
+                                  ✅ Akceptuj do produkcji
+                                </button>
+                              )}
 
-                            {/* Gotowe do druku (Archiwum) */}
-                            {englishStatusKey === "in_production" && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleReadyForPrint(item);
-                                }}
-                                className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-semibold disabled:opacity-50"
-                                disabled={isUpdating}
-                              >
-                                📦 Oznacz jako GOTOWE DO DRUKU (Archiwum)
-                              </button>
-                            )}
+
 
                             {/* Wysłano do druku (Gotowy) */}
                             {englishStatusKey === "archived" && (

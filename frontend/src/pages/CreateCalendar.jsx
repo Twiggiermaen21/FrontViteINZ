@@ -247,7 +247,7 @@ export default function CreateCalendar() {
   }, [dragging, setYearPosition]); 
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-14 gap-6 px-4">
+<div className="grid grid-cols-1 min-[1500px]:grid-cols-14 gap-6 px-4">
       <div className="lg:col-span-3 space-y-2 ">
         <StyleSidebar
           style={style}
@@ -466,12 +466,7 @@ export default function CreateCalendar() {
                       borderWidth: "5px",
                     }}
                   >
-                    <h3
-                      className="font-bold text-blue-700 uppercase mt-4"
-                      style={{ fontSize: "150px", marginTop: "40px" }}
-                    >
-                      {month}
-                    </h3>
+                   
                     <div
                       className="w-full grow text-gray-400 flex items-center justify-center"
                       style={{ fontSize: "100px" }}
