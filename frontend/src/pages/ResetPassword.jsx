@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const apiUrl = `${import.meta.env.VITE_API_URL}`;
 
 export default function ResetPassword() {
@@ -14,6 +15,16 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
+
+  // Funkcja do tłumaczenia błędów z backendu
+  const translateErrorMessage = (msg) => {
+    if (!msg) return "";
+    let translated = msg;
+    translated = translated.replace(/This password is too short\. It must contain at least 8 characters\./g, "To hasło jest za krótkie. Musi zawierać co najmniej 8 znaków.");
+    translated = translated.replace(/This password is too common\./g, "To hasło jest zbyt popularne.");
+    translated = translated.replace(/This password is entirely numeric\./g, "To hasło składa się wyłącznie z cyfr.");
+    return translated;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,16 +52,20 @@ export default function ResetPassword() {
 
       if (err.response && err.response.data) {
         const data = err.response.data;
+        
         if (data.new_password) {
-          const errorMsg = Array.isArray(data.new_password) 
+          // Pobranie oryginalnego błędu
+          const rawErrorMsg = Array.isArray(data.new_password) 
             ? data.new_password.join(" ") 
             : data.new_password;
-          setPasswordError(errorMsg);
+            
+          // Zastosowanie tłumaczenia przed ustawieniem stanu
+          setPasswordError(translateErrorMessage(rawErrorMsg));
         } 
         else if (data.detail) {
           setMessage(data.detail);
         } else {
-                  setMessage("Wystąpił błąd walidacji danych. Lub link do resetu jest nieprawidłowy.");
+          setMessage("Wystąpił błąd walidacji danych. Lub link do resetu jest nieprawidłowy.");
         }
       } else {
         setMessage("Błąd połączenia z serwerem.");
