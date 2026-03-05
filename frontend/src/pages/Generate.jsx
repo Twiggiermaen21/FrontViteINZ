@@ -16,7 +16,7 @@ export default function Generate() {
   const [newOptionValue, setNewOptionValue] = useState("");
   const [imageName, setImageName] = useState("");
   const [isStaff, setIsStaff] = useState(false);
-
+  const [active, setActive] = useState(false);
   const examplePrompts = [
     "Futurystyczna panorama miasta nocą",
     "Słodki kot w kapeluszu",
@@ -146,7 +146,6 @@ export default function Generate() {
       setLoading(false);
     }
   };
-
   const handleDeleteOption = async (field, id) => {
     const confirmDelete = window.confirm(
       "Czy na pewno chcesz usunąć ten element?",
@@ -307,15 +306,24 @@ export default function Generate() {
           Nazwa grafiki
         </label>
         <input
-          type="text"
-          value={imageName}
-          onChange={(e) => setImageName(e.target.value)}
-          placeholder="Wprowadź nazwę grafiki"
-          className="w-full p-2 mb-4 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
-        />
+  type="text"
+  value={imageName}
+  onChange={(e) => {
+    const newValue = e.target.value;
+    setImageName(newValue);
+
+    if (newValue.trim() === "") {
+      setActive(false);
+    } else {
+      setActive(true);
+    }
+  }}
+  placeholder="Wprowadź nazwę grafiki"
+  className="w-full p-2 mb-4 rounded-lg bg-[#374b4b] text-[#d2e4e2] focus:outline-none focus:ring-2 focus:ring-[#afe5e6] transition"
+/>
 
         {/* BUTTON */}
-        <GenerateButton generateImage={generateImage} loading={loading} />
+        <GenerateButton active={active} generateImage={generateImage} loading={loading} />
       </div>
 
       {/* PRAWY PANEL */}
