@@ -48,7 +48,17 @@ function ProtectedRoute({ children }) {
     };
 
     if (isAuthorized === null) {
-        return <div>Loading...</div>;
+        return (
+    <div className="flex flex-col justify-center items-center h-screen w-full bg-[#1e1f1f]">
+      {/* Kręcące się kółko z kolorami Twojego motywu */}
+      <div className="w-16 h-16 rounded-full border-[5px] border-[#3c3d3d] border-t-[#afe5e6] border-r-[#6d8f91] animate-spin mb-6"></div>
+      
+      {/* Pulsujący tekst */}
+      <div className="text-[#d2e4e2] text-lg font-semibold tracking-wider uppercase animate-pulse">
+        Chwila moment, pobieramy dane...
+      </div>
+    </div>
+  );
     }
 
     return isAuthorized ? children : <Navigate to="/login" />;
