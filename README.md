@@ -1,34 +1,48 @@
 <p align="center">
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
-  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
-  <img src="https://img.shields.io/badge/Material_UI-007FFF?style=for-the-badge&logo=mui&logoColor=white" />
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" />
-  <img src="https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
+  <img src="https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" />
 </p>
 
 # 🗓️ AI Calendar Generator — Frontend
 
-> **Aplikacja kliencka do tworzenia kalendarzy trójdzielnych z grafikami wygenerowanymi przez AI — od pomysłu do pliku gotowego do druku.**
+> **Interaktywna aplikacja kliencka do projektowania i generowania kalendarzy trójdzielnych AI.**
 
-Interfejs użytkownika systemu B2B dla drukarni, umożliwiający klientom projektowanie spersonalizowanych kalendarzy trójdzielnych. Użytkownik wybiera parametry stylu, generuje grafiki AI, komponuje układ kalendarza i zleca produkcję pliku PSD gotowego do profesjonalnego druku.
+System B2B umożliwiający drukarniom oferowanie klientom spersonalizowanych kalendarzy trójdzielnych z grafikami wygenerowanymi przez sztuczną inteligencję. Frontend to nowoczesna aplikacja SPA (Single Page Application), która przeprowadza użytkownika przez kreator projektowania kalendarza (wybór stylu, atmosfery, kolorystyki itp.), integruje logowanie Google OAuth i prezentuje galerię wyników gotowych do generacji PDF na zapleczu.
 
 ---
 
 ## ✨ Kluczowe funkcjonalności
 
-🎨 **Kreator grafik AI** — intuicyjny formularz do budowania promptów: wybór stylu artystycznego, kompozycji, kolorystyki, atmosfery, perspektywy i detali
+🎨 **Kreator krok po kroku** — responsywny i intuicyjny interfejs budowy promptu poprzez wybieranie metadanych (styl, kompozycja, atmosfera)
 
-📅 **Edytor kalendarza** — wizualny kreator z podglądem na żywo: ustawianie nagłówka, czcionek, kolorów dat, pól reklamowych i tła
+🖼️ **Podgląd wygenerowanych obrazów** — wbudowana galeria do przeglądania i wybierania wariantów dla nagłówka i poszczególnych miesięcy (reroll)
 
-🖼️ **Biblioteka grafik** — przeglądanie, zarządzanie i przypisywanie wygenerowanych grafik do pól kalendarza
+🔐 **Uwierzytelnianie** — wsparcie dla JWT oraz Google OAuth 2.0 (jedno kliknięcie do zalogowania)
 
-📋 **Biblioteka projektów** — lista zapisanych kalendarzy z możliwością edycji, kopiowania i usuwania
+🗂️ **Historia projektów** — dedykowany panel użytkownika prezentujący wcześniejsze prace i ich status
 
-🔍 **Podgląd na żywo** — wizualizacja kalendarza w przeglądarce przed zleceniem produkcji PSD
+📱 **Responsywność i styl** — architektura UI oparta w całości na klasach Tailwind CSS dla płynnego działania na desktopach i urządzeniach mobilnych
 
-🛒 **Zlecenie druku** — wybór ilości sztuk, daty realizacji, dodanie wiadomości i śledzenie statusu zamówienia
+---
 
-👤 **System kont** — rejestracja, logowanie (e-mail + Google OAuth), zarządzanie profilem i awatarem
+## 🏗️ Architektura
+
+```
+┌─────────────────┐       REST API / JWT Auth       ┌──────────────────────┐
+│   React App     │◄───────────────────────────────►│  Django / Gunicorn   │
+│   (Vite + SWC)  │                                 │  (DRF Backend)       │
+└─────────────────┘                                 └──────────┬───────────┘
+         │                                                     │
+         │ (UI, State Management)                              │ (Database, AI Gen)
+         ▼                                                     ▼
+┌──────────────────┐                                ┌──────────────────────┐
+│ Tailwind CSS     │                                │  PostgreSQL, FLUX.1  │
+│ React Router     │                                │  Together AI, Cloud  │
+└──────────────────┘                                └──────────────────────┘
+```
 
 ---
 
@@ -36,98 +50,57 @@ Interfejs użytkownika systemu B2B dla drukarni, umożliwiający klientom projek
 
 ```
 frontend/
-├── public/                     # Zasoby statyczne
+├── public/                  # Statyczne zasoby publiczne (ikony, manifesty)
+├── src/                     # Główny kod źródłowy aplikacji
+│   ├── assets/              # Zasoby graficzne, obrazki, tła
+│   ├── components/          # Reużywalne i specyficzne dla funkcji komponenty React
+│   │   ├── browseCalendarElements/
+│   │   ├── calendarEditorElements/
+│   │   ├── editCalendarElements/
+│   │   ├── imageGeneratorElements/
+│   │   ├── layoutElements/
+│   │   ├── menuElements/
+│   │   ├── startPage/
+│   │   ├── AuthForm.jsx, CalendarEditor.jsx, CalendarList.jsx, Form.jsx, etc.
+│   │
+│   ├── pages/               # Widoki i główne strony aplikacji (Routing)
+│   │   ├── ActivateAccount.jsx, BrowseCalendars.jsx, CreateCalendar.jsx
+│   │   ├── Dashboard.jsx, ForgotPassword.jsx, Gallery.jsx, Generate.jsx
+│   │   ├── Layout.jsx, Login.jsx, NotFound.jsx, ProductionList.jsx
+│   │   ├── Register.jsx, ResetPassword.jsx, Settings.jsx, StaffPage.jsx, StartPage.jsx
+│   │
+│   ├── utils/               # Funkcje i skrypty pomocnicze
+│   │   ├── autoFontSize.js
+│   │   ├── dragUtils.js
+│   │   ├── extractColorsFromImage.js
+│   │   ├── getBottomSectionBackground.js
+│   │   ├── getStatusStyle.js
+│   │   ├── getYearPositionStyles.js
+│   │   ├── monthHandlers.js
+│   │   ├── textPadding.js
+│   │   └── useCalendars.js
+│   │
+│   ├── api.js               # Globalna instancja Axios i interceptory
+│   ├── App.jsx              # Komponent najwyższego poziomu z całą logiką Routingu
+│   ├── constants.js         # Stałe tekstowe, konfiguracyjne, tokeny
+│   ├── index.css            # Dyrektywy Tailwind i globalne style
+│   └── main.jsx             # Punkt startowy aplikacji - definicja korzenia (Root)
 │
-├── src/
-│   ├── assets/                 # Obrazy, ikony, fonty
-│   │
-│   ├── components/             # Komponenty współdzielone
-│   │   ├── Navbar/             # Nawigacja główna
-│   │   ├── Footer/             # Stopka
-│   │   ├── ProtectedRoute/     # Ochrona tras (auth guard)
-│   │   ├── ImageCard/          # Karta grafiki AI
-│   │   ├── CalendarPreview/    # Podgląd kalendarza na żywo
-│   │   └── LoadingSpinner/     # Wskaźniki ładowania
-│   │
-│   ├── pages/                  # Widoki / strony
-│   │   ├── Home/               # Strona główna / landing
-│   │   ├── Login/              # Logowanie (email + Google)
-│   │   ├── Register/           # Rejestracja
-│   │   ├── ForgotPassword/     # Resetowanie hasła
-│   │   ├── Dashboard/          # Panel użytkownika
-│   │   ├── CalendarCreator/    # Kreator kalendarza (wieloetapowy)
-│   │   ├── CalendarEditor/     # Edycja istniejącego kalendarza
-│   │   ├── ImageGenerator/     # Generator grafik AI
-│   │   ├── ImageGallery/       # Biblioteka wygenerowanych grafik
-│   │   ├── ProjectLibrary/     # Lista zapisanych projektów
-│   │   ├── OrderForm/          # Formularz zlecenia druku
-│   │   ├── OrderStatus/        # Śledzenie statusu zamówienia
-│   │   └── Profile/            # Zarządzanie profilem
-│   │
-│   ├── context/                # React Context
-│   │   ├── AuthContext.jsx     # Stan autoryzacji + tokeny JWT
-│   │   └── CalendarContext.jsx # Stan edytowanego kalendarza
-│   │
-│   ├── hooks/                  # Custom hooks
-│   │   ├── useAuth.js          # Logika autoryzacji
-│   │   ├── useAPI.js           # Wrapper na Axios z JWT
-│   │   └── useCalendar.js     # Logika kalendarza
-│   │
-│   ├── services/               # Warstwa komunikacji z API
-│   │   ├── api.js              # Konfiguracja Axios (base URL, interceptory)
-│   │   ├── authService.js      # Endpointy autoryzacji
-│   │   ├── calendarService.js  # Endpointy kalendarzy
-│   │   ├── imageService.js     # Endpointy grafik AI
-│   │   └── metadataService.js  # Endpointy metadanych (style, itp.)
-│   │
-│   ├── utils/                  # Helpery i stałe
-│   │   ├── constants.js        # Stałe aplikacji
-│   │   └── helpers.js          # Funkcje pomocnicze
-│   │
-│   ├── App.jsx                 # Główny komponent + routing
-│   ├── main.jsx                # Entry point (Vite)
-│   └── index.css               # Style globalne
-│
-├── .env                        # Zmienne środowiskowe
-├── vite.config.js              # Konfiguracja Vite
-├── package.json                # Zależności i skrypty
-└── README.md
+├── .env                     # Zmienne środowiskowe (np. VITE_API_BASE_URL)
+├── eslint.config.js         # Plik konfiguracyjny lintera ESLint
+├── package.json             # Moduły, wersje bibliotek i skrypty pomocnicze (npm)
+├── tailwind.config.js       # Rozszerzenia motywu Tailwind CSS (brak w projekcie, jeśli w vite.config lub brak pliku)
+└── vite.config.js           # Konfiguracja pracy serwera kompilacji Vite
 ```
 
 ---
 
-## 🖥️ Główne widoki aplikacji
+## 🔌 API i Integracje
 
-### 🎨 Generator grafik AI
-Formularz z parametrami do budowy promptu — użytkownik wybiera spośród predefiniowanych opcji:
-
-| Parametr | Opis |
-|----------|------|
-| **Styl artystyczny** | Realizm, impresjonizm, abstrakcja, cyfrowy, itp. |
-| **Kompozycja** | Centralna, symetryczna, panoramiczna, z regułą trójpodziału |
-| **Kolorystyka** | Ciepła, zimna, pastelowa, monochromatyczna, kontrastowa |
-| **Atmosfera** | Spokojna, dynamiczna, tajemnicza, radosna, nostalgiczna |
-| **Perspektywa** | Z lotu ptaka, z poziomu oczu, makro, panorama |
-| **Detale** | Minimalistyczne, umiarkowane, bogate w szczegóły |
-| **Realizm** | Fotorealistyczny, stylizowany, artystyczny |
-| **Tło** | Natura, miasto, abstrakcja, gradient, jednokolorowe |
-| **Inspiracja** | Dodatkowe wskazówki i motywy |
-| **Styl narracyjny** | Poetycki, techniczny, opisowy |
-
-### 📅 Kreator kalendarza
-Wieloetapowy wizard do kompletowania kalendarza:
-
-```
-Krok 1 → Nadanie nazwy kalendarzowi
-Krok 2 → Dodanie zdjęcia główki (nagłówek)
-Krok 3 → Ustawienie czcionki i wielkości dat
-Krok 4 → Wybór rodzaju tła (kolor / gradient / grafika)
-Krok 5 → Wstawianie zdjęć i tekstów w pola reklamowe
-Krok 6 → Podgląd i zapis
-```
-
-### 🛒 Zlecenie do druku
-Formularz finalizacji z polami: ilość sztuk, data realizacji, dodatkowa wiadomość. Po złożeniu — śledzenie statusu zamówienia.
+Frontend integruje się z backendem Django poprzez RESTful API (szczegóły opisane w repozytorium backendu), ale również wewnątrz opiera się o kilka głównych mechanizmów:
+- **`Axios` Interceptors:** Dodawanie nagłówków autoryzacyjnych (`Bearer token`) i przechwytywanie pomyłek 401 w celu odświeżania sesji.
+- **`@react-oauth/google`:** Komponenty i hooki ułatwiające autoryzację po stronie klienta za pomocą kont Google.
+- **`react-toastify`:** Globale notyfikacje wyświetlające komunikaty w prawym dolnym rogu na akcjach.
 
 ---
 
@@ -135,105 +108,64 @@ Formularz finalizacji z polami: ilość sztuk, data realizacji, dodatkowa wiadom
 
 | Kategoria | Technologia |
 |-----------|-------------|
-| **Framework** | React 18 |
-| **Bundler** | Vite |
-| **UI Library** | Material-UI (MUI) |
-| **Routing** | React Router v6 |
-| **Formularze** | Formik + Yup (walidacja) |
-| **HTTP Client** | Axios (z interceptorami JWT) |
-| **Autoryzacja** | JWT + Google OAuth 2.0 |
-| **State management** | React Context API |
-| **Hosting** | Możliwość deploy na Vercel / Netlify |
+| **Biblioteka UI** | ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react&logoColor=61DAFB) |
+| **Bundler / Dev Server** | ![Vite](https://img.shields.io/badge/Vite-B73BFE?style=flat&logo=vite&logoColor=FFD62E) |
+| **Styling** | ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white) |
+| **Routing / HTTP**| React Router DOM, Axios |
+| **Konteneryzacja** | ![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=flat&logo=docker&logoColor=white) |
 
----
-
-## 🔐 Autoryzacja
-
-Aplikacja obsługuje dwa sposoby logowania:
-
-```
-┌─────────────────────────────────────┐
-│         Ekran logowania             │
-│                                     │
-│   ┌─────────────────────────────┐   │
-│   │  📧 E-mail + Hasło         │   │
-│   └─────────────────────────────┘   │
-│                                     │
-│             — lub —                 │
-│                                     │
-│   ┌─────────────────────────────┐   │
-│   │  🔵 Zaloguj przez Google   │   │
-│   └─────────────────────────────┘   │
-│                                     │
-│   Nie masz konta? Zarejestruj się   │
-│   Zapomniałeś hasła?               │
-└─────────────────────────────────────┘
-```
-
-Tokeny JWT są automatycznie odświeżane przez interceptor Axios — użytkownik nie jest wylogowywany w trakcie pracy.
+Zależności dodatkowe: `jwt-decode`, `lucide-react`, `react-icons`, `react-toastify`, `color-thief-browser`, `react-datepicker`.
 
 ---
 
 ## 🚀 Uruchomienie
 
+### 💻 Uruchomienie lokalne (Dev Mode)
+
+Jeżeli chcesz pracować nad aplikacją na żywo z szybką odświeżalnością ekranu (Hot Module Replacement):
+
 ```bash
-# Klonowanie repozytorium
+# Sklonuj repozytorium, jeżeli tego jeszcze nie zrobiłeś
 git clone https://github.com/Twiggiermaen21/FrontViteINZ.git
-cd ai-calendar-frontend
+# Przejdź do katalogu aplikacji frontendowej
+cd frontend
+
+# Opcjonalnie stwórz .env na bazie .env.example (składnia VITE_*)
+# cp .env.example .env
 
 # Instalacja zależności
 npm install
 
-# Konfiguracja zmiennych środowiskowych
-cp .env.example .env
-# Uzupełnij adres API backendu i klucz Google OAuth
-
-# Uruchomienie serwera deweloperskiego
+# Uruchomienie deweloperskiego środowiska Vite
 npm run dev
-
-# Build produkcyjny
-npm run build
-
-# Podgląd buildu
-npm run preview
 ```
 
-### Zmienne środowiskowe
+Serwer frontendowy zostanie otwarty pod adresem: **http://localhost:5173**. Pamiętaj o uruchomieniu backendu obok.
+
+### 🐳 Uruchomienie w Dockerze
+
+Zbuduj i wystartuj z pomocą wielowarstwowego obrazu (Docker / Nginx):
+
+```bash
+cd frontend
+
+# Zbudowanie obrazu serwującego produkcyjny build frontendu z Nginx
+docker build -t frontend-app .
+
+# Start kontenera z przemapowanym portem na przykład na 80:80
+docker run -d -p 5173:5173 frontend-app
+```
+
+### Zmienne środowiskowe (.env)
 
 ```env
-VITE_API_BASE_URL=http://localhost:8000/api
-VITE_GOOGLE_CLIENT_ID=your-google-client-id
+VITE_GOOGLE_CLIENT_ID=twoj_klucz_google_client_id.apps.googleusercontent.com
+VITE_API_BASE_URL=http://localhost:8000
 ```
-
----
-
-## 📱 Responsywność
-
-Aplikacja jest w pełni responsywna dzięki Material-UI i systemowi Grid/Breakpoints:
-
-| Urządzenie | Breakpoint | Wsparcie |
-|------------|-----------|----------|
-| 📱 Mobile | `< 600px` | ✅ |
-| 📱 Tablet | `600–960px` | ✅ |
-| 💻 Desktop | `960–1280px` | ✅ |
-| 🖥️ Large | `> 1280px` | ✅ |
-
----
-
-## 🔗 Powiązane repozytoria
-
-| Repozytorium | Opis |
-|-------------|------|
-| **[ai-calendar-backend](../ai-calendar-backend)** | Django REST Framework API — generowanie grafik, produkcja PSD, baza danych |
+*(Uwaga: Ze względu na charakter środowiska Frontend, zmienne powinny zaczynać się prefiksem `VITE_` zgodnie z wymogami frameworka).*
 
 ---
 
 ## 📝 Licencja
 
 Projekt realizowany w ramach pracy inżynierskiej.
-
----
-
-<p align="center">
-  <sub>Built with ❤️ and AI</sub>
-</p>
