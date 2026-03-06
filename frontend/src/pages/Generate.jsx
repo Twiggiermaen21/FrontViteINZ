@@ -307,6 +307,7 @@ export default function Generate() {
         </label>
         <input
   type="text"
+  id="imageName"
   value={imageName}
   onChange={(e) => {
     const newValue = e.target.value;
