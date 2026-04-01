@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN } from "../constants";
 import { useOutletContext } from "react-router-dom";
+import { toast } from "react-toastify";
 import CalendarDetailsModal from "../components/browseCalendarElements/ModalSelectedCalendar.jsx";
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview.jsx";
+import ConfirmModal from "../components/ConfirmModal";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
 const BrowseCalendars = () => {
@@ -133,21 +135,27 @@ const BrowseCalendars = () => {
   }, [handleScroll]);
 
 
-  const deleteCalendar = async (id) => {
-    const confirmed = window.confirm("Czy na pewno chcesz usunąć kalendarz?");
-    if (!confirmed) return;
+  const [confirmAction, setConfirmAction] = useState(null);
 
-    try {
-      const token = localStorage.getItem(ACCESS_TOKEN);
-      await axios.delete(`${apiUrl}/calendar-destroy/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCalendars((prev) => prev.filter((c) => c.id !== id));
-      setSelectedCalendar(null);
-    } catch (err) {
-      console.error("Błąd podczas usuwania kalendarza:", err);
-      alert("Nie udało się usunąć kalendarza.");
-    }
+  const deleteCalendar = async (id) => {
+    setConfirmAction({
+      message: "Czy na pewno chcesz usunąć kalendarz?",
+      onConfirm: async () => {
+        setConfirmAction(null);
+        try {
+          const token = localStorage.getItem(ACCESS_TOKEN);
+          await axios.delete(`${apiUrl}/calendar-destroy/${id}/`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setCalendars((prev) => prev.filter((c) => c.id !== id));
+          setSelectedCalendar(null);
+          toast.success("Kalendarz został usunięty.");
+        } catch (err) {
+          console.error("Błąd podczas usuwania kalendarza:", err);
+          toast.error("Nie udało się usunąć kalendarza.");
+        }
+      },
+    });
   };
 
   const handleAddToProduction = async () => {
@@ -169,7 +177,7 @@ const BrowseCalendars = () => {
         },
       );
 
-      alert("✅ Dodano do produkcji!");
+      toast.success("Dodano do produkcji!");
       setQuantity(1);
       setDeadline("");
       setNote("");
@@ -178,9 +186,12 @@ const BrowseCalendars = () => {
       console.error("Błąd dodawania do produkcji", err);
 
       if (err.response?.data) {
-        alert(JSON.stringify(err.response.data));
+        const msg = typeof err.response.data === "string"
+          ? err.response.data
+          : Object.values(err.response.data).flat().join(", ");
+        toast.error(msg || "Nie udało się dodać do produkcji.");
       } else {
-        alert("Nie udało się dodać do produkcji.");
+        toast.error("Nie udało się dodać do produkcji.");
       }
     }
   };
@@ -247,6 +258,15 @@ const BrowseCalendars = () => {
         <p className="text-[#989c9e] text-center mt-4">
           Ładowanie kalendarzy...
         </p>
+      )}
+
+      {/* Confirm Modal */}
+      {confirmAction && (
+        <ConfirmModal
+          message={confirmAction.message}
+          onConfirm={confirmAction.onConfirm}
+          onCancel={() => setConfirmAction(null)}
+        />
       )}
 
       {/* Modal */}

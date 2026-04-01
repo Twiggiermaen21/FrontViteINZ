@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { ACCESS_TOKEN, fontFamilies, fontWeights } from "../constants";
 import StyleSidebar from "../components/calendarEditorElements/stylesBar";
 import ImgColor from "../components/calendarEditorElements/imgAndColor";
@@ -167,10 +168,10 @@ export default function CreateCalendar() {
         },
       });
       
-      alert("✅ Kalendarz został zapisany!");
+      toast.success("Kalendarz został zapisany!");
     } catch (error) {
-      console.error("❌ Błąd zapisu:", error.response?.data || error.message);
-      alert("❌ Nie udało się zapisać kalendarza.");
+      console.error("Błąd zapisu:", error.response?.data || error.message);
+      toast.error("Nie udało się zapisać kalendarza.");
     } finally {
       setIsSaving(false); 
     }

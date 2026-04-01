@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ACCESS_TOKEN, fields, fieldToEndpoint } from "../constants";
 import { Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
 import GenerateButton from "../components/imageGeneratorElements/GenerateButton.jsx";
+import ConfirmModal from "../components/ConfirmModal";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -17,6 +19,7 @@ export default function Generate() {
   const [imageName, setImageName] = useState("");
   const [isStaff, setIsStaff] = useState(false);
   const [active, setActive] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
   const examplePrompts = [
     "Futurystyczna panorama miasta nocą",
     "Słodki kot w kapeluszu",
@@ -105,7 +108,7 @@ export default function Generate() {
       setSelectedValues((prev) => ({ ...prev, [field]: res.data.id }));
     } catch (err) {
       console.error("❌ Błąd przy dodawaniu nowej opcji:", err);
-      alert("Nie udało się dodać nowej opcji do bazy danych.");
+      toast.error("Nie udało się dodać nowej opcji do bazy danych.");
     } finally {
       cancelAddingNewOption();
     }
@@ -141,52 +144,45 @@ export default function Generate() {
       setImages((prev) => [...prev, res.data.url]);
     } catch (err) {
       console.error(err);
-      alert("Failed to generate image.");
+      toast.error("Nie udało się wygenerować obrazu.");
     } finally {
       setLoading(false);
     }
   };
-  const handleDeleteOption = async (field, id) => {
-    const confirmDelete = window.confirm(
-      "Czy na pewno chcesz usunąć ten element?",
-    );
-    if (!confirmDelete) return;
+  const handleDeleteOption = (field, id) => {
+    setConfirmAction({
+      message: "Czy na pewno chcesz usunąć ten element?",
+      onConfirm: async () => {
+        setConfirmAction(null);
+        try {
+          const token = localStorage.getItem(ACCESS_TOKEN);
+          const config = { headers: { Authorization: `Bearer ${token}` } };
 
-    try {
-      const token = localStorage.getItem(ACCESS_TOKEN);
-      const config = { headers: { Authorization: `Bearer ${token}` } };
+          await axios.delete(`${apiUrl}/${fieldToEndpoint[field]}/${id}/`, config);
 
-      // 🔹 Usunięcie w backendzie
-      await axios.delete(`${apiUrl}/${fieldToEndpoint[field]}/${id}/`, config);
+          setOptions((prevOptions) => {
+            const updatedOptions = { ...prevOptions };
+            updatedOptions[field].results = updatedOptions[field].results.filter(
+              (item) => String(item.id) !== String(id),
+            );
+            return updatedOptions;
+          });
 
-      // 🔹 Odśwież tylko dany select w options
-      setOptions((prevOptions) => {
-        const updatedOptions = { ...prevOptions };
+          setSelectedValues((prev) => {
+            if (String(prev[field]) === String(id)) {
+              return { ...prev, [field]: "" };
+            }
+            return prev;
+          });
 
-        // 🛠 Konwersja typów, jeśli id jest string/number
-        updatedOptions[field].results = updatedOptions[field].results.filter(
-          (item) => String(item.id) !== String(id),
-        );
-
-        return updatedOptions;
-      });
-
-      // 🔹 Jeśli była wybrana usunięta opcja, wyczyść select
-      setSelectedValues((prev) => {
-        if (String(prev[field]) === String(id)) {
-          return { ...prev, [field]: "" };
+          if (addingNewField === field) setAddingNewField(null);
+          toast.success("Element został usunięty.");
+        } catch (err) {
+          console.error("Błąd podczas usuwania:", err);
+          toast.error("Nie udało się usunąć elementu.");
         }
-        return prev;
-      });
-
-      // 🔹 Opcjonalnie zakończ tryb dodawania
-      if (addingNewField === field) setAddingNewField(null);
-
-      // alert nie jest konieczny, można pominąć
-    } catch (err) {
-      console.error("Błąd podczas usuwania:", err);
-      alert("Nie udało się usunąć elementu ❌");
-    }
+      },
+    });
   };
 
   return (
@@ -350,6 +346,14 @@ export default function Generate() {
           ))}
         </div>
       </div>
+
+      {confirmAction && (
+        <ConfirmModal
+          message={confirmAction.message}
+          onConfirm={confirmAction.onConfirm}
+          onCancel={() => setConfirmAction(null)}
+        />
+      )}
     </div>
   );
 }

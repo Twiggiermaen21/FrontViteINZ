@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { saveAs } from "file-saver";
+import { toast } from "react-toastify";
 import { ACCESS_TOKEN } from "../constants";
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview";
+import ConfirmModal from "../components/ConfirmModal";
 import { MONTHS, STATUS_MAP } from "../constants";
 import { getStatusStyle } from "../utils/getStatusStyle";
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
@@ -22,6 +24,7 @@ const StaffProductionList = () => {
   const [fullCalendarData, setFullCalendarData] = useState({});
   const [loadingCalendarId, setLoadingCalendarId] = useState(null);
   const [isUpdatingId, setIsUpdatingId] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
   const token = localStorage.getItem(ACCESS_TOKEN);
 
   const fetchCalendarById = useCallback(async (calendarId) => {
@@ -110,17 +113,13 @@ const StaffProductionList = () => {
           prev.map((p) => (p.id === productionId ? res.data : p)),
         );
 
-        alert(
-          `Sukces: Pozycja ID ${productionId} została ${actionDescription}.`,
-        );
+        toast.success(`Pozycja została ${actionDescription}.`);
         setExpandedId(null);
       } catch (err) {
         console.error(`Błąd podczas ${actionDescription}:`, err);
         const errorMessage =
           err.response?.data?.detail || "Wystąpił nieznany błąd.";
-        alert(
-          `Nie udało się wykonać akcji (${actionDescription}). Błąd: ${errorMessage}`,
-        );
+        toast.error(`Nie udało się wykonać akcji. ${errorMessage}`);
       } finally {
         setIsUpdatingId(null);
       }
@@ -171,8 +170,13 @@ const StaffProductionList = () => {
     }
   };
   const handleReject = (item) => {
-    if (!window.confirm("Czy na pewno chcesz ODRZUCIĆ tę pozycję?")) return;
-    updateProductionStatus(item.id, "rejected", "odrzucona");
+    setConfirmAction({
+      message: "Czy na pewno chcesz odrzucić tę pozycję?",
+      onConfirm: () => {
+        setConfirmAction(null);
+        updateProductionStatus(item.id, "rejected", "odrzucona");
+      },
+    });
   };
   return (
     <div className="mt-8 bg-[#2a2b2b] p-8 rounded-xl mx-auto text-white shadow-2xl">
@@ -435,6 +439,14 @@ const StaffProductionList = () => {
           </div>
         )}
       </div>
+
+      {confirmAction && (
+        <ConfirmModal
+          message={confirmAction.message}
+          onConfirm={confirmAction.onConfirm}
+          onCancel={() => setConfirmAction(null)}
+        />
+      )}
     </div>
   );
 };

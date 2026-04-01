@@ -1,6 +1,7 @@
 // EditRightPanel.jsx
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { ACCESS_TOKEN, fontFamilies, fontWeights } from "../../constants";
 import TopImageSection from "./TopImageSection";
 import BottomImageSection from "./BottomImageSection";
@@ -237,12 +238,12 @@ const EditRightPanel = ({
           },
         }
       );
-      alert("Kalendarz zaktualizowany ✅");
+      toast.success("Kalendarz zaktualizowany!");
       // setCalendar(res.data);
       console.log("data", res.data);
     } catch (err) {
       console.error(err);
-      alert("Błąd podczas zapisu ❌");
+      toast.error("Błąd podczas zapisu.");
     } finally {
       setSaving(false);
     }

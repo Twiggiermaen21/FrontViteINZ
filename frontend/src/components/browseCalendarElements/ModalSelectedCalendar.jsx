@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import CalendarPreview from "./CalendarPreview.jsx";
 
 const CalendarDetailsModal = ({
@@ -23,9 +24,7 @@ const CalendarDetailsModal = ({
     e.preventDefault();
 
     if (new Date(deadline) < minDate) {
-      alert(
-        "Termin realizacji musi być wyznaczony na co najmniej tydzień od dzisiaj.",
-      );
+      toast.warning("Termin realizacji musi być wyznaczony na co najmniej tydzień od dzisiaj.");
       return;
     }
     onAddToProduction(selectedCalendar.id, { quantity, deadline, note });

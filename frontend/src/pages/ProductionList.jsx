@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { ACCESS_TOKEN } from "../constants";
 import { MONTHS, STATUS_MAP } from "../constants";
 import { getStatusStyle } from "../utils/getStatusStyle";
 import CalendarPreview from "../components/browseCalendarElements/CalendarPreview.jsx";
+import ConfirmModal from "../components/ConfirmModal";
 
 const apiUrl = `${import.meta.env.VITE_API_URL}/api`;
 
@@ -16,6 +18,7 @@ const ProductionList = () => {
   const [fullCalendarData, setFullCalendarData] = useState({});
   const [loadingCalendarId, setLoadingCalendarId] = useState(null);
   const [isCancelling, setIsCancelling] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
 
   const fetchCalendarById = useCallback(async (calendarId) => {
     try {
@@ -74,34 +77,32 @@ const ProductionList = () => {
     }
   }, [fetchProductions, page, productions.length, loadingMore, hasMore]);
 
-  const cancelProduction = useCallback(async (productionId) => {
-    if (
-      !window.confirm(
-        "Czy na pewno chcesz anulować tę pozycję z produkcji? Kalendarz pozostanie nienaruszony.",
-      )
-    ) {
-      return;
-    }
+  const cancelProduction = useCallback((productionId) => {
+    setConfirmAction({
+      message: "Czy na pewno chcesz anulować tę pozycję z produkcji? Kalendarz pozostanie nienaruszony.",
+      onConfirm: async () => {
+        setConfirmAction(null);
+        setIsCancelling(productionId);
+        const token = localStorage.getItem(ACCESS_TOKEN);
 
-    setIsCancelling(productionId);
-    const token = localStorage.getItem(ACCESS_TOKEN);
-
-    try {
-      await axios.delete(`${apiUrl}/production-delete/${productionId}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProductions((prev) => prev.filter((item) => item.id !== productionId));
-      setExpandedId(null);
-      alert("Produkcja została pomyślnie anulowana.");
-    } catch (err) {
-      console.error("Błąd anulowania produkcji:", err);
-      const errorMessage =
-        err.response?.data?.detail ||
-        "Wystąpił nieznany błąd podczas anulowania.";
-      alert(`Błąd: ${errorMessage}`);
-    } finally {
-      setIsCancelling(null);
-    }
+        try {
+          await axios.delete(`${apiUrl}/production-delete/${productionId}/`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setProductions((prev) => prev.filter((item) => item.id !== productionId));
+          setExpandedId(null);
+          toast.success("Produkcja została pomyślnie anulowana.");
+        } catch (err) {
+          console.error("Błąd anulowania produkcji:", err);
+          const errorMessage =
+            err.response?.data?.detail ||
+            "Wystąpił nieznany błąd podczas anulowania.";
+          toast.error(errorMessage);
+        } finally {
+          setIsCancelling(null);
+        }
+      },
+    });
   }, []);
 
   const toggleExpand = async (item) => {
@@ -280,6 +281,14 @@ const ProductionList = () => {
           </div>
         )}
       </div>
+
+      {confirmAction && (
+        <ConfirmModal
+          message={confirmAction.message}
+          onConfirm={confirmAction.onConfirm}
+          onCancel={() => setConfirmAction(null)}
+        />
+      )}
     </div>
   );
 };

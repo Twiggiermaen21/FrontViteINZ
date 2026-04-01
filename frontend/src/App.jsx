@@ -19,6 +19,8 @@ import ActivateAccount from "./pages/ActivateAccount";
 import ProductionList from "./pages/ProductionList";
 import StaffPage from "./pages/StaffPage";
 import { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Logout() {
   localStorage.clear();
@@ -87,6 +89,21 @@ if (isLoading) {
           </Route>
         </Routes>
       </BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme="dark"
+        toastStyle={{
+          backgroundColor: "#2a2b2b",
+          border: "1px solid #374b4b",
+          color: "#d2e4e2",
+          borderRadius: "12px",
+        }}
+      />
     </GoogleOAuthProvider>
   );
 }
