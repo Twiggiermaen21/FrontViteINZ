@@ -43,7 +43,7 @@ export default function Settings() {
     }
   }, []);
 
-  const api = axios.create({
+  const getApi = () => axios.create({
     baseURL: apiUrl,
     headers: {
       Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
@@ -57,7 +57,7 @@ export default function Settings() {
     setSuccessProfile("");
 
     try {
-      await api.put("/user/update-profile/", {
+      await getApi().put("/user/update-profile/", {
         username,
         first_name: firstName,
         last_name: lastName,
@@ -81,7 +81,6 @@ export default function Settings() {
       );
     } finally {
       setLoadingProfile(false);
-       window.location.reload();
     }
   };
 
@@ -92,7 +91,7 @@ export default function Settings() {
     setSuccessEmail("");
 
     try {
-      await api.put("/user/change-email/", { email });
+      await getApi().put("/user/change-email/", { email });
       setSuccessEmail("Email został zmieniony pomyślnie!");
       const user = JSON.parse(localStorage.getItem("user")) || {};
       localStorage.setItem("user", JSON.stringify({ ...user, email }));
@@ -104,7 +103,6 @@ export default function Settings() {
       );
     } finally {
       setLoadingEmail(false);
-      window.location.reload();
     }
   };
 
@@ -121,7 +119,7 @@ export default function Settings() {
     }
 
     try {
-      await api.put("/user/change-password/", {
+      await getApi().put("/user/change-password/", {
         current_password: currentPassword,
         new_password: newPassword,
       });
@@ -159,7 +157,7 @@ export default function Settings() {
     formData.append("profile_image", profileImage);
 
     try {
-      const response = await api.put("/user/update-profile-image/", formData, {
+      const response = await getApi().put("/user/update-profile-image/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setSuccessImage("Zdjęcie profilowe zostało zapisane!");
@@ -175,7 +173,6 @@ export default function Settings() {
       setErrorImage("Nie udało się zapisać zdjęcia profilowego.");
     } finally {
       setLoadingImage(false);
-      window.location.reload();
     }
   };
   return (

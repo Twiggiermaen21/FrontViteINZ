@@ -231,7 +231,7 @@ const ProductionList = () => {
                         </p>
                       </div>
 
-                      {item.status == "waiting" && (
+                      {item.status === "waiting" && (
                         <div className="pt-4 border-t border-[#3c3d3d]">
                           <button
                             onClick={() => cancelProduction(item.id)}

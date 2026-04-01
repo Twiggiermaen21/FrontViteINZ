@@ -128,9 +128,8 @@ const CalendarList = () => {
                       const isImage = "path" in field;
 
                       return (
-                        <>
+                        <React.Fragment key={index}>
                           <div
-                            key={index}
                             className="w-full border rounded bg-white shadow p-2 flex flex-col items-center"
                           >
                             <h3 className="text-xl font-bold text-blue-700 uppercase tracking-wide mb-1">
@@ -165,7 +164,7 @@ const CalendarList = () => {
                                   )
                                 : console.log("blad")}
                           </div>
-                        </>
+                        </React.Fragment>
                       );
                     },
                   )}

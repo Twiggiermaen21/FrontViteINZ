@@ -60,7 +60,7 @@ export default function Login() {
               <GoogleLogin
                 onSuccess={async (credentialResponse) => {
                   const res = await axios.post(
-                    "http://localhost:8000/auth/google/",
+                    `${import.meta.env.VITE_API_URL}/auth/google/`,
                     { credential: credentialResponse.credential },
                     { withCredentials: true }
                   );

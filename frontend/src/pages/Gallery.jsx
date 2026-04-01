@@ -84,15 +84,15 @@ const Gallery = () => {
           ? img.name === selectedProject.name
           : true
       )
-      .map((img, index) => (
+      .map((img) => (
                 <div
-                  key={index}
+                  key={img.id}
                   className="relative group rounded-lg overflow-hidden border border-[#374b4b] bg-[#2a2b2b] shadow-sm cursor-pointer"
                   onClick={() => setSelectedImage(img)}
                 >
                   <img
                     src={img.url}
-                    alt={`Generated image ${index + 1}`}
+                    alt={`Generated image ${img.id}`}
                     className="w-full h-44 object-cover object-center"
                   />
                   <div className="absolute inset-0 bg-[#00000080] flex items-end p-2 opacity-0 group-hover:opacity-100 transition">

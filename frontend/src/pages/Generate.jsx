@@ -238,7 +238,7 @@ export default function Generate() {
             return (
               <div key={field} className="relative">
                 <label className="block text-xs font-semibold text-[#989c9e] uppercase mb-1">
-                  {field.replace("_", " ")}
+                  {field.replaceAll("_", " ")}
                 </label>
 
                 <div className="flex items-center gap-2">

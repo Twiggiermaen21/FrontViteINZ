@@ -44,7 +44,7 @@ const Layout = () => {
             </div>
             <div className="hidden sm:block">
               <h1 className="font-medium text-[#e0e0e0] text-sm sm:text-base">
-                {user?.first_name + " " + user?.last_name}
+                {user ? `${user.first_name} ${user.last_name}` : ""}
               </h1>
             </div>
           </div>
