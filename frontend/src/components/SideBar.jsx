@@ -11,6 +11,7 @@ import {
   Settings,
   Printer,
   Shield,
+  UserCheck,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -22,6 +23,7 @@ const navbar = [
   { label: "Kalendarze", path: "/ai/calendars", Icon: CalendarSearch },
   { label: "Produkcja", path: "/ai/production-list", Icon: Printer },
   { label: "Strona dla pracowników", path: "/ai/staffpage", Icon: Shield, staffOnly: true },
+  { label: "Zatwierdzanie użytkowników", path: "/ai/user-approvals", Icon: UserCheck, superuserOnly: true },
 ];
 
 const SideBar = ({ sidebar, setSidebar, user }) => {
@@ -57,7 +59,11 @@ const SideBar = ({ sidebar, setSidebar, user }) => {
 
         <div className="px-4 mt-6 text-sm font-medium">
           {navbar
-  .filter(item => (item.staffOnly ? user?.is_staff : true))
+  .filter(item => {
+    if (item.superuserOnly) return !!user?.is_superuser;
+    if (item.staffOnly) return !!user?.is_staff;
+    return true;
+  })
   .map(({ path, label, Icon }) => (
             <NavLink
               key={path}

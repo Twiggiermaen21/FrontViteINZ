@@ -18,6 +18,7 @@ import FlappyBird from "./components/menuElements/FlappyBird";
 import ActivateAccount from "./pages/ActivateAccount";
 import ProductionList from "./pages/ProductionList";
 import StaffPage from "./pages/StaffPage";
+import UserApprovals from "./pages/UserApprovals";
 import { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -78,6 +79,7 @@ if (isLoading) {
           >
             <Route path="generate" element={<Generate />} />
             <Route path="staffpage" element={<StaffPage />} />
+            <Route path="user-approvals" element={<UserApprovals />} />
             <Route path="production-list" element={<ProductionList />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="gallery" element={<Gallery />} />
